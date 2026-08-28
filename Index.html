@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện Thi Kanji N5 Full - Minna no Nihongo I</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .quiz-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 520px; text-align: center; }
+        .title { font-size: 15px; color: #7f8c8d; margin-bottom: 8px; font-weight: bold; }
+        .kanji-display { font-size: 64px; font-weight: bold; color: #2c3e50; margin: 15px 0; letter-spacing: 2px; min-height: 90px; display: flex; align-items: center; justify-content: center; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .btn-option { background: #ecf0f1; border: 2px solid transparent; padding: 14px 10px; font-size: 17px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .btn-option:hover { background: #bdc3c7; }
+        .btn-option.correct { background: #2ecc71; color: white; border-color: #27ae60; }
+        .btn-option.wrong { background: #e74c3c; color: white; border-color: #c0392b; }
+        .score-board { font-size: 15px; color: #34495e; margin-bottom: 5px; font-weight: 600; }
+        .btn-next { background: #3498db; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; display: none; margin: 0 auto; font-weight: bold; }
+        .btn-next:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <div class="title">MINNA NO NIHONGO I - KANJI & TỪ GHÉP</div>
+    <div class="score-board">Câu: <span id="current-index">0</span>/<span id="total-questions">0</span> | Đúng: <span id="score">0</span></div>
+    <div class="kanji-display" id="kanji">-</div>
+    <div class="options-grid" id="options"></div>
+    <button class="btn-next" id="next-btn" onclick="nextQuestion()">Câu tiếp theo ➔</button>
+</div>
+
+<script>
+    const rawKanjiList = [
+        // Chữ đơn & Từ ghép cơ bản
+        { kanji: '一', correct: 'ひとつ / いち', wrong: ['ふたつ', 'みっつ', 'よっつ'] },
+        { kanji: '二', correct: 'ふたつ / に', wrong: ['ひとつ', 'みっつ', 'いつつ'] },
+        { kanji: '三', correct: 'みっつ / さん', wrong: ['ふたつ', 'よっつ', 'むっつ'] },
+        { kanji: '四', correct: 'よっつ / よん', wrong: ['みっつ', 'いつつ', 'ななつ'] },
+        { kanji: '五', correct: 'いつつ / ご', wrong: ['よっつ', 'むっつ', 'やつ'] },
+        { kanji: '六', correct: 'むっつ / ろく', wrong: ['いつつ', 'ななつ', 'ここのつ'] },
+        { kanji: '七', correct: 'ななつ / しち', wrong: ['むっつ', 'やつ', 'とお'] },
+        { kanji: '八', correct: 'やつ / はち', wrong: ['ななつ', 'ここのつ', 'ひゃく'] },
+        { kanji: '九', correct: 'ここのつ / きゅう', wrong: ['やつ', 'とお', 'せん'] },
+        { kanji: '十', correct: 'とお / じゅう', wrong: ['ここのつ', 'ひゃく', 'まん'] },
+        { kanji: '百', correct: 'ひゃく', wrong: ['じゅう', 'せん', 'まん'] },
+        { kanji: '千', correct: 'せん', wrong: ['ひゃく', 'まん', 'えん'] },
+        { kanji: '万', correct: 'まん', wrong: ['せん', 'ひゃく', 'えん'] },
+        { kanji: '円', correct: 'えん', wrong: ['せん', 'じゅう', 'ほん'] },
+
+        // Từ ghép Thời gian & Ngày tháng
+        { kanji: '日本', correct: 'にほん', wrong: ['にっぽん', 'ひもと', 'にちほん'] },
+        { kanji: '日曜日', correct: 'にちようび', wrong: ['げつようび', 'かようび', 'すいようび'] },
+        { kanji: '月曜日', correct: 'げつようび', wrong: ['にちようび', 'もくようび', 'きんようび'] },
+        { kanji: '火曜日', correct: 'かようび', wrong: ['すいようび', 'どようび', 'にちようび'] },
+        { kanji: '水曜日', correct: 'すいようび', wrong: ['かようび', 'もくようび', 'きんようび'] },
+        { kanji: '木曜日', correct: 'もくようび', wrong: ['すいようび', 'きんようび', 'どようび'] },
+        { kanji: '金曜日', correct: 'きんようび', wrong: ['もくようび', 'どようび', 'にちようび'] },
+        { kanji: '土曜日', correct: 'どようび', wrong: ['きんようび', 'にちようび', 'かようび'] },
+        { kanji: '今日', correct: 'きょう', wrong: ['あした', 'きのう', 'いまび'] },
+        { kanji: '毎日', correct: 'まいにち', wrong: ['まいあさ', 'まいばん', 'まいとし'] },
+        { kanji: '毎朝', correct: 'まいあさ', wrong: ['まいにち', 'まいばん', 'まいしゅう'] },
+        { kanji: '毎晩', correct: 'まいばん', wrong: ['まいあさ', 'まいにち', 'まいとし'] },
+        { kanji: '今年', correct: 'ことし', wrong: ['きょねん', 'らいねん', 'こんねん'] },
+        { kanji: '去年', correct: 'きょねん', wrong: ['ことし', 'らいねん', 'まいとし'] },
+        { kanji: '来年', correct: 'らいねん', wrong: ['ことし', 'きょねん', 'らいげつ'] },
+        { kanji: '今月', correct: 'こんげつ', wrong: ['せんげつ', 'らいげつ', 'いまつき'] },
+        { kanji: '先月', correct: 'せんげつ', wrong: ['こんげつ', 'らいげつ', 'さきつき'] },
+        { kanji: '来月', correct: 'らいげつ', wrong: ['こんげつ', 'せんげつ', 'らいねん'] },
+        { kanji: '今週', correct: 'こんしゅう', wrong: ['せんしゅう', 'らいしゅう', 'まいしゅう'] },
+        { kanji: '先週', correct: 'せんしゅう', wrong: ['こんしゅう', 'らいしゅう', 'さきしゅう'] },
+        { kanji: '来週', correct: 'らいしゅう', wrong: ['こんしゅう', 'せんしゅう', 'らいねん'] },
+        { kanji: '時間', correct: 'じかん', wrong: ['とき', 'あいだ', 'じこく'] },
+        { kanji: '午前', correct: 'ごぜん', wrong: ['ごご', 'ひる', 'あさ'] },
+        { kanji: '午後', correct: 'ごご', wrong: ['ごぜん', 'ばん', 'よる'] },
+        { kanji: '今晩', correct: 'こんばん', wrong: ['けさ', 'きょう', 'まいばん'] },
+
+        // Từ ghép Con người, Xã hội, Trường học
+        { kanji: '日本人', correct: 'にほんじん', wrong: ['にほんびと', 'にちほんじん', 'にほんにん'] },
+        { kanji: '外国人', correct: 'がいこくじん', wrong: ['そとくにびと', 'がいこくびと', 'そとこくじん'] },
+        { kanji: '先生', correct: 'せんせい', wrong: ['さきせい', 'せんしょう', 'まなぶ'] },
+        { kanji: '学生', correct: 'がくせい', wrong: ['がっこう', 'まなびや', 'がくしょう'] },
+        { kanji: '大学', correct: 'だいがく', wrong: ['たいがく', 'おおがく', 'だいがっこう'] },
+        { kanji: '学校', correct: 'がっこう', wrong: ['まなびや', 'がくこう', 'がっきょう'] },
+        { kanji: '小学校', correct: 'しょうがっこう', wrong: ['ちいさいがっこう', 'しょうがく', 'こがっこう'] },
+        { kanji: '中学校', correct: 'ちゅうがっこう', wrong: ['なかがっこう', 'ちゅうがく', 'なかこう'] },
+        { kanji: '高校', correct: 'こうこう', wrong: ['たかいこう', 'たかがっこう', 'こうがっこう'] },
+        { kanji: '会社', correct: 'かいしゃ', wrong: ['しゃかい', 'あうしゃ', 'かいやしろ'] },
+        { kanji: '会社員', correct: 'かいしゃいん', wrong: ['かいしゃびと', 'しゃかいいん', 'かいしゃもの'] },
+        { kanji: '銀行員', correct: 'ぎんこういん', wrong: ['ぎんこうびと', 'かねゆきいん', 'ぎんゆきいん'] },
+        { kanji: '医者', correct: 'いしゃ', wrong: ['いもの', 'いしゃにん', 'くすりしゃ'] },
+        { kanji: '研究者', correct: 'けんきゅうしゃ', wrong: ['けんきゅうにん', 'けんきゅうもの', 'とぎしゃ'] },
+        { kanji: '友達', correct: 'ともだち', wrong: ['ゆうだち', 'ともたち', 'ゆうち'] },
+        { kanji: '父', correct: 'ちち', wrong: ['とうさん', 'はは', 'おじ'] },
+        { kanji: 'お父さん', correct: 'おとうさん', wrong: ['ちち', 'おかあさん', 'おじさん'] },
+        { kanji: '母', correct: 'はは', wrong: ['かあさん', 'ちち', 'おば'] },
+        { kanji: 'お母さん', correct: 'おかあさん', wrong: ['はは', 'おとうさん', 'おばあさん'] },
+        { kanji: '兄弟', correct: 'きょうだい', wrong: ['けいだい', 'あにおとうと', 'あにいもうと'] },
+        { kanji: '男の人', correct: 'おとこのひと', wrong: ['おとこのにん', 'なんのひと', 'おとこのびと'] },
+        { kanji: '女の人', correct: 'おんなのひと', wrong: ['おんなのにん', 'じょのひと', 'おんなのびと'] },
+        { kanji: '男の子', correct: 'おとこのこ', wrong: ['なんのこ', 'おとこのし', 'おとこのまご'] },
+        { kanji: '女の子', correct: 'おんなのこ', wrong: ['じょのこ', 'おんなのし', 'おんなのまご'] },
+
+        // Từ ghép Địa điểm, Di chuyển & Hướng
+        { kanji: '電車', correct: 'でんしゃ', wrong: ['でんきくるま', 'てんしゃ', 'でんしゃく'] },
+        { kanji: '自動車', correct: 'じどうしゃ', wrong: ['じどうくるま', 'じとうしゃ', 'みずからしゃ'] },
+        { kanji: '自転車', correct: 'じてんしゃ', wrong: ['じころくるま', 'じてんくるま', 'みずからしゃ'] },
+        { kanji: '新幹線', correct: 'しんかんせん', wrong: ['あたらしかんせん', 'しんみち', 'しんかんぜん'] },
+        { kanji: '東京', correct: 'とうきょう', wrong: ['ひがしきょう', 'とうけい', 'ひがしみやこ'] },
+        { kanji: '京都', correct: 'きょうと', wrong: ['みやこと', 'けいと', 'きょうみやこ'] },
+        { kanji: '病院', correct: 'びょういん', wrong: ['びょうかん', 'やまいいん', 'びょうえん'] },
+        { kanji: '本屋', correct: 'ほんや', wrong: ['ほんおく', 'もとや', 'ほんしつ'] },
+        { kanji: '売店', correct: 'ばいてん', wrong: ['うりみせ', 'ばいみせ', 'うりてん'] },
+        { kanji: '入口', correct: 'いりぐち', wrong: ['はいりくち', 'にゅうこう', 'いりくち'] },
+        { kanji: '出口', correct: 'でぐち', wrong: ['しゅっこう', 'いでくち', 'でくち'] },
+        { kanji: '北口', correct: 'きたぐち', wrong: ['ほくこう', 'きたくち', 'きたぐち'] },
+        { kanji: '南口', correct: 'みなみぐち', wrong: ['なんこう', 'みなみくち', 'なんぐち'] },
+        { kanji: '東口', correct: 'ひがしぐち', wrong: ['とうこう', 'ひがしくち', 'とうぐち'] },
+        { kanji: '西口', correct: 'にしぐち', wrong: ['せいこう', 'にしくち', 'さいぐち'] },
+        { kanji: '右側', correct: 'みぎがわ', wrong: ['うそく', 'みぎそく', 'みぎがわ'] },
+        { kanji: '左側', correct: 'ひだりがわ', wrong: ['さそく', 'ひだりそく', 'ひだりがわ'] },
+
+        // Từ ghép Đồ ăn, Vật dụng, Ngôn ngữ
+        { kanji: '日本語', correct: 'にほんご', wrong: ['にっぽんご', 'にちほんご', 'にほんわ'] },
+        { kanji: '英語', correct: 'えいご', wrong: ['えいわ', 'えいごう', 'はなし'] },
+        { kanji: '外国語', correct: 'がいこくご', wrong: ['そとくにご', 'がいこくわ', 'がいこくことば'] },
+        { kanji: '電気', correct: 'でんき', wrong: ['てんき', 'でんけい', 'でんき:'] },
+        { kanji: '天気', correct: 'てんき', wrong: ['でんき', 'てんけい', 'あめ'] },
+        { kanji: '電話', correct: 'でんわ', wrong: ['でんはなし', 'てんわ', 'でんご'] },
+        { kanji: '手紙', correct: 'てがみ', wrong: ['しゅし', 'てかみ', 'てがみ:'] },
+        { kanji: '写真', correct: 'しゃしん', wrong: ['うつし', 'しゃしん:', 'しゃしん'] },
+        { kanji: '映画', correct: 'えいが', wrong: ['えいがく', 'えいかく', 'えが'] },
+        { kanji: '音楽', correct: 'おんがく', wrong: ['おとらく', 'おんらく', 'おとがく'] },
+        { kanji: '旅行', correct: 'りょこう', wrong: ['たびゆき', 'りょこう:', 'りょこう'] },
+        { kanji: '土産', correct: 'みやげ', wrong: ['どさん', 'つちさん', 'みやげ:'] },
+        { kanji: 'お土産', correct: 'おみやげ', wrong: ['おどさん', 'おつちさん', 'おみやげ:'] },
+        { kanji: '食べ物', correct: 'たべもの', wrong: ['しょくぶつ', 'たべぶつ', 'くいいもの'] },
+        { kanji: '飲み物', correct: 'のみもの', wrong: ['いんぶつ', 'のみぶつ', 'のむもの'] },
+        { kanji: '買い物', correct: 'かいもの', wrong: ['ばいぶつ', 'かいぶつ', 'かうもの'] },
+        { kanji: '乗り物', correct: 'のりもの', wrong: ['じょうぶつ', 'のりぶつ', 'のるもの'] },
+        { kanji: '着物', correct: 'きもの', wrong: ['ちゃくぶつ', 'きぶつ', 'きるもの'] },
+        { kanji: '荷物', correct: 'にもつ', wrong: ['かぶつ', 'におうもの', 'にもつ:'] },
+        { kanji: 'お茶', correct: 'おちゃ', wrong: ['おさ', 'おはな', 'おみず'] },
+        { kanji: '紅茶', correct: 'こうちゃ', wrong: ['あかちゃ', 'べにちゃ', 'こうさ'] },
+        { kanji: '牛肉', correct: 'ぎゅうにく', wrong: ['うしにく', 'ぎゅうじく', 'うしじく'] },
+        { kanji: '豚肉', correct: 'ぶたにく', wrong: ['とんにく', 'ぶたじく', 'とんじく'] },
+        { kanji: '鶏肉', correct: 'とりにく', wrong: ['けいにく', 'とりじく', 'けいじく'] },
+        { kanji: '魚', correct: 'さかな', wrong: ['ぎょ', 'うお', 'さかな:'] },
+
+        // Động từ (Thể -masu & Nguyên dạng)
+        { kanji: '行きます', correct: 'いきます', wrong: ['きます', 'かえります', 'でます'] },
+        { kanji: '来ます', correct: 'きます', wrong: ['いきます', 'かえります', 'みます'] },
+        { kanji: '帰ります', correct: 'かえります', wrong: ['いきます', 'きます', 'は入ります'] },
+        { kanji: '食べます', correct: 'たべます', wrong: ['のみます', 'かいます', 'みみます'] },
+        { kanji: '飲みます', correct: 'のみます', wrong: ['たべます', 'よみます', 'かきます'] },
+        { kanji: '買います', correct: 'かいます', wrong: ['売りみます', 'かきます', 'ききます'] },
+        { kanji: '見ます', correct: 'みます', wrong: ['ききます', 'よみます', 'はなします'] },
+        { kanji: '聞きます', correct: 'ききます', wrong: ['みます', 'はなします', 'よみます'] },
+        { kanji: ' me書きます', correct: 'かきます', wrong: ['よみます', 'ききます', 'はなします'] },
+        { kanji: '書きます', correct: 'かきます', wrong: ['よみます', 'ききます', 'はなします'] },
+        { kanji: ' me読んだ', correct: 'よんだ', wrong: ['かいた', 'きいた', 'みた'] },
+        { kanji: '読みます', correct: 'よみます', wrong: ['かきます', 'はなします', 'ききます'] },
+        { kanji: '話します', correct: 'はなします', wrong: ['ききます', 'よみます', 'かきます'] },
+        { kanji: '買います', correct: 'かいます', wrong: ['うります', 'とります', 'あいます'] },
+        { kanji: '会います', correct: 'あいます', wrong: ['かいます', 'はなします', 'いきます'] },
+        { kanji: '休んで', correct: 'やすんで', wrong: ['のんで', 'よんで', '休んで'] },
+        { kanji: '休みます', correct: 'やすみます', wrong: ['はたらきます', 'やすみます:', 'ねます'] },
+        { kanji: '働きます', correct: 'はたらきます', wrong: ['やすみます', 'うごきます', '勉強します'] },
+        { kanji: '勉強します', correct: 'べんきょうします', wrong: ['きょうりょくします', 'はたらきます', 'べんきょう'] },
+        { kanji: '教えます', correct: 'おしえます', wrong: ['ならいます', 'べんきょうします', '覚えます'] },
+        { kanji: '習います', correct: 'ならいます', wrong: ['おしえます', 'べんきょう', 'ききます'] },
+
+        // Tính từ ghép & Từ chỉ mức độ
+        { kanji: '大きい', correct: 'おおきい', wrong: ['ちいさい', 'たかい', 'やすい'] },
+        { kanji: ' me小さい', correct: 'ちいさい', wrong: ['おおきい', 'すこし', 'みじかい'] },
+        { kanji: '小さい', correct: 'ちいさい', wrong: ['おおきい', 'すこし', 'みじかい'] },
+        { kanji: '高い', correct: 'たかい', wrong: ['ひくい', 'やすい', 'おもしろい'] },
+        { kanji: '安い', correct: 'やすい', wrong: ['たかい', 'あんぜん', 'ふるい'] },
+        { kanji: '新しい', correct: 'あたらしい', wrong: ['ふるい', 'しんせつ', 'あかるい'] },
+        { kanji: ' me古い', correct: 'ふるい', wrong: ['あたらしい', 'ながい', 'ひろい'] },
+        { kanji: '古い', correct: 'ふるい', wrong: ['あたらしい', 'ながい', 'ひろい'] },
+        { kanji: ' me長い', correct: 'ながい', wrong: ['みじかい', 'たかい', 'ひくい'] },
+        { kanji: '長い', correct: 'ながい', wrong: ['みじかい', 'たかい', 'ひくい'] },
+        { kanji: ' me短い', correct: 'みじかい', wrong: ['ながい', 'ちいさい', 'ひくい'] },
+        { kanji: '白い', correct: 'しろい', wrong: ['くろい', 'あかい', 'あおい'] },
+        { kanji: ' me黒い', correct: 'くろい', wrong: ['しろい', 'あかい', 'あおい'] },
+        { kanji: '黒い', correct: 'くろい', wrong: ['しろい', 'あかい', 'あおい'] },
+        { kanji: '赤い', correct: 'あかい', wrong: ['くろい', 'あおい', 'しろい'] },
+        { kanji: '青い', correct: 'あおい', wrong: ['あかい', 'しろい', 'くろい'] },
+        { kanji: ' me多い', correct: 'おい', wrong: ['すくない', 'ちいさい', 'ひろい'] },
+        { kanji: ' me少ない', correct: 'すくない', wrong: ['おい', 'すこし', 'ちいさい'] },
+        { kanji: '少し', correct: 'すこし', wrong: ['すくない', 'おい', 'ちいさい'] },
+        { kanji: ' me面白い', correct: 'おもしろい', wrong: ['たのしい', 'つまらない', 'すばらしい'] },
+        { kanji: '親切', correct: 'しんせつ', wrong: ['おやきり', 'しんせつ:', 'おやせつ'] },
+        { kanji: ' me有名', correct: 'ゆうめい', wrong: ['ゆうめい:', 'ありな', 'ゆうな'] },
+        { kanji: '有名', correct: 'ゆうめい', wrong: ['ありな', 'ゆうな', 'ゆうめい:'] },
+        { kanji: ' me便利', correct: 'べんり', wrong: ['びんり', 'べんり:', 'ふべん'] },
+        { kanji: '便利', correct: 'べんり', wrong: ['びんり', 'ふべん', 'べんり:'] },
+        { kanji: ' me不便', correct: 'ふべん', wrong: ['べんり', 'ふびん', 'ふべん:'] },
+        { kanji: '元気', correct: 'げんき', wrong: ['もとき', 'げんけい', 'がんき'] },
+        { kanji: ' me大丈夫', correct: 'だいじょうぶ', wrong: ['たいじょうぶ', 'だいじょうふ', 'おおじょうぶ'] },
+        { kanji: '大丈夫', correct: 'だいじょうぶ', wrong: ['たいじょうぶ', 'だいじょうふ', 'おおじょうぶ'] }
+    ];
+
+    let quizList = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    function shuffleArray(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function initQuiz() {
+        quizList = shuffleArray(rawKanjiList);
+        currentIndex = 0;
+        score = 0;
+        document.getElementById('total-questions').innerText = quizList.length;
+        document.getElementById('score').innerText = score;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('current-index').innerText = currentIndex + 1;
+        
+        const q = quizList[currentIndex];
+        document.getElementById('kanji').innerText = q.kanji;
+        
+        let allOptions = shuffleArray([q.correct, ...q.wrong]);
+
+        const optionsContainer = document.getElementById('options');
+        optionsContainer.innerHTML = '';
+
+        allOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt === q.correct);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedBtn, isCorrect) {
+        const buttons = document.querySelectorAll('.btn-option');
+        buttons.forEach(btn => btn.disabled = true);
+
+        if (isCorrect) {
+            selectedBtn.classList.add('correct');
+            score++;
+        } else {
+            selectedBtn.classList.add('wrong');
+            buttons.forEach(btn => {
+                if (quizList[currentIndex].correct === btn.innerText) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+
+        document.getElementById('score').innerText = score;
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if (currentIndex < quizList.length) {
+            loadQuestion();
+        } else {
+            alert(`Xong bài test rồi nhé! Kết quả: ${score}/${quizList.length}`);
+            initQuiz();
+        }
+    }
+
+    initQuiz();
+</script>
+
+</body>
+</html>
