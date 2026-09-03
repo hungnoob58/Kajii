@@ -3,167 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Học Kanji N5</title>
+    <title>KANJI VS ZOMBIE - Menu</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: #0d1117; 
+            color: #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
         }
 
-        body {
-            background-color: #f0f2f5;
+        .menu-container { 
+            background: linear-gradient(180deg, #052e16 0%, #0f172a 100%);
+            border: 4px solid #10b981; 
+            border-radius: 16px; 
+            padding: 40px 30px; 
+            width: 100%; 
+            max-width: 600px; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 100vh;
         }
 
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
+        .game-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #22c55e;
+            text-shadow: 0 0 12px #15803d, 3px 3px 0px #000;
+            margin: 0 0 10px 0;
+            letter-spacing: 2px;
         }
 
-        h1 {
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 24px;
-        }
-
-        p.subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
-
-        /* Menu Styles */
-        .menu-btn {
-            display: block;
-            width: 100%;
-            padding: 14px 20px;
-            margin-bottom: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            background: #fff;
-            color: #333;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
-        }
-
-        .menu-btn:hover {
-            border-color: #4f46e5;
-            background-color: #f5f3ff;
-            color: #4f46e5;
-            transform: translateY(-2px);
-        }
-
-        .menu-btn small {
-            display: block;
-            font-size: 12px;
-            font-weight: normal;
-            color: #777;
-            margin-top: 2px;
-        }
-
-        /* Game Screen Styles */
-        .hidden {
-            display: none !important;
-        }
-
-        .kanji-display {
-            font-size: 64px;
+        .game-subtitle {
+            font-size: 18px;
+            color: #fbbf24;
+            margin-bottom: 35px;
             font-weight: bold;
-            color: #4f46e5;
-            margin: 20px 0;
         }
 
-        .options-grid {
-            display: grid;
-            grid-template-columns: 100%;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .opt-btn {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background: #fff;
-            font-size: 16px;
+        .btn-play {
+            background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+            color: white;
+            border: 3px solid #bbf7d0;
+            padding: 16px 48px;
+            font-size: 24px;
+            font-weight: 900;
+            border-radius: 50px;
             cursor: pointer;
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
             transition: all 0.2s;
+            text-shadow: 1px 1px 2px #000;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .opt-btn:hover {
-            border-color: #4f46e5;
-            background: #f5f3ff;
+        .btn-play:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.6);
         }
 
-        .back-btn {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
+        .instructions {
+            margin-top: 35px;
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 12px;
             font-size: 14px;
-            text-decoration: underline;
-        }
-
-        .score-board {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 10px;
+            color: #d1d5db;
+            text-align: left;
+            width: 100%;
+            max-width: 480px;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.1);
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <!-- SCREEN 1: MENU MAIN -->
-        <div id="menu-screen">
-            <h1>🎮 KANJI N5 GAME</h1>
-            <p class="subtitle">Chọn chế độ chơi để bắt đầu ôn tập</p>
+<div class="menu-container">
+    <h1 class="game-title">KANJI VS ZOMBIE</h1>
+    <div class="game-subtitle">Ôn Luyện Trọn Bộ Kanji N5 (80+ Từ)</div>
+    
+    <a href="game.html" class="btn-play">BẮT ĐẦU CHƠI 🎯</a>
 
-            <button class="menu-btn" onclick="startGame('single')">
-                1. Ôn Từ Đơn
-                <small>Luyện tập 80+ Kanji N5 riêng lẻ</small>
-            </button>
-
-            <button class="menu-btn" onclick="startGame('compound')">
-                2. Ôn Từ Ghép
-                <small>Ghép Kanji thành 100+ từ vựng N5</small>
-            </button>
-
-            <button class="menu-btn" onclick="startGame('all')">
-                3. Chế Độ Trộn
-                <small>Thử thách tổng hợp cả từ đơn lẫn từ ghép</small>
-            </button>
-        </div>
-
-        <!-- SCREEN 2: GAMEPLAY -->
-        <div id="game-screen" class="hidden">
-            <div class="score-board">
-                <span>Điểm: <strong id="score">0</strong></span>
-            </div>
-
-            <div class="kanji-display" id="kanji-target">日</div>
-
-            <div class="options-grid" id="options-container">
-                <!-- Nút đáp án tự động load -->
-            </div>
-
-            <button class="back-btn" onclick="showMenu()">← Trở về Menu chính</button>
-        </div>
+    <div class="instructions">
+        📌 <b>Luật chơi:</b><br>
+        • Nhìn từ Kanji hiển thị và gõ <b>Romaji</b> hoặc <b>Hiragana</b>.<br>
+        • Mỗi câu hỏi có <b>60 giây</b> đếm ngược.<br>
+        • <b>10s CUỐI:</b> Bắn ra Đạn Lửa x2 Sát Thương (Crit Dame)!<br>
+        • Diệt càng nhiều Zombie càng tốt!
     </div>
+</div>
 
-    <script src="game.js"></script>
 </body>
 </html>
