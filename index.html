@@ -127,24 +127,24 @@
 <body>
 
     <div class="card">
-        <!-- SCREEN 1: MENU -->
+        <!-- SCREEN 1: MENU MAIN -->
         <div id="menu-screen">
             <h1>🎮 KANJI N5 GAME</h1>
             <p class="subtitle">Chọn chế độ chơi để bắt đầu ôn tập</p>
 
             <button class="menu-btn" onclick="startGame('single')">
                 1. Ôn Từ Đơn
-                <small>Luyện tập từng chữ Kanji N5 riêng lẻ</small>
+                <small>Luyện tập 80+ Kanji N5 riêng lẻ</small>
             </button>
 
             <button class="menu-btn" onclick="startGame('compound')">
                 2. Ôn Từ Ghép
-                <small>Ghép Kanji thành từ vựng có nghĩa</small>
+                <small>Ghép Kanji thành 100+ từ vựng N5</small>
             </button>
 
             <button class="menu-btn" onclick="startGame('all')">
                 3. Chế Độ Trộn
-                <small>Thử thách tổng hợp cả đơn lẫn ghép</small>
+                <small>Thử thách tổng hợp cả từ đơn lẫn từ ghép</small>
             </button>
         </div>
 
@@ -157,14 +157,13 @@
             <div class="kanji-display" id="kanji-target">日</div>
 
             <div class="options-grid" id="options-container">
-                <!-- Các nút đáp án sẽ tự sinh bằng JS -->
+                <!-- Nút đáp án tự động load -->
             </div>
 
             <button class="back-btn" onclick="showMenu()">← Trở về Menu chính</button>
         </div>
     </div>
 
-    <!-- Nhúng file script bên dưới vào -->
     <script src="game.js"></script>
 </body>
 </html>
