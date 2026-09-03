@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KANJI VS ZOMBIE - Play</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: #0d1117; 
+            color: #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
+        }
+
+        .game-container { 
+            background: #1f2937; 
+            border: 4px solid #10b981; 
+            border-radius: 16px; 
+            padding: 20px; 
+            width: 100%; 
+            max-width: 680px; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        /* Top Status Bar */
+        .status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; background: #374151; padding: 8px 16px; border-radius: 8px; margin-bottom: 15px; }
+        .timer { color: #f59e0b; font-size: 20px; }
+        .timer.crit-mode { color: #ef4444; font-size: 24px; animation: pulse 0.5s infinite alternate; }
+
+        /* Battle Arena - Nền Sân Cỏ PvZ */
+        .battle-field { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+            height: 200px; 
+            background: linear-gradient(180deg, #15803d 0%, #166534 60%, #14532d 100%);
+            background-image: radial-gradient(#22c55e 10%, transparent 11%);
+            background-size: 20px 20px;
+            border-bottom: 8px solid #052e16; 
+            padding: 0 20px 10px 20px; 
+            margin-bottom: 15px; 
+            position: relative; 
+            border-radius: 10px; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        .character-box { width: 110px; display: flex; flex-direction: column; align-items: center; }
+        .svg-char { width: 100px; height: 110px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); }
+        .zombie-box { transition: transform 0.1s; }
+        .zombie-box.hit { transform: translateX(15px) rotate(8deg); filter: brightness(1.8) drop-shadow(0 0 10px red); }
+
+        /* HP Bar */
+        .hp-bar-bg { width: 100px; height: 12px; background: #4b5563; border-radius: 6px; overflow: hidden; border: 2px solid #fff; margin-bottom: 8px; }
+        .hp-bar-fill { width: 100%; height: 100%; background: #ef4444; transition: width 0.2s; }
+
+        /* Kanji Question Box */
+        .question-box { background: #f3f4f6; color: #1f2937; border-radius: 12px; padding: 25px 20px; margin-bottom: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .kanji-text { font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: 2px; }
+
+        /* Input Controls */
+        .input-group { display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 12px 18px; font-size: 20px; border-radius: 8px; border: 3px solid #3b82f6; outline: none; text-align: center; font-weight: bold; background: #f9fafb; color: #111827; }
+        input[type="text"]:focus { border-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.5); }
+        .btn-submit { background: #10b981; color: white; border: none; padding: 0 24px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-submit:hover { background: #059669; }
+
+        .btn-home { background: #4b5563; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block; }
+        .btn-home:hover { background: #374151; }
+
+        /* Crit Banner Overlay */
+        .crit-banner { display: none; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; padding: 6px 20px; font-size: 15px; font-weight: 900; border-radius: 20px; box-shadow: 0 0 15px #f59e0b; text-transform: uppercase; letter-spacing: 1px; z-index: 10; animation: pulse 0.6s infinite alternate; }
+
+        /* Animations & Projectile */
+        @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.1); } }
+        .peashot { position: absolute; width: 22px; height: 22px; background: #10b981; border-radius: 50%; border: 2px solid #fff; bottom: 45px; left: 110px; z-index: 5; box-shadow: 0 0 6px #10b981; }
+        .peashot.crit { background: #ef4444; border-color: #fbbf24; box-shadow: 0 0 12px #f59e0b; width: 30px; height: 30px; }
+
+        /* Result Overlay */
+        .overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
+        .overlay h2 { font-size: 36px; margin-bottom: 10px; color: #ef4444; }
+        .btn-restart { background: #2563eb; color: white; border: none; padding: 12px 32px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+        .btn-restart:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="crit-banner" id="crit-banner">🔥 CRIT DAME X2 (10S CUỐI) 🔥</div>
+
+    <div class="status-bar">
+        <a href="index.html" class="btn-home">🏠 Menu</a>
+        <div>⏳ Thời gian: <span class="timer" id="timer">60</span>s</div>
+        <div>💀 Diệt: <span id="kills" style="color:#10b981;">0</span></div>
+    </div>
+
+    <div class="battle-field" id="arena">
+        <!-- Peashooter SVG -->
+        <div class="character-box">
+            <svg class="svg-char" viewBox="0 0 100 100">
+                <path d="M 50 60 Q 40 75 20 85 Q 45 80 50 60 Z" fill="#15803d"/>
+                <path d="M 50 60 Q 60 75 80 85 Q 55 80 50 60 Z" fill="#15803d"/>
+                <path d="M 46 45 C 45 60 55 75 50 90" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <circle cx="40" cy="38" r="22" fill="#22c55e"/>
+                <ellipse cx="60" cy="38" rx="12" ry="15" fill="#16a34a"/>
+                <ellipse cx="62" cy="38" rx="7" ry="10" fill="#052e16"/>
+                <circle cx="36" cy="30" r="4.5" fill="#fff"/>
+                <circle cx="37" cy="30" r="2.5" fill="#000"/>
+            </svg>
+        </div>
+        
+        <!-- Zombie SVG -->
+        <div class="character-box zombie-box" id="zombie-box">
+            <div class="hp-bar-bg"><div class="hp-bar-fill" id="hp-bar"></div></div>
+            <svg class="svg-char" viewBox="0 0 100 100">
+                <rect x="35" y="45" width="30" height="35" fill="#1e3a8a" rx="4"/>
+                <rect x="38" y="78" width="10" height="20" fill="#451a03"/>
+                <rect x="52" y="78" width="10" height="20" fill="#451a03"/>
+                <path d="M 35 50 L 15 52 L 10 58" stroke="#6b7280" stroke-width="6" stroke-linecap="round" fill="none"/>
+                <rect x="30" y="15" width="40" height="32" fill="#6b7280" rx="8"/>
+                <path d="M 35 45 L 45 58 L 50 45 L 60 55 L 65 45 Z" fill="#9ca3af"/>
+                <circle cx="42" cy="26" r="6" fill="#fff" stroke="#000" stroke-width="1"/>
+                <circle cx="43" cy="26" r="2" fill="#000"/>
+                <circle cx="58" cy="28" r="8" fill="#fff" stroke="#000" stroke-width="1"/>
+                <circle cx="57" cy="28" r="2.5" fill="#ef4444"/>
+                <path d="M 40 38 Q 50 44 60 38" stroke="#000" stroke-width="2" fill="none"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <div class="kanji-text" id="kanji-display">-</div>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="type-input" placeholder="Gõ Hiragana hoặc Romaji..." autocomplete="off">
+        <button class="btn-submit" onclick="submitAnswer()">BẮN ➔</button>
+    </div>
+
+    <!-- End Screen -->
+    <div class="overlay" id="end-screen">
+        <h2>HẾT GIỜ CÂU NÀY!</h2>
+        <p style="font-size: 20px;">Đáp án đúng là: <span id="correct-ans" style="color: #f59e0b; font-weight: bold;"></span></p>
+        <p style="font-size: 18px; margin-top: 10px;">Tổng Zombie đã hạ: <span id="final-kills" style="color: #10b981; font-weight: bold; font-size: 24px;">0</span></p>
+        <button class="btn-restart" onclick="startGame()">Thử lại 🔄</button>
+    </div>
+</div>
+
+<script>
+    // BỘ TỪ VỰNG KANJI N5 ĐẦY ĐỦ (100+ TỪ ĐƠN VÀ TỪ GHÉP)
+    const rawKanjiList = [
+        // --- Số đếm & Đơn vị ---
+        { kanji: '一', hira: 'いち', romaji: 'ichi' },
+        { kanji: '二', hira: 'に', romaji: 'ni' },
+        { kanji: '三', hira: 'さん', romaji: 'san' },
+        { kanji: '四', hira: 'よん', romaji: 'yon' },
+        { kanji: '五', hira: 'ご', romaji: 'go' },
+        { kanji: '六', hira: 'ろく', romaji: 'roku' },
+        { kanji: '七', hira: 'なな', romaji: 'nana' },
+        { kanji: '八', hira: 'はち', romaji: 'hachi' },
+        { kanji: '九', hira: 'きゅう', romaji: 'kyuu' },
+        { kanji: '十', hira: 'じゅう', romaji: 'juu' },
+        { kanji: '百', hira: 'ひゃく', romaji: 'hyaku' },
+        { kanji: '千', hira: 'せん', romaji: 'sen' },
+        { kanji: '万', hira: 'まん', romaji: 'man' },
+        { kanji: '円', hira: 'えん', romaji: 'en' },
+
+        // --- Thời gian & Ngày tháng ---
+        { kanji: '日', hira: 'ひ', romaji: 'hi' },
+        { kanji: '月', hira: 'つき', romaji: 'tsuki' },
+        { kanji: '火', hira: 'ひ', romaji: 'hi' },
+        { kanji: '水', hira: 'みず', romaji: 'mizu' },
+        { kanji: '木', hira: 'き', romaji: 'ki' },
+        { kanji: '金', hira: 'かね', romaji: 'kane' },
+        { kanji: '土', hira: 'つち', romaji: 'tsuchi' },
+        { kanji: '日曜日', hira: 'にちようび', romaji: 'nichiyoubi' },
+        { kanji: '月曜日', hira: 'げつようび', romaji: 'getsuyoubi' },
+        { kanji: '火曜日', hira: 'かようび', romaji: 'kayoubi' },
+        { kanji: '水曜日', hira: 'すいようび', romaji: 'suiyoubi' },
+        { kanji: '木曜日', hira: 'もくようび', romaji: 'mokuyoubi' },
+        { kanji: '金曜日', hira: 'きんようび', romaji: 'kinyoubi' },
+        { kanji: '土曜日', hira: 'どようび', romaji: 'doyoubi' },
+        { kanji: '今', hira: 'いま', romaji: 'ima' },
+        { kanji: '時', hira: 'じ', romaji: 'ji' },
+        { kanji: '分', hira: 'ふん', romaji: 'fun' },
+        { kanji: '半', hira: 'はん', romaji: 'han' },
+        { kanji: '年', hira: 'とし', romaji: 'toshi' },
+        { kanji: '午前', hira: 'ごぜん', romaji: 'gozen' },
+        { kanji: '午後', hira: 'ごご', romaji: 'gogo' },
+        { kanji: '今日', hira: 'きょう', romaji: 'kyou' },
+        { kanji: '明日', hira: 'あした', romaji: 'ashita' },
+        { kanji: '毎日', hira: 'まいにち', romaji: 'mainichi' },
+        { kanji: '毎月', hira: 'まいつき', romaji: 'maitsuki' },
+        { kanji: '毎年', hira: 'まいとし', romaji: 'maitoshi' },
+        { kanji: '今週', hira: 'こんしゅう', romaji: 'konshuu' },
+        { kanji: '先週', hira: 'せんしゅう', romaji: 'senshuu' },
+        { kanji: '来週', hira: 'らいしゅう', romaji: 'raishuu' },
+
+        // --- Hướng & Vị trí ---
+        { kanji: '上', hira: 'うえ', romaji: 'ue' },
+        { kanji: '下', hira: 'した', romaji: 'shita' },
+        { kanji: '中', hira: 'なか', romaji: 'naka' },
+        { kanji: '外', hira: 'そと', romaji: 'soto' },
+        { kanji: '前', hira: 'まえ', romaji: 'mae' },
+        { kanji: '後', hira: 'うしろ', romaji: 'ushiro' },
+        { kanji: '左', hira: 'ひだり', romaji: 'hidari' },
+        { kanji: '右', hira: 'みぎ', romaji: 'migi' },
+        { kanji: '東', hira: 'ひがし', romaji: 'higashi' },
+        { kanji: '西', hira: 'にし', romaji: 'nishi' },
+        { kanji: '南', hira: 'みなみ', romaji: 'minami' },
+        { kanji: '北', hira: 'きた', romaji: 'kita' },
+        { kanji: '北口', hira: 'きたぐち', romaji: 'kitaguchi' },
+        { kanji: '南口', hira: 'みなみぐち', romaji: 'minamiguchi' },
+
+        // --- Con người & Gia đình ---
+        { kanji: '人', hira: 'ひと', romaji: 'hito' },
+        { kanji: '男', hira: 'おとこ', romaji: 'otoko' },
+        { kanji: '女', hira: 'おんな', romaji: 'onna' },
+        { kanji: '子', hira: 'こ', romaji: 'ko' },
+        { kanji: '父', hira: 'ちち', romaji: 'chichi' },
+        { kanji: '母', hira: 'はは', romaji: 'haha' },
+        { kanji: '友', hira: 'とも', romaji: 'tomo' },
+        { kanji: '先生', hira: 'せんせい', romaji: 'sensei' },
+        { kanji: '学生', hira: 'がくせい', romaji: 'gakusei' },
+        { kanji: '大学', hira: 'だいがく', romaji: 'daigaku' },
+        { kanji: '学校', hira: 'がっこう', romaji: 'gakkou' },
+        { kanji: '男の子', hira: 'おとこのこ', romaji: 'otokonoko' },
+        { kanji: '女の子', hira: 'おんなのこ', romaji: 'onnanoko' },
+
+        // --- Tự nhiên, Địa điểm & Đất nước ---
+        { kanji: '山', hira: 'やま', romaji: 'yama' },
+        { kanji: '川', hira: 'かわ', romaji: 'kawa' },
+        { kanji: '天', hira: 'てん', romaji: 'ten' },
+        { kanji: '雨', hira: 'あめ', romaji: 'ame' },
+        { kanji: '花', hira: 'はな', romaji: 'hana' },
+        { kanji: '国', hira: 'くに', romaji: 'kuni' },
+        { kanji: '日本', hira: 'にほん', romaji: 'nihon' },
+        { kanji: '外国人', hira: 'がいこくじん', romaji: 'gaikokujin' },
+        { kanji: '天気', hira: 'てんき', romaji: 'tenki' },
+        { kanji: '電気', hira: 'でんき', romaji: 'denki' },
+
+        // --- Phương tiện & Vật dụng ---
+        { kanji: '車', hira: 'くるま', romaji: 'kuruma' },
+        { kanji: '電車', hira: 'でんしゃ', romaji: 'densha' },
+        { kanji: '駅', hira: 'えき', romaji: 'eki' },
+        { kanji: '校', hira: 'こう', romaji: 'kou' },
+        { kanji: '店', hira: 'みせ', romaji: 'mise' },
+        { kanji: '本', hira: 'ほん', romaji: 'hon' },
+        { kanji: '書', hira: 'しょ', romaji: 'sho' },
+        { kanji: '名', hira: 'な', romaji: 'na' },
+        { kanji: '名前', hira: 'なまえ', romaji: 'namae' },
+
+        // --- Động từ ---
+        { kanji: '行きます', hira: 'いきます', romaji: 'ikimasu' },
+        { kanji: '来ます', hira: 'きます', romaji: 'kimasu' },
+        { kanji: '帰ります', hira: 'かえります', romaji: 'kaerimasu' },
+        { kanji: '食べます', hira: 'たべます', romaji: 'tabemasu' },
+        { kanji: '飲みます', hira: 'のみます', romaji: 'nomimasu' },
+        { kanji: '見ます', hira: 'みます', romaji: 'mimasu' },
+        { kanji: '聞きます', hira: 'ききます', romaji: 'kikimasu' },
+        { kanji: '書きます', hira: 'かきます', romaji: 'kakimasu' },
+        { kanji: '読んだ', hira: 'よんだ', romaji: 'yonda' },
+        { kanji: '買います', hira: 'かい ます', romaji: 'kaimasu' },
+        { kanji: '話します', hira: 'はなします', romaji: 'hanashimasu' },
+        { kanji: '会います', hira: 'あいます', romaji: 'aimasu' },
+        { kanji: '出ます', hira: 'でます', romaji: 'demasu' },
+        { kanji: '入ります', hira: 'はいります', romaji: 'hairimasu' },
+        { kanji: '休みます', hira: 'やすみます', romaji: 'yasumimasu' },
+
+        // --- Tính từ ---
+        { kanji: '大きい', hira: 'おおきい', romaji: 'ookii' },
+        { kanji: '小さい', hira: 'ちいさい', romaji: 'chiisai' },
+        { kanji: '高い', hira: 'たかい', romaji: 'takai' },
+        { kanji: '安い', hira: 'やすい', romaji: 'yasui' },
+        { kanji: '新しい', hira: 'あたらしい', romaji: 'atarashii' },
+        { kanji: '古い', hira: 'ふるい', romaji: 'furui' },
+        { kanji: '長', hira: 'ながい', romaji: 'nagai' },
+        { kanji: '多', hira: 'おい', romaji: 'oi' },
+        { kanji: '少', hira: 'すくない', romaji: 'sukunai' },
+        { kanji: '白', hira: 'しろい', romaji: 'shiroi' },
+        { kanji: '赤', hira: 'あかい', romaji: 'akai' },
+        { kanji: '青', hira: 'あおい', romaji: 'aoi' },
+        { kanji: '黒', hira: 'くろい', romaji: 'kuroi' }
+    ];
+
+    let timeLeft = 60;
+    let kills = 0;
+    let currentZombieHP = 100;
+    let maxZombieHP = 100;
+    let currentQuestion = null;
+    let timerInterval = null;
+    let isCritMode = false;
+
+    const inputField = document.getElementById('type-input');
+
+    inputField.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            submitAnswer();
+        }
+    });
+
+    window.onload = function() {
+        startGame();
+    };
+
+    function startGame() {
+        kills = 0;
+        currentZombieHP = 100;
+        document.getElementById('kills').innerText = kills;
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('hp-bar').style.width = '100%';
+        
+        spawnNextQuestion();
+    }
+
+    function resetQuestionTimer() {
+        timeLeft = 60;
+        isCritMode = false;
+
+        document.getElementById('timer').innerText = timeLeft;
+        document.getElementById('timer').classList.remove('crit-mode');
+        document.getElementById('crit-banner').style.display = 'none';
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        timeLeft--;
+        document.getElementById('timer').innerText = timeLeft;
+
+        if (timeLeft <= 10 && !isCritMode) {
+            isCritMode = true;
+            document.getElementById('timer').classList.add('crit-mode');
+            document.getElementById('crit-banner').style.display = 'block';
+        }
+
+        if (timeLeft <= 0) {
+            endQuestionTimeout();
+        }
+    }
+
+    function spawnNextQuestion() {
+        const randomIndex = Math.floor(Math.random() * rawKanjiList.length);
+        currentQuestion = rawKanjiList[randomIndex];
+
+        document.getElementById('kanji-display').innerText = currentQuestion.kanji;
+        inputField.value = '';
+
+        resetQuestionTimer();
+        inputField.focus();
+    }
+
+    function submitAnswer() {
+        const userTyped = inputField.value.trim().toLowerCase();
+        if (!userTyped || !currentQuestion) return;
+
+        if (userTyped === currentQuestion.romaji || userTyped === currentQuestion.hira) {
+            shootPea();
+        } else {
+            inputField.style.borderColor = '#ef4444';
+            setTimeout(() => inputField.style.borderColor = '#3b82f6', 300);
+        }
+    }
+
+    function shootPea() {
+        const arena = document.getElementById('arena');
+        const pea = document.createElement('div');
+        pea.className = `peashot ${isCritMode ? 'crit' : ''}`;
+        arena.appendChild(pea);
+
+        let position = 110;
+        const shotAnimation = setInterval(() => {
+            position += 20;
+            pea.style.left = position + 'px';
+
+            if (position >= 500) {
+                clearInterval(shotAnimation);
+                pea.remove();
+                damageZombie();
+            }
+        }, 12);
+
+        spawnNextQuestion();
+    }
+
+    function damageZombie() {
+        const damage = isCritMode ? 50 : 25; 
+        currentZombieHP -= damage;
+
+        const zombieBox = document.getElementById('zombie-box');
+        zombieBox.classList.add('hit');
+        setTimeout(() => zombieBox.classList.remove('hit'), 150);
+
+        if (currentZombieHP <= 0) {
+            kills++;
+            document.getElementById('kills').innerText = kills;
+            currentZombieHP = 100;
+        }
+
+        const hpPercent = Math.max(0, (currentZombieHP / maxZombieHP) * 100);
+        document.getElementById('hp-bar').style.width = hpPercent + '%';
+    }
+
+    function endQuestionTimeout() {
+        clearInterval(timerInterval);
+        document.getElementById('correct-ans').innerText = `${currentQuestion.hira} (${currentQuestion.romaji})`;
+        document.getElementById('final-kills').innerText = kills;
+        document.getElementById('end-screen').style.display = 'flex';
+    }
+</script>
+
+</body>
+</html>
