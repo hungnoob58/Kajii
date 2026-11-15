@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KANJI VS ZOMBIE - Menu</title>
+    <title>KANJI VS ZOMBIE - Trung Tâm Luyện Thi N5</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { 
             background: #0d1117; 
+            background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
+            background-size: 24px 24px;
             color: #fff; 
             display: flex; 
             justify-content: center; 
@@ -18,87 +20,176 @@
         }
 
         .menu-container { 
-            background: linear-gradient(180deg, #052e16 0%, #0f172a 100%);
+            background: linear-gradient(180deg, #064e3b 0%, #0f172a 45%, #1e1b4b 100%);
             border: 4px solid #10b981; 
-            border-radius: 16px; 
-            padding: 40px 30px; 
+            border-radius: 20px; 
+            padding: 35px 28px; 
             width: 100%; 
-            max-width: 600px; 
+            max-width: 660px; 
             text-align: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(16, 185, 129, 0.2); 
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
+        .badge-edition {
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid #fbbf24;
+            color: #fbbf24;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
         .game-title {
-            font-size: 48px;
+            font-size: 46px;
             font-weight: 900;
             color: #22c55e;
-            text-shadow: 0 0 12px #15803d, 3px 3px 0px #000;
-            margin: 0 0 10px 0;
+            text-shadow: 0 0 15px rgba(34, 197, 94, 0.6), 3px 3px 0px #000;
+            margin: 0 0 8px 0;
             letter-spacing: 2px;
+            line-height: 1.1;
         }
 
         .game-subtitle {
-            font-size: 18px;
-            color: #fbbf24;
-            margin-bottom: 35px;
-            font-weight: bold;
+            font-size: 16px;
+            color: #e5e7eb;
+            margin-bottom: 28px;
+            font-weight: 600;
         }
 
-        .btn-play {
-            background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
-            color: white;
-            border: 3px solid #bbf7d0;
-            padding: 16px 48px;
-            font-size: 24px;
-            font-weight: 900;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
-            transition: all 0.2s;
-            text-shadow: 1px 1px 2px #000;
+        /* Khu vực chọn 2 chế độ chơi */
+        .modes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 540px) {
+            .modes-grid { grid-template-columns: 1fr; }
+            .game-title { font-size: 36px; }
+        }
+
+        .mode-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 16px;
+            border-radius: 16px;
             text-decoration: none;
-            display: inline-block;
+            color: #fff;
+            transition: all 0.22s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-play:hover {
-            transform: scale(1.08);
-            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.6);
+        /* Chế độ 1: Gõ Phím (game.html) */
+        .mode-read {
+            background: linear-gradient(180deg, #15803d 0%, #14532d 100%);
+            border: 3px solid #4ade80;
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+        }
+        .mode-read:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(34, 197, 94, 0.55);
+            border-color: #bbf7d0;
         }
 
+        /* Chế độ 2: Viết Bùa (game2.html) */
+        .mode-write {
+            background: linear-gradient(180deg, #6d28d9 0%, #3b0764 100%);
+            border: 3px solid #c084fc;
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3);
+        }
+        .mode-write:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(168, 85, 247, 0.55);
+            border-color: #f3e8ff;
+        }
+
+        .mode-icon { font-size: 36px; margin-bottom: 8px; }
+        .mode-name { font-size: 20px; font-weight: 900; margin-bottom: 4px; text-shadow: 1px 1px 2px #000; }
+        .mode-desc { font-size: 13px; color: #e2e8f0; margin-bottom: 14px; line-height: 1.4; }
+        
+        .mode-record {
+            background: rgba(0, 0, 0, 0.45);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fbbf24;
+        }
+
+        /* Luật chơi */
         .instructions {
-            margin-top: 35px;
-            background: rgba(0,0,0,0.4);
-            padding: 20px;
+            background: rgba(15, 23, 42, 0.75);
+            padding: 18px 20px;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 13.5px;
             color: #d1d5db;
             text-align: left;
             width: 100%;
-            max-width: 480px;
-            line-height: 1.6;
-            border: 1px solid rgba(255,255,255,0.1);
+            line-height: 1.65;
+            border: 1px solid rgba(255,255,255,0.12);
         }
+        .instructions b.green { color: #4ade80; }
+        .instructions b.purple { color: #c084fc; }
+        .instructions b.gold { color: #fbbf24; }
     </style>
 </head>
 <body>
 
 <div class="menu-container">
+    <div class="badge-edition">Full 20 Bài Kanji Look & Learn</div>
     <h1 class="game-title">KANJI VS ZOMBIE</h1>
-    <div class="game-subtitle">Ôn Luyện Trọn Bộ Kanji N5 (80+ Từ)</div>
+    <div class="game-subtitle">Ôn Luyện Trọn Bộ 160+ Từ Vựng Kanji N5</div>
     
-    <a href="game.html" class="btn-play">BẮT ĐẦU CHƠI 🎯</a>
+    <div class="modes-grid">
+        <!-- Nút vào game.html -->
+        <a href="game.html" class="mode-card mode-read">
+            <div>
+                <div class="mode-icon">🎯</div>
+                <div class="mode-name">LUYỆN ĐỌC & GÕ</div>
+                <div class="mode-desc">Nhìn chữ Kanji, gõ nhanh Hiragana hoặc Romaji để bắn hạ Zombie.</div>
+            </div>
+            <div class="mode-record">🏆 Kỷ lục: <span id="best-read">0</span> Zombie</div>
+        </a>
+
+        <!-- Nút vào game2.html -->
+        <a href="game2.html" class="mode-card mode-write">
+            <div>
+                <div class="mode-icon">🖌️</div>
+                <div class="mode-name">LUYỆN VIẾT KANJI</div>
+                <div class="mode-desc">Nhìn cách đọc & nghĩa, tự tay vẽ bùa chữ Kanji để phóng phép.</div>
+            </div>
+            <div class="mode-record">🏆 Kỷ lục: <span id="best-write">0</span> Zombie</div>
+        </a>
+    </div>
 
     <div class="instructions">
-        📌 <b>Luật chơi:</b><br>
-        • Nhìn từ Kanji hiển thị và gõ <b>Romaji</b> hoặc <b>Hiragana</b>.<br>
-        • Mỗi câu hỏi có <b>60 giây</b> đếm ngược.<br>
-        • <b>10s CUỐI:</b> Bắn ra Đạn Lửa x2 Sát Thương (Crit Dame)!<br>
-        • Diệt càng nhiều Zombie càng tốt!
+        📌 <b>Hướng dẫn chiến đấu:</b><br>
+        • <b class="green">Chế độ Đọc & Gõ:</b> Mỗi câu có <b class="gold">10 giây</b> đếm ngược. Bắn trúng ở <b class="gold">3s cuối</b> kích hoạt Đạn Lửa x2 Sát Thương (Crit Dame)!<br>
+        • <b class="purple">Chế độ Viết Kanji:</b> Vẽ đúng nét chữ Kanji lên lá bùa (hỗ trợ cả chuột & cảm ứng). Quên mặt chữ có thể bật <b>Nét mờ</b> để đồ theo.<br>
+        • Giữ chuỗi trả lời đúng liên tục để kích hoạt <b>Combo Streak</b> tăng sát thương!
     </div>
 </div>
+
+<script>
+    // Tự động lấy kỷ lục từ LocalStorage của 2 game để hiển thị lên Menu
+    window.onload = function() {
+        const bestRead = localStorage.getItem('kanji_zombie_best') || 0;
+        const bestWrite = localStorage.getItem('kanji_write_best') || 0;
+        document.getElementById('best-read').innerText = bestRead;
+        document.getElementById('best-write').innerText = bestWrite;
+    };
+</script>
 
 </body>
 </html>
