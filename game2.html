@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KANJI VS ZOMBIE - Luyện Viết Kanji N5</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        body { 
+            background: #0d1117; 
+            color: #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 15px; 
+        }
+
+        .game-container { 
+            background: #1f2937; 
+            border: 4px solid #8b5cf6; 
+            border-radius: 16px; 
+            padding: 18px; 
+            width: 100%; 
+            max-width: 650px; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.85); 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        /* Top Status Bar */
+        .status-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 8px;
+            font-size: 14px; 
+            font-weight: bold; 
+            background: #374151; 
+            padding: 8px 14px; 
+            border-radius: 8px; 
+            margin-bottom: 12px; 
+            flex-wrap: wrap;
+        }
+        select.level-select {
+            background: #7c3aed;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+            outline: none;
+        }
+        .high-score { color: #fbbf24; }
+
+        /* Battle Arena */
+        .battle-field { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+            height: 155px; 
+            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 65%, #1e1b4b 100%);
+            border-bottom: 6px solid #4c1d95; 
+            padding: 0 25px 8px 25px; 
+            margin-bottom: 12px; 
+            position: relative; 
+            border-radius: 10px; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+        }
+        
+        .character-box { width: 95px; display: flex; flex-direction: column; align-items: center; }
+        .svg-char { width: 85px; height: 95px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.6)); }
+        .zombie-box { transition: transform 0.12s; }
+        .zombie-box.hit { transform: translateX(16px) rotate(8deg); filter: brightness(1.8) drop-shadow(0 0 12px #a855f7); }
+
+        /* HP Bar */
+        .hp-bar-bg { width: 90px; height: 10px; background: #4b5563; border-radius: 6px; overflow: hidden; border: 2px solid #fff; margin-bottom: 6px; }
+        .hp-bar-fill { width: 100%; height: 100%; background: #ef4444; transition: width 0.25s; }
+
+        /* Prompt Box */
+        .prompt-box { 
+            background: #f3f4f6; 
+            color: #111827; 
+            border-radius: 10px; 
+            padding: 12px; 
+            margin-bottom: 12px; 
+            position: relative;
+        }
+        .reading-text { font-size: 28px; font-weight: 900; color: #4f46e5; letter-spacing: 1px; }
+        .meaning-text { font-size: 16px; font-weight: 700; color: #374151; margin-top: 2px; }
+        .progress-text { font-size: 12px; color: #6b7280; margin-top: 4px; font-weight: bold; }
+        .combo-badge { position: absolute; top: 8px; right: 12px; background: #f59e0b; color: #111; padding: 2px 8px; font-size: 12px; font-weight: 900; border-radius: 6px; display: none; }
+
+        /* Drawing Pad Area */
+        .pad-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .canvas-container {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            background: #fefce8;
+            border: 4px solid #d97706;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 15px rgba(217, 119, 6, 0.2);
+            touch-action: none; /* Chống cuộn trang khi vẽ trên điện thoại */
+        }
+        /* Đường kẻ ô ly chữ thập mờ (Genkouyoushi style) */
+        .canvas-grid {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(to right, transparent 49.5%, rgba(217, 119, 6, 0.25) 49.5%, rgba(217, 119, 6, 0.25) 50.5%, transparent 50.5%),
+                linear-gradient(to bottom, transparent 49.5%, rgba(217, 119, 6, 0.25) 49.5%, rgba(217, 119, 6, 0.25) 50.5%, transparent 50.5%);
+        }
+        .ghost-kanji {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 175px;
+            font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", "Meiryo", sans-serif;
+            color: rgba(156, 163, 175, 0.32);
+            pointer-events: none;
+            display: none;
+            line-height: 1;
+        }
+        canvas#draw-canvas {
+            position: relative;
+            z-index: 2;
+            cursor: crosshair;
+            border-radius: 8px;
+        }
+
+        /* Feedback Toast */
+        .feedback-msg {
+            height: 22px;
+            font-size: 14px;
+            font-weight: 800;
+            color: #fbbf24;
+        }
+
+        /* Action Buttons */
+        .controls {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            color: #fff;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-clear { background: #4b5563; }
+        .btn-clear:hover { background: #374151; }
+        .btn-hint { background: #d97706; }
+        .btn-hint:hover { background: #b45309; }
+        .btn-cast { background: #8b5cf6; padding: 10px 26px; font-size: 16px; box-shadow: 0 0 12px rgba(139, 92, 246, 0.6); }
+        .btn-cast:hover { background: #7c3aed; }
+
+        /* Magic Spell Projectile */
+        .spell-shot { 
+            position: absolute; 
+            width: 34px; 
+            height: 34px; 
+            background: radial-gradient(circle, #fff 10%, #c084fc 50%, #7e22ce 100%);
+            border-radius: 50%; 
+            bottom: 35px; 
+            left: 100px; 
+            z-index: 5; 
+            box-shadow: 0 0 18px #a855f7, 0 0 30px #ec4899; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 900;
+            color: #3b0764;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="status-bar">
+        <select class="level-select" id="level-select" onchange="changeLevel()"></select>
+        <div>💀 Diệt: <span id="kills" style="color:#a855f7;">0</span> | 🏆 <span class="high-score" id="high-score">0</span></div>
+    </div>
+
+    <div class="battle-field" id="arena">
+        <!-- Pháp sư Đậu (Wizard Peashooter) -->
+        <div class="character-box">
+            <svg class="svg-char" viewBox="0 0 100 100">
+                <path d="M 50 65 Q 38 78 20 88 Q 45 83 50 65 Z" fill="#15803d"/>
+                <path d="M 50 65 Q 62 78 80 88 Q 55 83 50 65 Z" fill="#15803d"/>
+                <path d="M 46 48 C 45 63 55 78 50 92" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <circle cx="40" cy="42" r="21" fill="#22c55e"/>
+                <ellipse cx="59" cy="42" rx="11" ry="14" fill="#16a34a"/>
+                <ellipse cx="61" cy="42" rx="6" ry="9" fill="#052e16"/>
+                <circle cx="36" cy="35" r="4" fill="#fff"/>
+                <circle cx="37" cy="35" r="2" fill="#000"/>
+                <!-- Mũ pháp sư -->
+                <polygon points="20,25 60,25 38,2" fill="#7c3aed"/>
+                <ellipse cx="40" cy="25" rx="26" ry="5" fill="#6d28d9"/>
+            </svg>
+        </div>
+        
+        <!-- Zombie -->
+        <div class="character-box zombie-box" id="zombie-box">
+            <div class="hp-bar-bg"><div class="hp-bar-fill" id="hp-bar"></div></div>
+            <svg class="svg-char" viewBox="0 0 100 100">
+                <rect x="35" y="45" width="30" height="35" fill="#1e3a8a" rx="4"/>
+                <rect x="38" y="78" width="10" height="20" fill="#451a03"/>
+                <rect x="52" y="78" width="10" height="20" fill="#451a03"/>
+                <path d="M 35 50 L 15 52 L 10 58" stroke="#6b7280" stroke-width="6" stroke-linecap="round" fill="none"/>
+                <rect x="30" y="15" width="40" height="32" fill="#6b7280" rx="8"/>
+                <path d="M 35 45 L 45 58 L 50 45 L 60 55 L 65 45 Z" fill="#9ca3af"/>
+                <circle cx="42" cy="26" r="6" fill="#fff" stroke="#000" stroke-width="1"/>
+                <circle cx="43" cy="26" r="2" fill="#000"/>
+                <circle cx="58" cy="28" r="8" fill="#fff" stroke="#000" stroke-width="1"/>
+                <circle cx="57" cy="28" r="2.5" fill="#ef4444"/>
+                <path d="M 40 38 Q 50 44 60 38" stroke="#000" stroke-width="2" fill="none"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="prompt-box">
+        <div class="combo-badge" id="combo-badge">COMBO x2</div>
+        <div class="reading-text" id="reading-display">-</div>
+        <div class="meaning-text" id="meaning-display">-</div>
+        <div class="progress-text" id="progress-display">Tiến độ: 0/0</div>
+    </div>
+
+    <div class="pad-wrapper">
+        <div class="canvas-container">
+            <div class="canvas-grid"></div>
+            <div class="ghost-kanji" id="ghost-kanji">一</div>
+            <canvas id="draw-canvas" width="240" height="240"></canvas>
+        </div>
+
+        <div class="feedback-msg" id="feedback-msg">Vẽ chữ Kanji tương ứng vào ô trên!</div>
+
+        <div class="controls">
+            <button class="btn btn-clear" onclick="clearCanvas()">🗑️ Xóa bảng</button>
+            <button class="btn btn-hint" id="btn-hint" onclick="toggleHint()">👁️ Nét mờ</button>
+            <button class="btn btn-cast" onclick="checkKanji()">⚡ TUNG CHIÊU</button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Canvas để chấm điểm đối chiếu nét vẽ -->
+<canvas id="target-canvas" width="240" height="240" style="display:none;"></canvas>
+
+<script>
+    // DỮ LIỆU CHỮ KANJI ĐƠN N5 THEO 20 BÀI (KÈM NGHĨA TIẾNG VIỆT)
+    const n5KanjiWriteData = {
+        1: [
+            { kanji: '一', hira: 'いち', romaji: 'ichi', mean: 'Số 1 (Nhất)' },
+            { kanji: '二', hira: 'に', romaji: 'ni', mean: 'Số 2 (Nhị)' },
+            { kanji: '三', hira: 'さん', romaji: 'san', mean: 'Số 3 (Tam)' },
+            { kanji: '四', hira: 'よん', romaji: 'yon', mean: 'Số 4 (Tứ)' },
+            { kanji: '五', hira: 'ご', romaji: 'go', mean: 'Số 5 (Ngũ)' },
+            { kanji: '六', hira: 'ろく', romaji: 'roku', mean: 'Số 6 (Lục)' },
+            { kanji: '七', hira: 'なな', romaji: 'nana', mean: 'Số 7 (Thất)' },
+            { kanji: '八', hira: 'はち', romaji: 'hachi', mean: 'Số 8 (Bát)' },
+            { kanji: '九', hira: 'きゅう', romaji: 'kyuu', mean: 'Số 9 (Cửu)' },
+            { kanji: '十', hira: 'じゅう', romaji: 'juu', mean: 'Số 10 (Thập)' }
+        ],
+        2: [
+            { kanji: '百', hira: 'ひゃく', romaji: 'hyaku', mean: 'Trăm (Bách)' },
+            { kanji: '千', hira: 'せん', romaji: 'sen', mean: 'Nghìn (Thiên)' },
+            { kanji: '万', hira: 'まん', romaji: 'man', mean: 'Vạn (10.000)' },
+            { kanji: '円', hira: 'えん', romaji: 'en', mean: 'Yên Nhật / Hình tròn' },
+            { kanji: '時', hira: 'じ / とき', romaji: 'ji / toki', mean: 'Giờ / Thời gian' },
+            { kanji: '分', hira: 'ふん / わける', romaji: 'fun / wakeru', mean: 'Phút / Phân chia' },
+            { kanji: '半', hira: 'はん', romaji: 'han', mean: 'Một nửa (Bán)' }
+        ],
+        3: [
+            { kanji: '日', hira: 'ひ / にち', romaji: 'hi / nichi', mean: 'Mặt trời / Ngày' },
+            { kanji: '月', hira: 'つき / げつ', romaji: 'tsuki / getsu', mean: 'Mặt trăng / Tháng' },
+            { kanji: '火', hira: 'ひ / か', romaji: 'hi / ka', mean: 'Lửa (Hỏa)' },
+            { kanji: '水', hira: 'みず / すい', romaji: 'mizu / sui', mean: 'Nước (Thủy)' },
+            { kanji: '木', hira: 'き / もく', romaji: 'ki / moku', mean: 'Cây (Mộc)' },
+            { kanji: '金', hira: 'かね / きん', romaji: 'kane / kin', mean: 'Tiền / Vàng (Kim)' },
+            { kanji: '土', hira: 'つち / ど', romaji: 'tsuchi / do', mean: 'Đất (Thổ)' }
+        ],
+        4: [
+            { kanji: '上', hira: 'うえ', romaji: 'ue', mean: 'Bên trên (Thượng)' },
+            { kanji: '下', hira: 'した', romaji: 'shita', mean: 'Bên dưới (Hạ)' },
+            { kanji: '中', hira: 'なか', romaji: 'naka', mean: 'Bên trong / Ở giữa' },
+            { kanji: '外', hira: 'そと', romaji: 'soto', mean: 'Bên ngoài (Ngoại)' },
+            { kanji: '前', hira: 'まえ', romaji: 'mae', mean: 'Phía trước (Tiền)' },
+            { kanji: '後', hira: 'うしろ', romaji: 'ushiro', mean: 'Phía sau (Hậu)' },
+            { kanji: '左', hira: 'ひだり', romaji: 'hidari', mean: 'Bên trái (Tả)' },
+            { kanji: '右', hira: 'みぎ', romaji: 'migi', mean: 'Bên phải (Hữu)' }
+        ],
+        5: [
+            { kanji: '東', hira: 'ひがし', romaji: 'higashi', mean: 'Hướng Đông' },
+            { kanji: '西', hira: 'にし', romaji: 'nishi', mean: 'Hướng Tây' },
+            { kanji: '南', hira: 'みなみ', romaji: 'minami', mean: 'Hướng Nam' },
+            { kanji: '北', hira: 'きた', romaji: 'kita', mean: 'Hướng Bắc' },
+            { kanji: '口', hira: 'くち', romaji: 'kuchi', mean: 'Cái miệng / Cửa ra vào' }
+        ],
+        6: [
+            { kanji: '人', hira: 'ひと', romaji: 'hito', mean: 'Người (Nhân)' },
+            { kanji: '男', hira: 'おとこ', romaji: 'otoko', mean: 'Đàn ông / Con trai' },
+            { kanji: '女', hira: 'おんな', romaji: 'onna', mean: 'Phụ nữ / Con gái' },
+            { kanji: '子', hira: 'こ', romaji: 'ko', mean: 'Trẻ con (Tử)' },
+            { kanji: '父', hira: 'ちち', romaji: 'chichi', mean: 'Bố / Cha' },
+            { kanji: '母', hira: 'はは', romaji: 'haha', mean: 'Mẹ / Mẫu' },
+            { kanji: '友', hira: 'とも', romaji: 'tomo', mean: 'Bạn bè (Hữu)' }
+        ],
+        7: [
+            { kanji: '先', hira: 'さき / せん', romaji: 'saki / sen', mean: 'Trước (Tiên)' },
+            { kanji: '生', hira: 'うまれる / せい', romaji: 'umareru / sei', mean: 'Sinh ra / Sống' },
+            { kanji: '学', hira: 'まなぶ / がく', romaji: 'manabu / gaku', mean: 'Học tập' },
+            { kanji: '校', hira: 'こう', romaji: 'kou', mean: 'Trường học (Hiệu)' }
+        ],
+        8: [
+            { kanji: '山', hira: 'やま', romaji: 'yama', mean: 'Núi (Sơn)' },
+            { kanji: '川', hira: 'かわ', romaji: 'kawa', mean: 'Sông (Xuyên)' },
+            { kanji: '天', hira: 'てん', romaji: 'ten', mean: 'Bầu trời (Thiên)' },
+            { kanji: '雨', hira: 'あめ', romaji: 'ame', mean: 'Mưa (Vũ)' },
+            { kanji: '花', hira: 'はな', romaji: 'hana', mean: 'Hoa' },
+            { kanji: '国', hira: 'くに', romaji: 'kuni', mean: 'Đất nước (Quốc)' },
+            { kanji: '気', hira: 'き', romaji: 'ki', mean: 'Khí / Tinh thần' }
+        ],
+        9: [
+            { kanji: '車', hira: 'くるま', romaji: 'kuruma', mean: 'Xe hơi / Ô tô' },
+            { kanji: '電', hira: 'でん', romaji: 'den', mean: 'Điện' },
+            { kanji: '駅', hira: 'えき', romaji: 'eki', mean: 'Nhà ga' },
+            { kanji: '店', hira: 'みせ', romaji: 'mise', mean: 'Cửa hàng (Điếm)' },
+            { kanji: '本', hira: 'ほん', romaji: 'hon', mean: 'Sách / Gốc' },
+            { kanji: '書', hira: 'かく / しょ', romaji: 'kaku / sho', mean: 'Viết / Sách' },
+            { kanji: '名', hira: 'な / めい', romaji: 'na / mei', mean: 'Tên (Danh)' }
+        ],
+        10: [
+            { kanji: '行', hira: 'いく', romaji: 'iku', mean: 'Đi (Hành)' },
+            { kanji: '来', hira: 'くる', romaji: 'kuru', mean: 'Đến (Lai)' },
+            { kanji: '帰', hira: 'かえる', romaji: 'kaeru', mean: 'Trở về (Quy)' },
+            { kanji: '出', hira: 'でる', romaji: 'deru', mean: 'Ra ngoài (Xuất)' },
+            { kanji: '入', hira: 'はいる', romaji: 'hairu', mean: 'Đi vào (Nhập)' }
+        ],
+        11: [
+            { kanji: '食', hira: 'たべる', romaji: 'taberu', mean: 'Ăn (Thực)' },
+            { kanji: '飲', hira: 'のむ', romaji: 'nomu', mean: 'Uống (Ẩm)' },
+            { kanji: '見', hira: 'みる', romaji: 'miru', mean: 'Nhìn / Xem (Kiến)' },
+            { kanji: '聞', hira: 'きく', romaji: 'kiku', mean: 'Nghe / Hỏi (Văn)' },
+            { kanji: '読', hira: 'よむ', romaji: 'yomu', mean: 'Đọc (Độc)' },
+            { kanji: '買', hira: 'かう', romaji: 'kau', mean: 'Mua (Mãi)' },
+            { kanji: '話', hira: 'はなす', romaji: 'hanasu', mean: 'Nói chuyện (Thoại)' },
+            { kanji: '会', hira: 'あう', romaji: 'au', mean: 'Gặp gỡ (Hội)' },
+            { kanji: '休', hira: 'やすむ', romaji: 'yasumu', mean: 'Nghỉ ngơi (Hưu)' }
+        ],
+        12: [
+            { kanji: '大', hira: 'おおきい', romaji: 'ookii', mean: 'To lớn (Đại)' },
+            { kanji: '小', hira: 'ちいさい', romaji: 'chiisai', mean: 'Nhỏ bé (Tiểu)' },
+            { kanji: '高', hira: 'たかい', romaji: 'takai', mean: 'Cao / Đắt (Cao)' },
+            { kanji: '安', hira: 'やすい', romaji: 'yasui', mean: 'Rẻ / Bình an (An)' },
+            { kanji: '新', hira: 'あたらしい', romaji: 'atarashii', mean: 'Mới (Tân)' },
+            { kanji: '古', hira: 'ふるい', romaji: 'furui', mean: 'Cũ (Cổ)' },
+            { kanji: '長', hira: 'ながい', romaji: 'nagai', mean: 'Dài (Trường)' },
+            { kanji: '多', hira: 'おおい', romaji: 'ooi', mean: 'Nhiều (Đa)' },
+            { kanji: '少', hira: 'すくない', romaji: 'sukunai', mean: 'Ít (Thiểu)' }
+        ],
+        13: [
+            { kanji: '白', hira: 'しろ', romaji: 'shiro', mean: 'Màu trắng (Bạch)' },
+            { kanji: '赤', hira: 'あか', romaji: 'aka', mean: 'Màu đỏ (Xích)' },
+            { kanji: '青', hira: 'あお', romaji: 'ao', mean: 'Màu xanh (Thanh)' },
+            { kanji: '黒', hira: 'くろ', romaji: 'kuro', mean: 'Màu đen (Hắc)' }
+        ],
+        14: [
+            { kanji: '今', hira: 'いま', romaji: 'ima', mean: 'Bây giờ (Kim)' },
+            { kanji: '年', hira: 'とし / ねん', romaji: 'toshi / nen', mean: 'Năm (Niên)' },
+            { kanji: '毎', hira: 'まい', romaji: 'mai', mean: 'Mỗi / Hàng (Mỗi)' }
+        ],
+        15: [
+            { kanji: '週', hira: 'しゅう', romaji: 'shuu', mean: 'Tuần lễ (Chu)' }
+        ],
+        16: [
+            { kanji: '間', hira: 'あいだ / かん', romaji: 'aida / kan', mean: 'Ở giữa / Khoảng (Gian)' },
+            { kanji: '目', hira: 'め', romaji: 'me', mean: 'Con mắt (Mục)' },
+            { kanji: '足', hira: 'あし', romaji: 'ashi', mean: 'Cái chân (Túc)' },
+            { kanji: '手', hira: 'て', romaji: 'te', mean: 'Bàn tay (Thủ)' }
+        ],
+        17: [
+            { kanji: '立', hira: 'たつ', romaji: 'tatsu', mean: 'Đứng lên (Lập)' },
+            { kanji: '言', hira: 'いう', romaji: 'iu', mean: 'Nói (Ngôn)' },
+            { kanji: '思', hira: 'おもう', romaji: 'omou', mean: 'Suy nghĩ (Tư)' }
+        ],
+        18: [
+            { kanji: '心', hira: 'こころ', romaji: 'kokoro', mean: 'Trái tim / Tấm lòng (Tâm)' },
+            { kanji: '知', hira: 'しる', romaji: 'shiru', mean: 'Biết (Tri)' }
+        ],
+        19: [
+            { kanji: '田', hira: 'た', romaji: 'ta', mean: 'Ruộng lúa (Điền)' },
+            { kanji: '町', hira: 'まち', romaji: 'machi', mean: 'Thị trấn / Khu phố' },
+            { kanji: '村', hira: 'むら', romaji: 'mura', mean: 'Ngôi làng (Thôn)' }
+        ],
+        20: [
+            { kanji: '魚', hira: 'さかな', romaji: 'sakana', mean: 'Con cá (Ngư)' },
+            { kanji: '肉', hira: 'にく', romaji: 'niku', mean: 'Thịt (Nhục)' },
+            { kanji: '犬', hira: 'いぬ', romaji: 'inu', mean: 'Con chó (Khuyển)' },
+            { kanji: '猫', hira: 'ねこ', romaji: 'neko', mean: 'Con mèo (Miêu)' }
+        ]
+    };
+
+    // Canvas setup
+    const drawCanvas = document.getElementById('draw-canvas');
+    const ctx = drawCanvas.getContext('2d', { willReadFrequently: true });
+    const targetCanvas = document.getElementById('target-canvas');
+    const targetCtx = targetCanvas.getContext('2d', { willReadFrequently: true });
+
+    let isDrawing = false;
+    let hasDrawn = false;
+    let hintUsed = false;
+    let isCasting = false;
+
+    let queue = [];
+    let qIndex = 0;
+    let currentQ = null;
+    let kills = 0;
+    let combo = 0;
+    let highScore = localStorage.getItem('kanji_write_best') || 0;
+    let zombieHP = 100;
+
+    document.getElementById('high-score').innerText = highScore;
+
+    // Populate Level Select Dropdown
+    const levelSelect = document.getElementById('level-select');
+    const mixOpt = document.createElement('option');
+    mixOpt.value = 'all';
+    mixOpt.innerText = '🔥 TRỘN TẤT CẢ N5';
+    levelSelect.appendChild(mixOpt);
+
+    for (let i = 1; i <= 20; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.innerText = `BÀI KANJI ${i}`;
+        levelSelect.appendChild(opt);
+    }
+    levelSelect.value = '1'; // Mặc định bắt đầu từ Bài 1
+
+    // Drawing Events (Mouse & Touch)
+    function getPos(e) {
+        const rect = drawCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    function startDraw(e) {
+        if (isCasting) return;
+        isDrawing = true;
+        hasDrawn = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        e.preventDefault();
+    }
+
+    function moveDraw(e) {
+        if (!isDrawing || isCasting) return;
+        const pos = getPos(e);
+        ctx.lineWidth = 13;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#111827';
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        e.preventDefault();
+    }
+
+    function endDraw() {
+        isDrawing = false;
+    }
+
+    drawCanvas.addEventListener('mousedown', startDraw);
+    drawCanvas.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', endDraw);
+
+    drawCanvas.addEventListener('touchstart', startDraw, { passive: false });
+    drawCanvas.addEventListener('touchmove', moveDraw, { passive: false });
+    window.addEventListener('touchend', endDraw);
+
+    // Sound FX (Web Audio API)
+    let audioCtx = null;
+    function playSound(type) {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'cast') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(850, now + 0.25);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(140, now);
+                osc.frequency.linearRampToValueAtTime(45, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'fail') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+        } catch (e) {}
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        hasDrawn = false;
+    }
+
+    function toggleHint() {
+        const ghost = document.getElementById('ghost-kanji');
+        if (ghost.style.display === 'block') {
+            ghost.style.display = 'none';
+        } else {
+            ghost.style.display = 'block';
+            hintUsed = true;
+            setFeedback("Đã bật nét mờ (Sát thương giảm nhẹ)", "#f59e0b");
+        }
+    }
+
+    function setFeedback(text, color) {
+        const el = document.getElementById('feedback-msg');
+        el.innerText = text;
+        el.style.color = color;
+    }
+
+    function changeLevel() {
+        const val = levelSelect.value;
+        let list = [];
+        if (val === 'all') {
+            for (let i = 1; i <= 20; i++) {
+                list = list.concat(n5KanjiWriteData[i]);
+            }
+        } else {
+            list = [...n5KanjiWriteData[val]];
+        }
+        queue = list.sort(() => Math.random() - 0.5);
+        qIndex = 0;
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        if (qIndex >= queue.length) {
+            setFeedback("🎉 Xong vòng! Tự động trộn lại bài...", "#10b981");
+            queue = queue.sort(() => Math.random() - 0.5);
+            qIndex = 0;
+        }
+
+        currentQ = queue[qIndex];
+        document.getElementById('reading-display').innerText = `${currentQ.hira} (${currentQ.romaji})`;
+        document.getElementById('meaning-display').innerText = `Nghĩa: ${currentQ.mean}`;
+        document.getElementById('progress-display').innerText = `Tiến độ: ${qIndex + 1}/${queue.length}`;
+
+        // Cập nhật chữ mẫu ẩn và nét mờ
+        const ghost = document.getElementById('ghost-kanji');
+        ghost.innerText = currentQ.kanji;
+        ghost.style.display = 'none';
+        hintUsed = false;
+
+        // Vẽ chữ mẫu lên targetCanvas ẩn để chuẩn bị chấm điểm
+        targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+        targetCtx.font = '175px "Hiragino Kaku Gothic Pro", "Yu Gothic", "Meiryo", sans-serif';
+        targetCtx.textAlign = 'center';
+        targetCtx.textBaseline = 'middle';
+        // Vẽ viền dày nhẹ để tạo vùng dung sai (tolerance zone) cho nét vẽ tay
+        targetCtx.lineWidth = 18;
+        targetCtx.strokeStyle = '#000';
+        targetCtx.strokeText(currentQ.kanji, 120, 125);
+        targetCtx.fillStyle = '#000';
+        targetCtx.fillText(currentQ.kanji, 120, 125);
+
+        clearCanvas();
+        isCasting = false;
+    }
+
+    // THUẬT TOÁN CHẤM ĐIỂM ĐỐI CHIẾU NÉT VẼ KANJI
+    function checkKanji() {
+        if (isCasting || !currentQ) return;
+        if (!hasDrawn) {
+            setFeedback("⚠️ Ông chưa vẽ nét nào lên bảng kìa!", "#ef4444");
+            return;
+        }
+
+        const userData = ctx.getImageData(0, 0, 240, 240).data;
+        const targetData = targetCtx.getImageData(0, 0, 240, 240).data;
+
+        let targetPixels = 0;
+        let matchedPixels = 0;
+        let strayPixels = 0;
+
+        for (let i = 3; i < targetData.length; i += 4) {
+            const tAlpha = targetData[i];
+            const uAlpha = userData[i];
+
+            if (tAlpha > 50) {
+                targetPixels++;
+                if (uAlpha > 50) {
+                    matchedPixels++;
+                }
+            } else {
+                if (uAlpha > 50) {
+                    strayPixels++;
+                }
+            }
+        }
+
+        const coverage = matchedPixels / Math.max(1, targetPixels); // Tỷ lệ phủ đúng nét mẫu
+        const precision = matchedPixels / Math.max(1, matchedPixels + strayPixels); // Độ chính xác (không vẽ lem ra ngoài)
+
+        // Điều kiện đạt: Phủ ít nhất 42% vùng dung sai mẫu VÀ độ chính xác nét >= 48%
+        if (coverage >= 0.42 && precision >= 0.48) {
+            isCasting = true;
+            combo++;
+            if (combo > 1) {
+                const cb = document.getElementById('combo-badge');
+                cb.innerText = `COMBO x${combo}`;
+                cb.style.display = 'block';
+            }
+            const accuracyPercent = Math.min(100, Math.round((coverage * 0.5 + precision * 0.5) * 125));
+            setFeedback(`✨ CHUẨN XÁC (${accuracyPercent}%)! Phóng bùa "${currentQ.kanji}"!`, "#10b981");
+            castSpell(currentQ.kanji);
+        } else {
+            combo = 0;
+            document.getElementById('combo-badge').style.display = 'none';
+            playSound('fail');
+            if (precision < 0.48) {
+                setFeedback(`❌ Lệch nét quá nhiều! Bấm "Nét mờ" nếu quên mặt chữ nhé.`, "#ef4444");
+            } else {
+                setFeedback(`❌ Còn thiếu nét của chữ "${currentQ.kanji}" rồi! Thử lại nào.`, "#ef4444");
+            }
+            // Nháy đỏ viền canvas
+            const container = document.querySelector('.canvas-container');
+            container.style.borderColor = '#ef4444';
+            setTimeout(() => container.style.borderColor = '#d97706', 350);
+        }
+    }
+
+    function castSpell(kanjiChar) {
+        playSound('cast');
+        const arena = document.getElementById('arena');
+        const spell = document.createElement('div');
+        spell.className = 'spell-shot';
+        spell.innerText = kanjiChar;
+        arena.appendChild(spell);
+
+        let pos = 100;
+        const anim = setInterval(() => {
+            pos += 22;
+            spell.style.left = pos + 'px';
+
+            if (pos >= 470) {
+                clearInterval(anim);
+                spell.remove();
+                damageZombie();
+                qIndex++;
+                nextQuestion();
+            }
+        }, 12);
+    }
+
+    function damageZombie() {
+        playSound('hit');
+        // Nếu không dùng gợi ý nét mờ thì gây sát thương cao hơn
+        const baseDmg = hintUsed ? 35 : 50;
+        const dmg = baseDmg + Math.min(combo * 5, 25);
+        zombieHP -= dmg;
+
+        const zBox = document.getElementById('zombie-box');
+        zBox.classList.add('hit');
+        setTimeout(() => zBox.classList.remove('hit'), 160);
+
+        if (zombieHP <= 0) {
+            kills++;
+            document.getElementById('kills').innerText = kills;
+            if (kills > highScore) {
+                highScore = kills;
+                localStorage.setItem('kanji_write_best', highScore);
+                document.getElementById('high-score').innerText = highScore;
+            }
+            zombieHP = 100;
+        }
+
+        const hpPct = Math.max(0, zombieHP);
+        document.getElementById('hp-bar').style.width = hpPct + '%';
+    }
+
+    // Khởi chạy game lần đầu
+    window.onload = function() {
+        changeLevel();
+    };
+</script>
+
+</body>
+</html>
