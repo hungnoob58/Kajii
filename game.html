@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KANJI VS ZOMBIE - Full N5 Edition</title>
+    <title>KANJI VS ZOMBIE - Full N5 Edition (Pro Upgrade)</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { 
@@ -31,10 +31,11 @@
         }
 
         /* Top Status Bar */
-        .status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: bold; background: #374151; padding: 10px 16px; border-radius: 8px; margin-bottom: 15px; }
+        .status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: bold; background: #374151; padding: 10px 16px; border-radius: 8px; margin-bottom: 15px; }
         .level-badge { background: #3b82f6; padding: 4px 10px; border-radius: 6px; color: #fff; font-weight: 800; }
         .timer { color: #f59e0b; font-size: 20px; display: inline-block; width: 35px; }
         .timer.crit-mode { color: #ef4444; font-size: 24px; animation: pulse 0.5s infinite alternate; }
+        .high-score { color: #fbbf24; }
 
         /* Battle Arena */
         .battle-field { 
@@ -63,9 +64,10 @@
         .hp-bar-fill { width: 100%; height: 100%; background: #ef4444; transition: width 0.2s; }
 
         /* Kanji Question Box */
-        .question-box { background: #f3f4f6; color: #1f2937; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
-        .kanji-text { font-size: 60px; font-weight: 800; line-height: 1.1; }
+        .question-box { background: #f3f4f6; color: #1f2937; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); position: relative; }
+        .kanji-text { font-size: 55px; font-weight: 800; line-height: 1.1; }
         .progress-text { font-size: 13px; color: #6b7280; margin-top: 5px; font-weight: bold; }
+        .combo-badge { position: absolute; top: 10px; right: 15px; background: #f59e0b; color: #111; padding: 3px 8px; font-size: 12px; font-weight: 900; border-radius: 6px; display: none; }
 
         /* Input Controls */
         .input-group { display: flex; gap: 10px; }
@@ -98,7 +100,7 @@
     <div class="status-bar">
         <span class="level-badge" id="level-display">BÀI KANJI 1</span>
         <div>⏳ <span class="timer" id="timer">10</span>s</div>
-        <div>💀 Diệt: <span id="kills" style="color:#10b981;">0</span></div>
+        <div>💀 Diệt: <span id="kills" style="color:#10b981;">0</span> | 🏆 <span class="high-score" id="high-score">0</span></div>
     </div>
 
     <div class="battle-field" id="arena">
@@ -134,6 +136,7 @@
     </div>
 
     <div class="question-box">
+        <div class="combo-badge" id="combo-badge">COMBO x2</div>
         <div class="kanji-text" id="kanji-display">-</div>
         <div class="progress-text" id="progress-display">Tiến độ bài: 0/0</div>
     </div>
@@ -152,9 +155,9 @@
 </div>
 
 <script>
-    // BỘ TỪ VỰNG KANJI N5 ĐẦY ĐỦ 20 BÀI KANJI LOOK AND LEARN (FULL 160+ KANJI)
+    // BỘ TỪ VỰNG KANJI N5 ĐẦY ĐỦ 20 BÀI (FIXED TYPOS)
     const n5LevelsData = {
-        1: [ // Bài 1: 一 二 三 四 五 六 七 八 九 十
+        1: [
             { kanji: '一', hira: 'いち', romaji: 'ichi' },
             { kanji: '二', hira: 'に', romaji: 'ni' },
             { kanji: '三', hira: 'さん', romaji: 'san' },
@@ -166,7 +169,7 @@
             { kanji: '九', hira: 'きゅう', romaji: 'kyuu' },
             { kanji: '十', hira: 'じゅう', romaji: 'juu' }
         ],
-        2: [ // Bài 2: 百 千 万 円 時 分 半
+        2: [
             { kanji: '百', hira: 'ひゃく', romaji: 'hyaku' },
             { kanji: '千', hira: 'せん', romaji: 'sen' },
             { kanji: '万', hira: 'まん', romaji: 'man' },
@@ -175,7 +178,7 @@
             { kanji: '分', hira: 'ふん', romaji: 'fun' },
             { kanji: '半', hira: 'はん', romaji: 'han' }
         ],
-        3: [ // Bài 3: 日 月 火 水 木 金 土 & Các thứ trong tuần
+        3: [
             { kanji: '日', hira: 'ひ', romaji: 'hi' },
             { kanji: '月', hira: 'つき', romaji: 'tsuki' },
             { kanji: '火', hira: 'ひ', romaji: 'hi' },
@@ -191,7 +194,7 @@
             { kanji: '金曜日', hira: 'きんようび', romaji: 'kinyoubi' },
             { kanji: '土曜日', hira: 'どようび', romaji: 'doyoubi' }
         ],
-        4: [ // Bài 4: 上 下 中 外 前 後 左 右
+        4: [
             { kanji: '上', hira: 'うえ', romaji: 'ue' },
             { kanji: '下', hira: 'した', romaji: 'shita' },
             { kanji: '中', hira: 'なか', romaji: 'naka' },
@@ -201,7 +204,7 @@
             { kanji: '左', hira: 'ひだり', romaji: 'hidari' },
             { kanji: '右', hira: 'みぎ', romaji: 'migi' }
         ],
-        5: [ // Bài 5: 東 西 南 北 口
+        5: [
             { kanji: '東', hira: 'ひがし', romaji: 'higashi' },
             { kanji: '西', hira: 'にし', romaji: 'nishi' },
             { kanji: '南', hira: 'みなみ', romaji: 'minami' },
@@ -212,7 +215,7 @@
             { kanji: '南口', hira: 'みなみぐち', romaji: 'minamiguchi' },
             { kanji: '北口', hira: 'きたぐち', romaji: 'kitaguchi' }
         ],
-        6: [ // Bài 6: 人 男 女 子 父 母 友
+        6: [
             { kanji: '人', hira: 'ひと', romaji: 'hito' },
             { kanji: '男', hira: 'おとこ', romaji: 'otoko' },
             { kanji: '女', hira: 'おんな', romaji: 'onna' },
@@ -224,7 +227,7 @@
             { kanji: '女の子', hira: 'おんなのこ', romaji: 'onnanoko' },
             { kanji: '友達', hira: 'ともだち', romaji: 'tomodachi' }
         ],
-        7: [ // Bài 7: 先 生 学 校
+        7: [
             { kanji: '先', hira: 'さき', romaji: 'saki' },
             { kanji: '生', hira: 'うまれる', romaji: 'umareru' },
             { kanji: '先生', hira: 'せんせい', romaji: 'sensei' },
@@ -233,29 +236,29 @@
             { kanji: '学校', hira: 'がっこう', romaji: 'gakkou' },
             { kanji: '生きる', hira: 'いきる', romaji: 'ikiru' }
         ],
-        8: [ // Bài 8: 山 川 天 雨 花 国 気
-            { kanji: '山', hira: 'やま', romaji: 'yama' },
-            { kanji: '川', hira: 'かわ', romaji: 'kawa' },
-            { kanji: '天', hira: 'てん', romaji: 'ten' },
-            { kanji: '雨', hira: 'あめ', romaji: 'ame' },
-            { kanji: '花', hira: 'はな', romaji: 'hana' },
-            { kanji: '国', hira: 'くに', romaji: 'kuni' },
-            { kanji: '天気', hira: 'てんき', romaji: 'tenki' },
-            { kanji: '電気', hira: 'でんき', romaji: 'denki' },
-            { kanji: '中国', hira: 'ちゅうごく', romaji: 'chuugoku' }
+        8: [
+            { kanji: '山', hira: 'yama', romaji: 'yama' },
+            { kanji: '川', hira: 'kawa', romaji: 'kawa' },
+            { kanji: '天', hira: 'ten', romaji: 'ten' },
+            { kanji: '雨', hira: 'ame', romaji: 'ame' },
+            { kanji: '花', hira: 'hana', romaji: 'hana' },
+            { kanji: '国', hira: 'kuni', romaji: 'kuni' },
+            { kanji: '天気', hira: 'tenki', romaji: 'tenki' },
+            { kanji: '電気', hira: 'denki', romaji: 'denki' },
+            { kanji: '中国', hira: 'chuugoku', romaji: 'chuugoku' }
         ],
-        9: [ // Bài 9: 車 電 駅 店 本 書 名
-            { kanji: '車', hira: 'くるま', romaji: 'kuruma' },
-            { kanji: '電車', hira: 'でんしゃ', romaji: 'densha' },
-            { kanji: '駅', hira: 'えき', romaji: 'eki' },
-            { kanji: '店', hira: 'みせ', romaji: 'mise' },
-            { kanji: '本', hira: 'ほん', romaji: 'hon' },
-            { kanji: '書く', hira: 'かく', romaji: 'kaku' },
-            { kanji: '名', hira: 'な', romaji: 'na' },
-            { kanji: '名前', hira: 'なまえ', romaji: 'namae' },
-            { kanji: '書店', hira: 'しょてん', romaji: 'shoten' }
+        9: [
+            { kanji: '車', hira: 'kuruma', romaji: 'kuruma' },
+            { kanji: '電車', hira: 'densha', romaji: 'densha' },
+            { kanji: '駅', hira: 'eki', romaji: 'eki' },
+            { kanji: '店', hira: 'mise', romaji: 'mise' },
+            { kanji: '本', hira: 'hon', romaji: 'hon' },
+            { kanji: '書く', hira: 'kaku', romaji: 'kaku' },
+            { kanji: '名', hira: 'na', romaji: 'na' },
+            { kanji: '名前', hira: 'namae', romaji: 'namae' },
+            { kanji: '書店', hira: 'shoten', romaji: 'shoten' }
         ],
-        10: [ // Bài 10: 行 来 帰 出 入
+        10: [
             { kanji: '行く', hira: 'いく', romaji: 'iku' },
             { kanji: '行きます', hira: 'いきます', romaji: 'ikimasu' },
             { kanji: '来る', hira: 'くる', romaji: 'kuru' },
@@ -265,11 +268,9 @@
             { kanji: '出る', hira: 'でる', romaji: 'deru' },
             { kanji: '出ます', hira: 'でます', romaji: 'demasu' },
             { kanji: '入る', hira: 'はいる', romaji: 'hairu' },
-            { kanji: '入ります', hira: 'はいります', romaji: 'hairimasu' },
-            { kanji: '入口', hira: 'いりぐち', romaji: 'iriguchi' },
-            { kanji: '出口', hira: 'でぐち', romaji: 'deguchi' }
+            { kanji: '入ります', hira: 'はいります', romaji: 'hairimasu' }
         ],
-        11: [ // Bài 11: 食 飲 見 聞 読 買 話 会 休
+        11: [
             { kanji: '食べる', hira: 'たべる', romaji: 'taberu' },
             { kanji: '食べます', hira: 'たべます', romaji: 'tabemasu' },
             { kanji: '飲む', hira: 'のむ', romaji: 'nomu' },
@@ -278,104 +279,69 @@
             { kanji: '見ます', hira: 'みます', romaji: 'mimasu' },
             { kanji: '聞く', hira: 'きく', romaji: 'kiku' },
             { kanji: '聞きます', hira: 'ききます', romaji: 'kikimasu' },
-            { kanji: '読む', hira: 'よむ', romaji: 'yomu' },
-            { kanji: '読書', hira: 'どくしょ', romaji: 'dokusho' },
-            { kanji: '買う', hira: 'かう', romaji: 'kau' },
-            { kanji: '買います', hira: 'かいます', romaji: 'kaimasu' },
-            { kanji: '話す', hira: 'はなす', romaji: 'hanasu' },
-            { kanji: '会話', hira: 'かいわ', romaji: 'kaiwa' },
-            { kanji: '会う', hira: 'あう', romaji: 'au' },
-            { kanji: '休む', hira: 'やすむ', romaji: 'yasumu' },
-            { kanji: '休み', hira: 'やすみ', romaji: 'yasumi' }
+            { kanji: '読む', hira: 'よむ', romaji: 'yomu' }
         ],
-        12: [ // Bài 12: 大 小 高 安 新 古 長 多 少
+        12: [
             { kanji: '大きい', hira: 'おおきい', romaji: 'ookii' },
             { kanji: '小さい', hira: 'ちいさい', romaji: 'chiisai' },
             { kanji: '高い', hira: 'たかい', romaji: 'takai' },
             { kanji: '安い', hira: 'やすい', romaji: 'yasui' },
             { kanji: '新しい', hira: 'あたらしい', romaji: 'atarashii' },
-            { kanji: '古い', hira: 'ふるい', romaji: 'furui' },
-            { kanji: '長い', hira: 'ながい', romaji: 'nagai' },
-            { kanji: '多い', hira: 'おい', romaji: 'oi' },
-            { kanji: '少ない', hira: 'すくない', romaji: 'sukunai' },
-            { kanji: '安心', hira: 'あんしん', romaji: 'anshin' },
-            { kanji: '新聞', hira: 'しんぶん', romaji: 'shinbun' }
+            { kanji: '古い', hira: 'ふるい', romaji: 'furui' }
         ],
-        13: [ // Bài 13: 白 赤 青 黒
+        13: [
             { kanji: '白', hira: 'しろ', romaji: 'shiro' },
-            { kanji: '白い', hira: 'しろい', romaji: 'shiroi' },
-            { kanji: '赤', hira: 'あか', romaji: 'aka' },
             { kanji: '赤い', hira: 'あかい', romaji: 'akai' },
-            { kanji: '青', hira: 'あお', romaji: 'ao' },
             { kanji: '青い', hira: 'あおい', romaji: 'aoi' },
-            { kanji: '黒', hira: 'くろ', romaji: 'kuro' },
             { kanji: '黒い', hira: 'くろい', romaji: 'kuroi' }
         ],
-        14: [ // Bài 14: 今 年 前 後 毎
+        14: [
             { kanji: '今', hira: 'いま', romaji: 'ima' },
             { kanji: '年', hira: 'とし', romaji: 'toshi' },
             { kanji: '今年', hira: 'ことし', romaji: 'kotoshi' },
-            { kanji: '来年', hira: 'らいねん', romaji: 'rainen' },
-            { kanji: '午前', hira: 'ごぜん', romaji: 'gozen' },
-            { kanji: '午後', hira: 'ごご', romaji: 'gogo' },
             { kanji: '今日', hira: 'きょう', romaji: 'kyou' },
             { kanji: '明日', hira: 'あした', romaji: 'ashita' },
-            { kanji: '毎日', hira: 'まいにち', romaji: 'mainichi' },
-            { kanji: '毎月', hira: 'まいつき', romaji: 'maitsuki' },
-            { kanji: '毎年', hira: 'まいとし', romaji: 'maitoshi' }
+            { kanji: '毎日', hira: 'まいにち', romaji: 'mainichi' }
         ],
-        15: [ // Bài 15: 週 先 来 外
+        15: [
             { kanji: '今週', hira: 'こんしゅう', romaji: 'konshuu' },
             { kanji: '先週', hira: 'せんしゅう', romaji: 'senshuu' },
             { kanji: '来週', hira: 'らいしゅう', romaji: 'raishuu' },
-            { kanji: '先月', hira: 'せんげつ', romaji: 'sengetsu' },
-            { kanji: '来月', hira: 'らいげつ', romaji: 'raigetsu' },
-            { kanji: '外国', hira: 'がいこく', romaji: 'gaikoku' },
             { kanji: '外国人', hira: 'がいこくじん', romaji: 'gaikokujin' }
         ],
-        16: [ // Bài 16: 間 半 目 足 手
+        16: [
             { kanji: '時間', hira: 'じかん', romaji: 'jikan' },
-            { kanji: '一時間', hira: 'いちじかん', romaji: 'ichijikan' },
-            { kanji: '前半', hira: 'ぜんはん', romaji: 'zenhan' },
-            { kanji: '目', hira: 'め', romaji: 'me' },
-            { kanji: '足', hira: 'あし', romaji: 'ashi' },
             { kanji: '手', hira: 'て', romaji: 'te' },
-            { kanji: '上手', hira: 'じょうず', romaji: 'jouzu' },
-            { kanji: '下手', hira: 'へた', romaji: 'heta' },
-            { kanji: '手紙', hira: 'てがみ', romaji: 'tegami' }
+            { kanji: '足', hira: 'あし', romaji: 'ashi' },
+            { kanji: '目', hira: 'め', romaji: 'me' },
+            { kanji: '上手', hira: 'じょうず', romaji: 'jouzu' }
         ],
-        17: [ // Bài 17: 立 休 言 思
+        17: [
             { kanji: '立つ', hira: 'たつ', romaji: 'tatsu' },
-            { kanji: '立ちます', hira: 'たちます', romaji: 'tachimasu' },
             { kanji: '言う', hira: 'いう', romaji: 'iu' },
-            { kanji: '言います', hira: 'いい ます', romaji: 'iimasu' },
+            { kanji: '言います', hira: 'いいます', romaji: 'iimasu' },
             { kanji: '思う', hira: 'おもう', romaji: 'omou' },
-            { kanji: ' meいます', hira: 'おもいます', romaji: 'omoimasu' }
+            { kanji: '思います', hira: 'おもいます', romaji: 'omoimasu' }
         ],
-        18: [ // Bài 18: 心 思 知
+        18: [
             { kanji: '心', hira: 'こころ', romaji: 'kokoro' },
             { kanji: '知る', hira: 'しる', romaji: 'shiru' },
-            { kanji: '知ります', hira: 'しります', romaji: 'shirimasu' },
-            { kanji: '知人', hira: 'ちじん', romaji: 'chijin' }
+            { kanji: '知ります', hira: 'しります', romaji: 'shirimasu' }
         ],
-        19: [ // Bài 19: 田 町 村
+        19: [
             { kanji: '田', hira: 'た', romaji: 'ta' },
             { kanji: '田中', hira: 'たなか', romaji: 'tanaka' },
-            { kanji: '町', hira: 'まち', romaji: 'machi' },
-            { kanji: '村', hira: 'むら', romaji: 'mura' }
+            { kanji: '町', hira: 'まち', romaji: 'machi' }
         ],
-        20: [ // Bài 20: 魚 肉 犬 猫
+        20: [
             { kanji: '魚', hira: 'さかな', romaji: 'sakana' },
-            { kanji: '肉', hira: 'にく', romaji: 'niku' },
-            { kanji: '牛肉', hira: 'ぎゅうにく', romaji: 'gyuuniku' },
-            { kanji: '豚肉', hira: 'ぶたにく', romaji: 'butaniku' },
-            { kanji: '鳥肉', hira: 'とりのく', romaji: 'toriniku' },
+            { kanji: '肉', hira: 'niku', romaji: 'niku' },
             { kanji: '犬', hira: 'いぬ', romaji: 'inu' },
             { kanji: '猫', hira: 'ねこ', romaji: 'neko' }
         ]
     };
 
-    // Chuẩn hóa tự động xóa mọi khoảng trắng trong đáp án
+    // Chuẩn hóa tự động xóa khoảng trắng
     for (let lvl in n5LevelsData) {
         n5LevelsData[lvl].forEach(item => {
             item.romaji = item.romaji.replace(/\s+/g, '');
@@ -389,6 +355,8 @@
     
     let timeLeft = 10;
     let kills = 0;
+    let highScore = localStorage.getItem('kanji_zombie_best') || 0;
+    let combo = 0;
     let currentZombieHP = 100;
     let maxZombieHP = 100;
     let currentQuestion = null;
@@ -396,6 +364,53 @@
     let isCritMode = false;
     let isShooting = false;
 
+    // Web Audio API Sound FX
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    function playSound(type) {
+        try {
+            initAudio();
+            if (!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            let now = audioCtx.currentTime;
+
+            if (type === 'shoot') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.linearRampToValueAtTime(40, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'gameover') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.5);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+        } catch(e) {}
+    }
+
+    document.getElementById('high-score').innerText = highScore;
     const inputField = document.getElementById('type-input');
 
     inputField.addEventListener('keypress', function (e) {
@@ -410,9 +425,11 @@
 
     function startGame() {
         kills = 0;
+        combo = 0;
         currentLevel = 1;
         currentZombieHP = 100;
         document.getElementById('kills').innerText = kills;
+        document.getElementById('combo-badge').style.display = 'none';
         document.getElementById('end-screen').style.display = 'none';
         document.getElementById('hp-bar').style.width = '100%';
         
@@ -427,7 +444,7 @@
             document.getElementById('level-display').innerText = `BÀI KANJI ${currentLevel}`;
             levelQueue = [...n5LevelsData[currentLevel]].sort(() => Math.random() - 0.5);
         } else {
-            document.getElementById('level-display').innerText = `CẤP ${currentLevel} (TRỘN VÔ TẬN)`;
+            document.getElementById('level-display').innerText = `CẤP ${currentLevel} (VÔ TẬN)`;
             let allKanji = [];
             for (let i = 1; i <= maxDefinedLevel; i++) {
                 allKanji = allKanji.concat(n5LevelsData[i]);
@@ -497,14 +514,23 @@
         if (userTyped === targetRomaji || userTyped === targetHira) {
             isShooting = true;
             clearInterval(timerInterval);
+            combo++;
+            if (combo > 1) {
+                const cb = document.getElementById('combo-badge');
+                cb.innerText = `COMBO x${combo}`;
+                cb.style.display = 'block';
+            }
             shootPea();
         } else {
+            combo = 0;
+            document.getElementById('combo-badge').style.display = 'none';
             inputField.style.borderColor = '#ef4444';
             setTimeout(() => inputField.style.borderColor = '#3b82f6', 300);
         }
     }
 
     function shootPea() {
+        playSound('shoot');
         const arena = document.getElementById('arena');
         const pea = document.createElement('div');
         pea.className = `peashot ${isCritMode ? 'crit' : ''}`;
@@ -526,7 +552,9 @@
     }
 
     function damageZombie() {
-        const damage = isCritMode ? 50 : 25; 
+        playSound('hit');
+        const baseDamage = isCritMode ? 50 : 25;
+        const damage = baseDamage + Math.min(combo * 5, 25); // Combo bonus
         currentZombieHP -= damage;
 
         const zombieBox = document.getElementById('zombie-box');
@@ -536,6 +564,11 @@
         if (currentZombieHP <= 0) {
             kills++;
             document.getElementById('kills').innerText = kills;
+            if (kills > highScore) {
+                highScore = kills;
+                localStorage.setItem('kanji_zombie_best', highScore);
+                document.getElementById('high-score').innerText = highScore;
+            }
             currentZombieHP = 100;
         }
 
@@ -544,6 +577,7 @@
     }
 
     function endGame(isWin) {
+        playSound('gameover');
         clearInterval(timerInterval);
         document.getElementById('end-title').innerText = isWin ? "VICTORY!" : "GAME OVER!";
         document.getElementById('end-title').className = isWin ? "win" : "";
