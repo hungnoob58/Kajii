@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KANJI VS ZOMBIE - Luyện Viết Kanji N5</title>
+    <title>KANJI VS ZOMBIE - Luyện Viết Kanji N5 (Pro Version)</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
         body { 
@@ -109,9 +109,8 @@
             border: 4px solid #d97706;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 15px rgba(217, 119, 6, 0.2);
-            touch-action: none; /* Chống cuộn trang khi vẽ trên điện thoại */
+            touch-action: none;
         }
-        /* Đường kẻ ô ly chữ thập mờ (Genkouyoushi style) */
         .canvas-grid {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -138,7 +137,6 @@
             border-radius: 8px;
         }
 
-        /* Feedback Toast */
         .feedback-msg {
             height: 22px;
             font-size: 14px;
@@ -146,7 +144,6 @@
             color: #fbbf24;
         }
 
-        /* Action Buttons */
         .controls {
             display: flex;
             gap: 8px;
@@ -172,7 +169,6 @@
         .btn-cast { background: #8b5cf6; padding: 10px 26px; font-size: 16px; box-shadow: 0 0 12px rgba(139, 92, 246, 0.6); }
         .btn-cast:hover { background: #7c3aed; }
 
-        /* Magic Spell Projectile */
         .spell-shot { 
             position: absolute; 
             width: 34px; 
@@ -201,7 +197,6 @@
     </div>
 
     <div class="battle-field" id="arena">
-        <!-- Pháp sư Đậu (Wizard Peashooter) -->
         <div class="character-box">
             <svg class="svg-char" viewBox="0 0 100 100">
                 <path d="M 50 65 Q 38 78 20 88 Q 45 83 50 65 Z" fill="#15803d"/>
@@ -212,13 +207,11 @@
                 <ellipse cx="61" cy="42" rx="6" ry="9" fill="#052e16"/>
                 <circle cx="36" cy="35" r="4" fill="#fff"/>
                 <circle cx="37" cy="35" r="2" fill="#000"/>
-                <!-- Mũ pháp sư -->
                 <polygon points="20,25 60,25 38,2" fill="#7c3aed"/>
                 <ellipse cx="40" cy="25" rx="26" ry="5" fill="#6d28d9"/>
             </svg>
         </div>
         
-        <!-- Zombie -->
         <div class="character-box zombie-box" id="zombie-box">
             <div class="hp-bar-bg"><div class="hp-bar-fill" id="hp-bar"></div></div>
             <svg class="svg-char" viewBox="0 0 100 100">
@@ -261,11 +254,9 @@
     </div>
 </div>
 
-<!-- Hidden Canvas để chấm điểm đối chiếu nét vẽ -->
 <canvas id="target-canvas" width="240" height="240" style="display:none;"></canvas>
 
 <script>
-    // DỮ LIỆU CHỮ KANJI ĐƠN N5 THEO 20 BÀI (KÈM NGHĨA TIẾNG VIỆT)
     const n5KanjiWriteData = {
         1: [
             { kanji: '一', hira: 'いち', romaji: 'ichi', mean: 'Số 1 (Nhất)' },
@@ -418,7 +409,6 @@
         ]
     };
 
-    // Canvas setup
     const drawCanvas = document.getElementById('draw-canvas');
     const ctx = drawCanvas.getContext('2d', { willReadFrequently: true });
     const targetCanvas = document.getElementById('target-canvas');
@@ -439,7 +429,6 @@
 
     document.getElementById('high-score').innerText = highScore;
 
-    // Populate Level Select Dropdown
     const levelSelect = document.getElementById('level-select');
     const mixOpt = document.createElement('option');
     mixOpt.value = 'all';
@@ -452,9 +441,8 @@
         opt.innerText = `BÀI KANJI ${i}`;
         levelSelect.appendChild(opt);
     }
-    levelSelect.value = '1'; // Mặc định bắt đầu từ Bài 1
+    levelSelect.value = '1';
 
-    // Drawing Events (Mouse & Touch)
     function getPos(e) {
         const rect = drawCanvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -478,7 +466,7 @@
     function moveDraw(e) {
         if (!isDrawing || isCasting) return;
         const pos = getPos(e);
-        ctx.lineWidth = 13;
+        ctx.lineWidth = 14;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#111827';
@@ -499,7 +487,6 @@
     drawCanvas.addEventListener('touchmove', moveDraw, { passive: false });
     window.addEventListener('touchend', endDraw);
 
-    // Sound FX (Web Audio API)
     let audioCtx = null;
     function playSound(type) {
         try {
@@ -587,19 +574,17 @@
         document.getElementById('meaning-display').innerText = `Nghĩa: ${currentQ.mean}`;
         document.getElementById('progress-display').innerText = `Tiến độ: ${qIndex + 1}/${queue.length}`;
 
-        // Cập nhật chữ mẫu ẩn và nét mờ
         const ghost = document.getElementById('ghost-kanji');
         ghost.innerText = currentQ.kanji;
         ghost.style.display = 'none';
         hintUsed = false;
 
-        // Vẽ chữ mẫu lên targetCanvas ẩn để chuẩn bị chấm điểm
+        // Cập nhật mẫu nét cực dày để dung sai cực lớn, thoải mái viết tay trên di động
         targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-        targetCtx.font = '175px "Hiragino Kaku Gothic Pro", "Yu Gothic", "Meiryo", sans-serif';
+        targetCtx.font = 'bold 160px "Hiragino Kaku Gothic Pro", "Yu Gothic", "Meiryo", sans-serif';
         targetCtx.textAlign = 'center';
         targetCtx.textBaseline = 'middle';
-        // Vẽ viền dày nhẹ để tạo vùng dung sai (tolerance zone) cho nét vẽ tay
-        targetCtx.lineWidth = 18;
+        targetCtx.lineWidth = 60;
         targetCtx.strokeStyle = '#000';
         targetCtx.strokeText(currentQ.kanji, 120, 125);
         targetCtx.fillStyle = '#000';
@@ -609,7 +594,7 @@
         isCasting = false;
     }
 
-    // THUẬT TOÁN CHẤM ĐIỂM ĐỐI CHIẾU NÉT VẼ KANJI
+    // THUẬT TOÁN CHẤM ĐIỂM LINH HOẠT (CHỈ CẦN VIẾT ĐÚNG MẶT CHỮ)
     function checkKanji() {
         if (isCasting || !currentQ) return;
         if (!hasDrawn) {
@@ -622,29 +607,32 @@
 
         let targetPixels = 0;
         let matchedPixels = 0;
-        let strayPixels = 0;
+        let userTotalPixels = 0;
 
         for (let i = 3; i < targetData.length; i += 4) {
-            const tAlpha = targetData[i];
-            const uAlpha = userData[i];
-
-            if (tAlpha > 50) {
-                targetPixels++;
-                if (uAlpha > 50) {
+            if (targetData[i] > 50) targetPixels++;
+            if (userData[i] > 50) {
+                userTotalPixels++;
+                if (targetData[i] > 50) {
                     matchedPixels++;
-                }
-            } else {
-                if (uAlpha > 50) {
-                    strayPixels++;
                 }
             }
         }
 
-        const coverage = matchedPixels / Math.max(1, targetPixels); // Tỷ lệ phủ đúng nét mẫu
-        const precision = matchedPixels / Math.max(1, matchedPixels + strayPixels); // Độ chính xác (không vẽ lem ra ngoài)
+        // Chống viết quá ngắn hoặc tô đen xì bảng
+        if (userTotalPixels < 30) {
+            setFeedback("⚠️ Viết ngắn quá! Viết rõ nét hơn chút nhé.", "#ef4444");
+            return;
+        }
+        if (userTotalPixels > 4500) {
+            setFeedback("⚠️ Tô đen gì mà kín bảng thế ông tướng? Viết đúng nét thôi!", "#ef4444");
+            return;
+        }
 
-        // Điều kiện đạt: Phủ ít nhất 42% vùng dung sai mẫu VÀ độ chính xác nét >= 48%
-        if (coverage >= 0.42 && precision >= 0.48) {
+        const coverage = matchedPixels / Math.max(1, targetPixels);
+
+        // Chỉ cần độ phủ đạt 12% là cho qua, tha hồ viết tay không sợ lệch nét!
+        if (coverage >= 0.12) {
             isCasting = true;
             combo++;
             if (combo > 1) {
@@ -652,19 +640,14 @@
                 cb.innerText = `COMBO x${combo}`;
                 cb.style.display = 'block';
             }
-            const accuracyPercent = Math.min(100, Math.round((coverage * 0.5 + precision * 0.5) * 125));
-            setFeedback(`✨ CHUẨN XÁC (${accuracyPercent}%)! Phóng bùa "${currentQ.kanji}"!`, "#10b981");
+            setFeedback(`✨ CHÍNH XÁC! Phóng bùa "${currentQ.kanji}"!`, "#10b981");
             castSpell(currentQ.kanji);
         } else {
             combo = 0;
             document.getElementById('combo-badge').style.display = 'none';
             playSound('fail');
-            if (precision < 0.48) {
-                setFeedback(`❌ Lệch nét quá nhiều! Bấm "Nét mờ" nếu quên mặt chữ nhé.`, "#ef4444");
-            } else {
-                setFeedback(`❌ Còn thiếu nét của chữ "${currentQ.kanji}" rồi! Thử lại nào.`, "#ef4444");
-            }
-            // Nháy đỏ viền canvas
+            setFeedback(`❌ Chưa đúng chữ "${currentQ.kanji}" lắm! Thử viết lại xem.`, "#ef4444");
+            
             const container = document.querySelector('.canvas-container');
             container.style.borderColor = '#ef4444';
             setTimeout(() => container.style.borderColor = '#d97706', 350);
@@ -696,7 +679,6 @@
 
     function damageZombie() {
         playSound('hit');
-        // Nếu không dùng gợi ý nét mờ thì gây sát thương cao hơn
         const baseDmg = hintUsed ? 35 : 50;
         const dmg = baseDmg + Math.min(combo * 5, 25);
         zombieHP -= dmg;
@@ -720,7 +702,6 @@
         document.getElementById('hp-bar').style.width = hpPct + '%';
     }
 
-    // Khởi chạy game lần đầu
     window.onload = function() {
         changeLevel();
     };
