@@ -466,7 +466,7 @@
     function moveDraw(e) {
         if (!isDrawing || isCasting) return;
         const pos = getPos(e);
-        ctx.lineWidth = 14;
+        ctx.lineWidth = 10; // Giảm xuống 10 cho thanh thoát, tránh quá dày
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#111827';
@@ -579,7 +579,6 @@
         ghost.style.display = 'none';
         hintUsed = false;
 
-        // Cập nhật mẫu nét cực dày để dung sai cực lớn, thoải mái viết tay trên di động
         targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
         targetCtx.font = 'bold 160px "Hiragino Kaku Gothic Pro", "Yu Gothic", "Meiryo", sans-serif';
         targetCtx.textAlign = 'center';
@@ -594,7 +593,6 @@
         isCasting = false;
     }
 
-    // THUẬT TOÁN CHẤM ĐIỂM LINH HOẠT (CHỈ CẦN VIẾT ĐÚNG MẶT CHỮ)
     function checkKanji() {
         if (isCasting || !currentQ) return;
         if (!hasDrawn) {
@@ -619,19 +617,17 @@
             }
         }
 
-        // Chống viết quá ngắn hoặc tô đen xì bảng
         if (userTotalPixels < 30) {
             setFeedback("⚠️ Viết ngắn quá! Viết rõ nét hơn chút nhé.", "#ef4444");
             return;
         }
-        if (userTotalPixels > 4500) {
-            setFeedback("⚠️ Tô đen gì mà kín bảng thế ông tướng? Viết đúng nét thôi!", "#ef4444");
+        if (userTotalPixels > 9000) { // Nới giới hạn lên 9000 pixel để thoải mái viết các chữ khung to (như 四, 口, 田...)
+            setFeedback("⚠️ Viết gọn tay lại chút nhé ông tướng!", "#ef4444");
             return;
         }
 
         const coverage = matchedPixels / Math.max(1, targetPixels);
 
-        // Chỉ cần độ phủ đạt 12% là cho qua, tha hồ viết tay không sợ lệch nét!
         if (coverage >= 0.12) {
             isCasting = true;
             combo++;
