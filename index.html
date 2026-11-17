@@ -2,65 +2,359 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>KANJI VS ZOMBIE - Trung Tâm Luyện Thi N5</title>
+
+    <!-- Cấu hình chạy Fullscreen (Ẩn thanh địa chỉ khi thêm vào màn hình chính) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kanji vs Zombie">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#064e3b">
+
+    <!-- Placeholder Icon (Sẽ được script tự động vẽ Peashooter bắn Kanji đè vào ngay khi tải) -->
+    <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="">
+    <link id="favicon-icon" rel="icon" type="image/png" href="">
+    <link id="manifest-link" rel="manifest" href="">
+
+    <script>
+        // Tự động vẽ Logo Peashooter bắn chữ Kanji (180x180 PNG sắc nét cho iOS & Android)
+        (function generateAppIcon() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 180;
+            canvas.height = 180;
+            const ctx = canvas.getContext('2d');
+
+            // 1. Nền xanh ngọc đậm chuyển sắc
+            const bgGrad = ctx.createRadialGradient(65, 85, 10, 90, 90, 125);
+            bgGrad.addColorStop(0, '#059669');
+            bgGrad.addColorStop(0.6, '#064e3b');
+            bgGrad.addColorStop(1, '#022c22');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, 180, 180);
+
+            // Viền sáng nhẹ quanh icon
+            ctx.strokeStyle = 'rgba(74, 222, 128, 0.35)';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(2, 2, 176, 176);
+
+            // Thảm cỏ phía dưới
+            ctx.fillStyle = '#047857';
+            ctx.fillRect(0, 142, 180, 38);
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(0, 142, 180, 4);
+
+            // 2. Thân và lá gốc của Peashooter
+            ctx.strokeStyle = '#16a34a';
+            ctx.lineWidth = 9;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(54, 152);
+            ctx.quadraticCurveTo(46, 122, 54, 96);
+            ctx.stroke();
+
+            // 4 chiếc lá dưới gốc
+            const drawLeaf = (x, y, rx, ry, rot, color) => {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(rot);
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#052e16';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
+            };
+            drawLeaf(36, 150, 18, 8, -0.35, '#22c55e');
+            drawLeaf(72, 150, 18, 8, 0.35, '#22c55e');
+            drawLeaf(42, 156, 15, 7, -0.1, '#4ade80');
+            drawLeaf(66, 156, 15, 7, 0.1, '#4ade80');
+
+            // Lá sau đầu Peashooter
+            drawLeaf(24, 72, 15, 7, -0.65, '#16a34a');
+
+            // 3. Đầu Peashooter
+            ctx.save();
+            ctx.translate(54, 88);
+            ctx.rotate(-0.18); // Hơi ngẩng đầu bắn lên
+
+            // Nòng súng (miệng loa)
+            const snoutGrad = ctx.createLinearGradient(12, 0, 46, 0);
+            snoutGrad.addColorStop(0, '#22c55e');
+            snoutGrad.addColorStop(1, '#4ade80');
+            ctx.fillStyle = snoutGrad;
+            ctx.beginPath();
+            ctx.moveTo(14, -10);
+            ctx.lineTo(44, -17);
+            ctx.lineTo(44, 17);
+            ctx.lineTo(14, 10);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#052e16';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Vành miệng loa & lỗ nòng tối
+            ctx.fillStyle = '#86efac';
+            ctx.beginPath();
+            ctx.ellipse(44, 0, 8, 17, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#052e16';
+            ctx.beginPath();
+            ctx.ellipse(45, 0, 4.5, 11.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hộp sọ tròn của Peashooter
+            const headGrad = ctx.createRadialGradient(-6, -8, 4, 0, 0, 28);
+            headGrad.addColorStop(0, '#bbf7d0');
+            headGrad.addColorStop(0.45, '#22c55e');
+            headGrad.addColorStop(1, '#15803d');
+            ctx.fillStyle = headGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, 26, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#052e16';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Mắt to long lanh
+            ctx.fillStyle = '#090d16';
+            ctx.beginPath();
+            ctx.ellipse(8, -7, 5, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(10, -10, 2.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // 4. Tia năng lượng & Đạn chữ Kanji「漢」
+            // Vệt sáng bay ra từ nòng
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.75)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(100, 74);
+            ctx.lineTo(116, 70);
+            ctx.moveTo(102, 83);
+            ctx.lineTo(114, 81);
+            ctx.stroke();
+
+            // Hào quang viên đạn
+            const orbX = 140, orbY = 66;
+            const aura = ctx.createRadialGradient(orbX, orbY, 8, orbX, orbY, 36);
+            aura.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
+            aura.addColorStop(0.55, 'rgba(74, 222, 128, 0.65)');
+            aura.addColorStop(1, 'rgba(74, 222, 128, 0)');
+            ctx.fillStyle = aura;
+            ctx.beginPath();
+            ctx.arc(orbX, orbY, 36, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Lõi viên đạn tròn
+            const orbGrad = ctx.createRadialGradient(orbX - 6, orbY - 6, 3, orbX, orbY, 25);
+            orbGrad.addColorStop(0, '#fef9c3');
+            orbGrad.addColorStop(0.5, '#4ade80');
+            orbGrad.addColorStop(1, '#15803d');
+            ctx.fillStyle = orbGrad;
+            ctx.beginPath();
+            ctx.arc(orbX, orbY, 25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Chữ Kanji「漢」bên trong viên đạn
+            ctx.fillStyle = '#052e16';
+            ctx.font = '900 29px "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('漢', orbX + 1, orbY + 2);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('漢', orbX, orbY + 1);
+
+            // Xuất ra PNG Data URL và gắn vào thẻ head
+            const pngUrl = canvas.toDataURL('image/png');
+            window.__APP_ICON_URL__ = pngUrl;
+            document.getElementById('apple-touch-icon').href = pngUrl;
+            document.getElementById('favicon-icon').href = pngUrl;
+
+            // Tạo Web App Manifest động cho Android/Chrome
+            const manifest = {
+                name: "KANJI VS ZOMBIE - Luyện Thi N5",
+                short_name: "Kanji Zombie",
+                start_url: "./index.html",
+                display: "standalone",
+                background_color: "#064e3b",
+                theme_color: "#064e3b",
+                icons: [{ src: pngUrl, sizes: "180x180", type: "image/png" }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
+        })();
+    </script>
+
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { 
-            background: #0d1117; 
-            background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
-            background-size: 24px 24px;
-            color: #fff; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px; 
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .menu-container { 
-            background: linear-gradient(180deg, #064e3b 0%, #0f172a 45%, #1e1b4b 100%);
-            border: 4px solid #10b981; 
-            border-radius: 20px; 
-            padding: 35px 28px; 
-            width: 100%; 
-            max-width: 660px; 
-            text-align: center; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(16, 185, 129, 0.2); 
+        body {
+            background: #070b14;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: calc(16px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)) 16px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Hiệu ứng nền lưới & chữ Kanji bay lơ lửng */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.18), transparent 60%),
+                radial-gradient(rgba(34, 197, 94, 0.12) 1px, transparent 1px);
+            background-size: 100% 100%, 26px 26px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .floating-kanji {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .floating-kanji span {
+            position: absolute;
+            color: rgba(74, 222, 128, 0.08);
+            font-weight: 900;
+            user-select: none;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) rotate(0deg); opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { transform: translateY(-15vh) rotate(25deg); opacity: 0; }
+        }
+
+        /* Khung chính */
+        .menu-container {
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(175deg, rgba(6, 78, 59, 0.92) 0%, rgba(15, 23, 42, 0.96) 48%, rgba(30, 27, 75, 0.95) 100%);
+            backdrop-filter: blur(12px);
+            border: 3px solid #10b981;
+            border-radius: 26px;
+            padding: 28px 22px;
+            width: 100%;
+            max-width: 640px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(16, 185, 129, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .badge-edition {
-            background: rgba(251, 191, 36, 0.15);
-            border: 1px solid #fbbf24;
-            color: #fbbf24;
-            padding: 4px 14px;
+        /* Huy hiệu Logo Peashooter sống động */
+        .hero-logo-wrap {
+            position: relative;
+            margin-bottom: 12px;
+            animation: heroBounce 2.6s ease-in-out infinite;
+        }
+
+        .hero-logo-img {
+            width: 78px;
+            height: 78px;
             border-radius: 20px;
-            font-size: 12px;
+            border: 3px solid #4ade80;
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5), 0 0 15px rgba(250, 204, 21, 0.35);
+            display: block;
+        }
+
+        .hero-level-tag {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            color: #1e1b4b;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 2px 10px;
+            border-radius: 99px;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes heroBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.03); }
+        }
+
+        .badge-edition {
+            background: rgba(251, 191, 36, 0.14);
+            border: 1px solid rgba(251, 191, 36, 0.7);
+            color: #fde047;
+            padding: 5px 14px;
+            border-radius: 99px;
+            font-size: 11.5px;
             font-weight: 800;
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-top: 6px;
+            margin-bottom: 10px;
             text-transform: uppercase;
         }
 
         .game-title {
-            font-size: 46px;
+            font-size: 42px;
             font-weight: 900;
-            color: #22c55e;
-            text-shadow: 0 0 15px rgba(34, 197, 94, 0.6), 3px 3px 0px #000;
-            margin: 0 0 8px 0;
-            letter-spacing: 2px;
-            line-height: 1.1;
+            background: linear-gradient(180deg, #86efac 0%, #22c55e 55%, #15803d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 3px 0 #052e16) drop-shadow(0 0 16px rgba(34, 197, 94, 0.55));
+            margin: 0 0 6px 0;
+            letter-spacing: 1.5px;
+            line-height: 1.08;
         }
 
         .game-subtitle {
-            font-size: 16px;
-            color: #e5e7eb;
-            margin-bottom: 28px;
+            font-size: 14.5px;
+            color: #cbd5e1;
+            margin-bottom: 14px;
             font-weight: 600;
+        }
+
+        /* Thanh tổng thành tích */
+        .total-stats {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            padding: 6px 16px;
+            border-radius: 99px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #a7f3d0;
+            margin-bottom: 22px;
         }
 
         /* Khu vực chọn 2 chế độ chơi */
@@ -69,12 +363,12 @@
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             width: 100%;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         @media (max-width: 540px) {
-            .modes-grid { grid-template-columns: 1fr; }
-            .game-title { font-size: 36px; }
+            .modes-grid { grid-template-columns: 1fr; gap: 14px; }
+            .game-title { font-size: 34px; }
         }
 
         .mode-card {
@@ -82,82 +376,223 @@
             flex-direction: column;
             justify-content: space-between;
             padding: 20px 16px;
-            border-radius: 16px;
+            border-radius: 20px;
             text-decoration: none;
             color: #fff;
-            transition: all 0.22s ease;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
             position: relative;
             overflow: hidden;
         }
 
+        /* Hiệu ứng vệt sáng lướt qua thẻ */
+        .mode-card::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -75%;
+            width: 50%;
+            height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.16), transparent);
+            transform: rotate(25deg);
+            transition: left 0.6s ease;
+        }
+
+        .mode-card:hover::after {
+            left: 130%;
+        }
+
+        .mode-card:active {
+            transform: translateY(4px) scale(0.98) !important;
+        }
+
         /* Chế độ 1: Gõ Phím (game.html) */
         .mode-read {
-            background: linear-gradient(180deg, #15803d 0%, #14532d 100%);
-            border: 3px solid #4ade80;
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+            background: linear-gradient(165deg, #16a34a 0%, #14532d 100%);
+            border: 2.5px solid #4ade80;
+            box-shadow: 0 6px 0 #052e16, 0 12px 24px rgba(34, 197, 94, 0.3);
         }
         .mode-read:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 28px rgba(34, 197, 94, 0.55);
-            border-color: #bbf7d0;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 0 #052e16, 0 16px 30px rgba(34, 197, 94, 0.5);
         }
 
         /* Chế độ 2: Viết Bùa (game2.html) */
         .mode-write {
-            background: linear-gradient(180deg, #6d28d9 0%, #3b0764 100%);
-            border: 3px solid #c084fc;
-            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3);
+            background: linear-gradient(165deg, #7c3aed 0%, #3b0764 100%);
+            border: 2.5px solid #c084fc;
+            box-shadow: 0 6px 0 #1e1b4b, 0 12px 24px rgba(168, 85, 247, 0.3);
         }
         .mode-write:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 28px rgba(168, 85, 247, 0.55);
-            border-color: #f3e8ff;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 0 #1e1b4b, 0 16px 30px rgba(168, 85, 247, 0.5);
         }
 
-        .mode-icon { font-size: 36px; margin-bottom: 8px; }
-        .mode-name { font-size: 20px; font-weight: 900; margin-bottom: 4px; text-shadow: 1px 1px 2px #000; }
-        .mode-desc { font-size: 13px; color: #e2e8f0; margin-bottom: 14px; line-height: 1.4; }
-        
+        .mode-tag {
+            align-self: center;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 99px;
+            background: rgba(0, 0, 0, 0.35);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .mode-icon {
+            font-size: 38px;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+
+        .mode-name {
+            font-size: 19px;
+            font-weight: 900;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .mode-desc {
+            font-size: 13px;
+            color: #f1f5f9;
+            margin-bottom: 14px;
+            line-height: 1.45;
+        }
+
         .mode-record {
-            background: rgba(0, 0, 0, 0.45);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            padding: 7px 10px;
+            border-radius: 10px;
+            font-size: 12.5px;
             font-weight: 800;
             color: #fbbf24;
         }
 
-        /* Luật chơi */
+        /* Bảng hướng dẫn chiến đấu */
         .instructions {
-            background: rgba(15, 23, 42, 0.75);
-            padding: 18px 20px;
-            border-radius: 12px;
-            font-size: 13.5px;
-            color: #d1d5db;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 16px 18px;
+            border-radius: 16px;
+            font-size: 13px;
+            color: #cbd5e1;
             text-align: left;
             width: 100%;
-            line-height: 1.65;
-            border: 1px solid rgba(255,255,255,0.12);
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .instructions-title {
+            font-weight: 800;
+            color: #f8fafc;
+            margin-bottom: 6px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         .instructions b.green { color: #4ade80; }
         .instructions b.purple { color: #c084fc; }
         .instructions b.gold { color: #fbbf24; }
+
+        /* Hộp hướng dẫn Thêm vào màn hình chính (Tự ẩn khi mở từ App) */
+        .pwa-install-box {
+            margin-top: 16px;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(16, 185, 129, 0.14));
+            border: 1.5px dashed #fbbf24;
+            border-radius: 16px;
+            padding: 14px 16px;
+            text-align: left;
+            position: relative;
+        }
+
+        .pwa-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .pwa-preview-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 11px;
+            border: 2px solid #fbbf24;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .pwa-title {
+            font-size: 14px;
+            font-weight: 900;
+            color: #fde047;
+            line-height: 1.3;
+        }
+
+        .pwa-sub {
+            font-size: 11.5px;
+            color: #e2e8f0;
+        }
+
+        .pwa-steps {
+            font-size: 12.5px;
+            color: #f1f5f9;
+            line-height: 1.55;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 10px 12px;
+            border-radius: 10px;
+        }
+
+        .pwa-steps b {
+            color: #4ade80;
+        }
+
+        .pwa-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #cbd5e1;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
 
+<div class="bg-grid"></div>
+<div class="floating-kanji" id="floating-kanji"></div>
+
 <div class="menu-container">
+    <!-- Logo Peashooter bắn Kanji -->
+    <div class="hero-logo-wrap">
+        <img id="hero-logo-img" class="hero-logo-img" alt="Kanji vs Zombie Logo">
+        <span class="hero-level-tag">N5 EDITION</span>
+    </div>
+
     <div class="badge-edition">Full 20 Bài Kanji Look & Learn</div>
     <h1 class="game-title">KANJI VS ZOMBIE</h1>
     <div class="game-subtitle">Ôn Luyện Trọn Bộ 160+ Từ Vựng Kanji N5</div>
-    
+
+    <div class="total-stats">
+        <span>🧟 Tổng tiêu diệt:</span>
+        <b id="total-kills" style="color: #fbbf24;">0 Zombie</b>
+    </div>
+
     <div class="modes-grid">
         <!-- Nút vào game.html -->
         <a href="game.html" class="mode-card mode-read">
             <div>
+                <div class="mode-tag">⚡ PHẢN XẠ NHANH</div>
                 <div class="mode-icon">🎯</div>
                 <div class="mode-name">LUYỆN ĐỌC & GÕ</div>
-                <div class="mode-desc">Nhìn chữ Kanji, gõ nhanh Hiragana hoặc Romaji để bắn hạ Zombie.</div>
+                <div class="mode-desc">Nhìn chữ Kanji, gõ nhanh Hiragana hoặc Romaji để nã đạn hạ Zombie.</div>
             </div>
             <div class="mode-record">🏆 Kỷ lục: <span id="best-read">0</span> Zombie</div>
         </a>
@@ -165,30 +600,86 @@
         <!-- Nút vào game2.html -->
         <a href="game2.html" class="mode-card mode-write">
             <div>
+                <div class="mode-tag">✨ VẼ BÙA PHÉP</div>
                 <div class="mode-icon">🖌️</div>
                 <div class="mode-name">LUYỆN VIẾT KANJI</div>
-                <div class="mode-desc">Nhìn cách đọc & nghĩa, tự tay vẽ bùa chữ Kanji để phóng phép.</div>
+                <div class="mode-desc">Nhìn cách đọc & nghĩa, tự tay vẽ nét bùa chữ Kanji để phóng phép.</div>
             </div>
             <div class="mode-record">🏆 Kỷ lục: <span id="best-write">0</span> Zombie</div>
         </a>
     </div>
 
+    <!-- Hướng dẫn chơi -->
     <div class="instructions">
-        📌 <b>Hướng dẫn chiến đấu:</b><br>
+        <div class="instructions-title">📌 Luật chiến đấu:</div>
         • <b class="green">Chế độ Đọc & Gõ:</b> Mỗi câu có <b class="gold">10 giây</b> đếm ngược. Bắn trúng ở <b class="gold">3s cuối</b> kích hoạt Đạn Lửa x2 Sát Thương (Crit Dame)!<br>
         • <b class="purple">Chế độ Viết Kanji:</b> Vẽ đúng nét chữ Kanji lên lá bùa (hỗ trợ cả chuột & cảm ứng). Quên mặt chữ có thể bật <b>Nét mờ</b> để đồ theo.<br>
-        • Giữ chuỗi trả lời đúng liên tục để kích hoạt <b>Combo Streak</b> tăng sát thương!
+        • Giữ chuỗi trả lời đúng liên tục để kích hoạt <b>Combo Streak</b> tăng uy lực!
+    </div>
+
+    <!-- Hướng dẫn cài ra màn hình chính (Tự biến mất khi mở từ App) -->
+    <div class="pwa-install-box" id="pwa-install-box">
+        <button class="pwa-close-btn" onclick="document.getElementById('pwa-install-box').style.display='none'" title="Đóng">✕</button>
+        <div class="pwa-header">
+            <img id="pwa-preview-icon" class="pwa-preview-icon" alt="App Icon Preview">
+            <div>
+                <div class="pwa-title">📲 Cài thành App Full Màn Hình</div>
+                <div class="pwa-sub">Ẩn thanh địa chỉ web & hiện logo Peashooter ngoài màn hình</div>
+            </div>
+        </div>
+        <div class="pwa-steps" id="pwa-steps-text">
+            1. Bấm nút <b>Chia sẻ</b> (biểu tượng ô vuông có mũi tên lên ⬆️) ở thanh dưới trình duyệt Safari.<br>
+            2. Kéo xuống chọn <b>"Thêm vào MH chính"</b> (Add to Home Screen).<br>
+            3. Bấm <b>"Thêm"</b> ở góc trên bên phải, sau đó mở game từ icon mới ngoài màn hình chính!
+        </div>
     </div>
 </div>
 
 <script>
-    // Tự động lấy kỷ lục từ LocalStorage của 2 game để hiển thị lên Menu
-    window.onload = function() {
-        const bestRead = localStorage.getItem('kanji_zombie_best') || 0;
-        const bestWrite = localStorage.getItem('kanji_write_best') || 0;
+    window.addEventListener('DOMContentLoaded', function() {
+        // 1. Gắn ảnh icon Peashooter đã vẽ vào giao diện
+        if (window.__APP_ICON_URL__) {
+            document.getElementById('hero-logo-img').src = window.__APP_ICON_URL__;
+            document.getElementById('pwa-preview-icon').src = window.__APP_ICON_URL__;
+        }
+
+        // 2. Kiểm tra xem đang mở bằng trình duyệt hay mở từ Màn hình chính (Standalone)
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isStandalone) {
+            // Đã mở từ Màn hình chính -> Ẩn hoàn toàn khung hướng dẫn cài đặt
+            const installBox = document.getElementById('pwa-install-box');
+            if (installBox) installBox.style.display = 'none';
+        } else {
+            // Nếu dùng Android/Chrome thì đổi text hướng dẫn cho khớp
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            if (isAndroid) {
+                document.getElementById('pwa-steps-text').innerHTML =
+                    '1. Bấm dấu <b>3 chấm (⋮)</b> ở góc trên bên phải trình duyệt Chrome.<br>' +
+                    '2. Chọn <b>"Thêm vào màn hình chính"</b> hoặc <b>"Cài đặt ứng dụng"</b>.<br>' +
+                    '3. Xác nhận <b>Thêm</b> rồi mở game trực tiếp từ màn hình chính!';
+            }
+        }
+
+        // 3. Lấy kỷ lục từ LocalStorage
+        const bestRead = parseInt(localStorage.getItem('kanji_zombie_best') || '0', 10);
+        const bestWrite = parseInt(localStorage.getItem('kanji_write_best') || '0', 10);
         document.getElementById('best-read').innerText = bestRead;
         document.getElementById('best-write').innerText = bestWrite;
-    };
+        document.getElementById('total-kills').innerText = (bestRead + bestWrite) + ' Zombie';
+
+        // 4. Tạo hiệu ứng chữ Kanji bay nhẹ ở nền
+        const kanjiList = ['日', '月', '火', '水', '木', '金', '土', '山', '川', '漢', '字', '学', '力', '気'];
+        const container = document.getElementById('floating-kanji');
+        for (let i = 0; i < 14; i++) {
+            const span = document.createElement('span');
+            span.innerText = kanjiList[i % kanjiList.length];
+            span.style.left = (Math.random() * 94) + '%';
+            span.style.fontSize = (20 + Math.random() * 26) + 'px';
+            span.style.animationDuration = (12 + Math.random() * 14) + 's';
+            span.style.animationDelay = (-Math.random() * 20) + 's';
+            container.appendChild(span);
+        }
+    });
 </script>
 
 </body>
