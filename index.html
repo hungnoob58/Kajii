@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>KANJI VS ZOMBIE - Luyện Thi N5</title>
 
-    <!-- Cấu hình chuẩn iOS Standalone App (Ẩn thanh địa chỉ Safari khi mở từ MH chính) -->
+    <!-- Cấu hình chuẩn iOS Standalone App -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Kanji Zombie">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#064e3b">
 
-    <!-- Icon tĩnh chuẩn iOS (Up file icon.png vào cùng thư mục với index.html) -->
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
 
@@ -70,7 +69,6 @@
             100% { transform: translateY(-15vh) rotate(25deg); opacity: 0; }
         }
 
-        /* Quản lý 3 màn hình trong cùng 1 file (Chuyển cảnh tức thì, không bao giờ bung thanh Safari) */
         .screen {
             display: none;
             width: 100%;
@@ -96,6 +94,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+        }
+
+        .menu-audio-bar {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            display: flex;
+            gap: 6px;
+            z-index: 5;
         }
 
         .hero-logo-wrap {
@@ -258,7 +266,6 @@
         .instructions b.purple { color: #c084fc; }
         .instructions b.gold { color: #fbbf24; }
 
-        /* Hộp hướng dẫn cài đặt & tải file icon.png */
         .pwa-install-box {
             margin-top: 12px;
             width: 100%;
@@ -333,8 +340,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             margin-bottom: 8px;
+        }
+
+        .nav-right-btns {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
         }
 
         .btn-back {
@@ -344,12 +358,13 @@
             background: rgba(30, 41, 59, 0.9);
             border: 1px solid rgba(148, 163, 184, 0.35);
             color: #e2e8f0;
-            padding: 5px 10px;
+            padding: 5px 9px;
             border-radius: 10px;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .level-select-wrap {
@@ -358,7 +373,7 @@
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             border: 1.5px solid #60a5fa;
             border-radius: 10px;
-            padding: 2px 6px;
+            padding: 2px 5px;
             min-width: 0;
         }
         .level-select-wrap.purple {
@@ -370,12 +385,12 @@
             background: transparent;
             color: #fff;
             border: none;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 800;
             padding: 3px 2px;
             outline: none;
             cursor: pointer;
-            max-width: 185px;
+            max-width: 155px;
         }
         .level-select option { background: #1e293b; color: #fff; }
 
@@ -383,15 +398,21 @@
             background: rgba(30, 41, 59, 0.9);
             border: 1px solid rgba(148, 163, 184, 0.35);
             color: #fbbf24;
-            width: 32px;
-            height: 30px;
-            border-radius: 10px;
-            font-size: 14px;
+            width: 31px;
+            height: 29px;
+            border-radius: 9px;
+            font-size: 13.5px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .btn-sound.bgm-active {
+            border-color: #38bdf8;
+            background: rgba(14, 116, 144, 0.35);
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.35);
         }
 
         .status-bar {
@@ -769,6 +790,11 @@
 <!-- ==================== 1. MÀN HÌNH MENU CHÍNH ==================== -->
 <div class="screen active" id="screen-menu">
     <div class="menu-container">
+        <div class="menu-audio-bar">
+            <button type="button" class="btn-sound bgm-active" id="btn-bgm-0" onclick="toggleBgm()" title="Bật/Tắt nhạc chill">🎵</button>
+            <button type="button" class="btn-sound" id="btn-sound-0" onclick="toggleSound()" title="Bật/Tắt âm hiệu ứng">🔊</button>
+        </div>
+
         <div class="hero-logo-wrap">
             <img id="hero-logo-img" class="hero-logo-img" alt="Kanji vs Zombie Logo">
             <span class="hero-level-tag">N5 EDITION</span>
@@ -809,10 +835,9 @@
             <div class="instructions-title">📌 Luật chiến đấu:</div>
             • <b class="green">Chế độ Đọc & Gõ:</b> Mỗi câu có <b class="gold">10 giây</b> đếm ngược. Bắn trúng ở <b class="gold">3s cuối</b> kích hoạt Đạn Lửa x2 Sát Thương (Crit Dame)!<br>
             • <b class="purple">Chế độ Viết Kanji:</b> Vẽ đúng nét chữ Kanji lên lá bùa. Quên mặt chữ có thể bật <b>Nét mờ</b> để đồ theo.<br>
-            • Giữ chuỗi trả lời đúng liên tục để kích hoạt <b>Combo Streak</b> tăng uy lực!
+            • Bấm nút <b class="gold">🎵</b> ở góc trên để bật/tắt <b>nhạc Lo-Fi Chill</b> khi học bài!
         </div>
 
-        <!-- Khung cài đặt thành App Full Màn Hình (Tự ẩn hoàn toàn khi mở từ MH chính) -->
         <div class="pwa-install-box" id="pwa-install-box">
             <button class="pwa-close-btn" onclick="document.getElementById('pwa-install-box').style.display='none'" title="Đóng">✕</button>
             <div class="pwa-header">
@@ -842,7 +867,10 @@
             <div class="level-select-wrap">
                 <select id="read-level-select" class="level-select" onchange="jumpToReadLevel(this.value)"></select>
             </div>
-            <button type="button" class="btn-sound" id="btn-sound-1" onclick="toggleSound()">🔊</button>
+            <div class="nav-right-btns">
+                <button type="button" class="btn-sound bgm-active" id="btn-bgm-1" onclick="toggleBgm()" title="Nhạc nền chill">🎵</button>
+                <button type="button" class="btn-sound" id="btn-sound-1" onclick="toggleSound()" title="Âm hiệu ứng">🔊</button>
+            </div>
         </div>
 
         <div class="status-bar">
@@ -948,7 +976,10 @@
             <div class="level-select-wrap purple">
                 <select class="level-select" id="write-level-select" onchange="changeWriteLevel()"></select>
             </div>
-            <button type="button" class="btn-sound" id="btn-sound-2" onclick="toggleSound()">🔊</button>
+            <div class="nav-right-btns">
+                <button type="button" class="btn-sound bgm-active" id="btn-bgm-2" onclick="toggleBgm()" title="Nhạc nền chill">🎵</button>
+                <button type="button" class="btn-sound" id="btn-sound-2" onclick="toggleSound()" title="Âm hiệu ứng">🔊</button>
+            </div>
         </div>
 
         <div class="status-bar">
@@ -1182,8 +1213,239 @@
         return canvas.toDataURL('image/png');
     }
 
+    // ==================== HỆ THỐNG ÂM THANH & NHẠC LO-FI CHILL ====================
+    let soundEnabled = true;
+    let bgmEnabled = localStorage.getItem('kanji_bgm_enabled') !== 'false';
+    let audioCtx = null;
+    let bgmTimer = null;
+    let rainNode = null;
+    let rainGain = null;
+    let chordStep = 0;
+
+    // Vòng hợp âm Lo-Fi Study ấm áp: Fmaj9 -> Em7 -> Dm9 -> Cmaj9
+    const chillChords = [
+        { notes: [174.61, 220.00, 261.63, 329.63, 392.00], melody: [523.25, 659.25] }, // Fmaj9
+        { notes: [164.81, 196.00, 246.94, 293.66, 392.00], melody: [587.33, 493.88] }, // Em7
+        { notes: [146.83, 174.61, 220.00, 261.63, 329.63], melody: [440.00, 523.25] }, // Dm9
+        { notes: [130.81, 164.81, 196.00, 246.94, 293.66], melody: [392.00, 493.88] }  // Cmaj9
+    ];
+
+    function ensureAudioCtx() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+        }
+    }
+
+    function updateBgmButtonsUI() {
+        ['btn-bgm-0', 'btn-bgm-1', 'btn-bgm-2'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.innerText = bgmEnabled ? '🎵' : '🔇';
+            if (bgmEnabled) btn.classList.add('bgm-active');
+            else btn.classList.remove('bgm-active');
+        });
+    }
+
+    function startRainAmbience() {
+        if (!audioCtx || rainNode) return;
+        const bufferSize = audioCtx.sampleRate * 3;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            data[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = data[i];
+            data[i] *= 1.8;
+        }
+        rainNode = audioCtx.createBufferSource();
+        rainNode.buffer = buffer;
+        rainNode.loop = true;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 650;
+        filter.Q.value = 0.6;
+
+        rainGain = audioCtx.createGain();
+        rainGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        rainGain.gain.linearRampToValueAtTime(0.016, audioCtx.currentTime + 1.5);
+
+        rainNode.connect(filter);
+        filter.connect(rainGain);
+        rainGain.connect(audioCtx.destination);
+        rainNode.start();
+    }
+
+    function stopRainAmbience() {
+        if (rainNode) {
+            try { rainNode.stop(); rainNode.disconnect(); } catch (e) {}
+            rainNode = null;
+            rainGain = null;
+        }
+    }
+
+    function playChillBar() {
+        if (!bgmEnabled || !audioCtx || audioCtx.state !== 'running') return;
+        const now = audioCtx.currentTime;
+        const barDuration = 3.4; // ~70 BPM chill tempo
+        const current = chillChords[chordStep % chillChords.length];
+        chordStep++;
+
+        // Bộ lọc ấm kiểu đàn Rhodes qua băng cassette
+        const warmFilter = audioCtx.createBiquadFilter();
+        warmFilter.type = 'lowpass';
+        warmFilter.frequency.setValueAtTime(720, now);
+        warmFilter.Q.setValueAtTime(0.7, now);
+        warmFilter.connect(audioCtx.destination);
+
+        // Chơi rải nhẹ từng nốt của hợp âm
+        current.notes.forEach((freq, idx) => {
+            const start = now + idx * 0.045;
+            const osc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain();
+
+            osc.type = idx === 0 ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, start);
+            osc.detune.setValueAtTime((idx % 2 === 0 ? 1 : -1) * 3.5, start);
+
+            const peakGain = idx === 0 ? 0.045 : 0.022;
+            noteGain.gain.setValueAtTime(0.0001, start);
+            noteGain.gain.linearRampToValueAtTime(peakGain, start + 0.35);
+            noteGain.gain.exponentialRampToValueAtTime(0.0001, start + barDuration - 0.1);
+
+            osc.connect(noteGain);
+            noteGain.connect(warmFilter);
+            osc.start(start);
+            osc.stop(start + barDuration);
+        });
+
+        // Thêm 2 nốt giai điệu chuông nhẹ nhàng ở nửa sau ô nhịp
+        current.melody.forEach((mFreq, mIdx) => {
+            const mStart = now + 1.2 + mIdx * 0.95;
+            const mOsc = audioCtx.createOscillator();
+            const mGain = audioCtx.createGain();
+
+            mOsc.type = 'sine';
+            mOsc.frequency.setValueAtTime(mFreq, mStart);
+
+            mGain.gain.setValueAtTime(0.0001, mStart);
+            mGain.gain.linearRampToValueAtTime(0.018, mStart + 0.08);
+            mGain.gain.exponentialRampToValueAtTime(0.0001, mStart + 1.1);
+
+            mOsc.connect(mGain);
+            mGain.connect(warmFilter);
+            mOsc.start(mStart);
+            mOsc.stop(mStart + 1.15);
+        });
+    }
+
+    function startChillMusic() {
+        if (!bgmEnabled) return;
+        ensureAudioCtx();
+        startRainAmbience();
+        if (!bgmTimer) {
+            playChillBar();
+            bgmTimer = setInterval(playChillBar, 3400);
+        }
+    }
+
+    function stopChillMusic() {
+        if (bgmTimer) {
+            clearInterval(bgmTimer);
+            bgmTimer = null;
+        }
+        stopRainAmbience();
+    }
+
+    function toggleBgm() {
+        bgmEnabled = !bgmEnabled;
+        localStorage.setItem('kanji_bgm_enabled', bgmEnabled);
+        updateBgmButtonsUI();
+        if (bgmEnabled) startChillMusic();
+        else stopChillMusic();
+    }
+
+    // Tự động kích hoạt nhạc chill ngay lần chạm đầu tiên của người dùng trên iPhone/PC
+    document.addEventListener('pointerdown', () => {
+        if (bgmEnabled && !bgmTimer) startChillMusic();
+        else if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    }, { passive: true });
+
+    // Tự tạm dừng nhạc khi khóa màn hình hoặc thoát sang app khác
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopChillMusic();
+        } else if (bgmEnabled) {
+            startChillMusic();
+        }
+    });
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        const icon = soundEnabled ? '🔊' : '🔇';
+        ['btn-sound-0', 'btn-sound-1', 'btn-sound-2'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = icon;
+        });
+    }
+
+    function playSound(type, crit = false) {
+        if (!soundEnabled) return;
+        try {
+            ensureAudioCtx();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'shoot') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.14);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+                osc.start(now); osc.stop(now + 0.14);
+            } else if (type === 'cast') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.25);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now); osc.stop(now + 0.25);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(crit ? 180 : 135, now);
+                osc.frequency.linearRampToValueAtTime(45, now + 0.13);
+                gain.gain.setValueAtTime(crit ? 0.3 : 0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.13);
+                osc.start(now); osc.stop(now + 0.13);
+            } else if (type === 'levelup') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'fail' || type === 'gameover') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.35);
+                gain.gain.setValueAtTime(0.26, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now); osc.stop(now + 0.35);
+            }
+        } catch (e) {}
+    }
+
     // ==================== CHUYỂN MÀN HÌNH TỨC THÌ ====================
     function openMode(mode) {
+        if (bgmEnabled) startChillMusic();
         clearInterval(timerInterval);
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         if (mode === 'menu') {
@@ -1204,66 +1466,6 @@
         document.getElementById('best-read').innerText = bestRead;
         document.getElementById('best-write').innerText = bestWrite;
         document.getElementById('total-kills').innerText = (bestRead + bestWrite) + ' Zombie';
-    }
-
-    // ==================== ÂM THANH CHUNG ====================
-    let soundEnabled = true;
-    let audioCtx = null;
-    function toggleSound() {
-        soundEnabled = !soundEnabled;
-        const icon = soundEnabled ? '🔊' : '🔇';
-        document.getElementById('btn-sound-1').innerText = icon;
-        document.getElementById('btn-sound-2').innerText = icon;
-    }
-
-    function playSound(type, crit = false) {
-        if (!soundEnabled) return;
-        try {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-
-            if (type === 'shoot') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.exponentialRampToValueAtTime(110, now + 0.14);
-                gain.gain.setValueAtTime(0.22, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
-                osc.start(now); osc.stop(now + 0.14);
-            } else if (type === 'cast') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(320, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.25);
-                gain.gain.setValueAtTime(0.24, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                osc.start(now); osc.stop(now + 0.25);
-            } else if (type === 'hit') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(crit ? 180 : 135, now);
-                osc.frequency.linearRampToValueAtTime(45, now + 0.13);
-                gain.gain.setValueAtTime(crit ? 0.34 : 0.25, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.13);
-                osc.start(now); osc.stop(now + 0.13);
-            } else if (type === 'levelup') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.setValueAtTime(659.25, now + 0.1);
-                osc.frequency.setValueAtTime(783.99, now + 0.2);
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                osc.start(now); osc.stop(now + 0.4);
-            } else if (type === 'fail' || type === 'gameover') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.linearRampToValueAtTime(80, now + 0.35);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-                osc.start(now); osc.stop(now + 0.35);
-            }
-        } catch (e) {}
     }
 
     // ==================== DỮ LIỆU & LOGIC GAME 1 (ĐỌC & GÕ) ====================
@@ -1736,6 +1938,8 @@
         document.getElementById('hero-logo-img').src = iconUrl;
         document.getElementById('pwa-preview-icon').src = iconUrl;
         document.getElementById('btn-dl-icon').href = iconUrl;
+
+        updateBgmButtonsUI();
 
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         if (isStandalone) {
