@@ -2,94 +2,609 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KANJI VS ZOMBIE - Full N5 Edition (Pro Upgrade)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>KANJI VS ZOMBIE - Luyện Đọc & Gõ N5</title>
+
+    <!-- Đồng bộ chế độ Fullscreen App (Không thanh địa chỉ) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kanji vs Zombie">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#064e3b">
+
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { 
-            background: #0d1117; 
-            color: #fff; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px; 
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .game-container { 
-            background: #1f2937; 
-            border: 4px solid #10b981; 
-            border-radius: 16px; 
-            padding: 20px; 
-            width: 100%; 
-            max-width: 680px; 
-            text-align: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
-            position: relative; 
-            overflow: hidden; 
+        body {
+            background: #070b14;
+            background-image: 
+                radial-gradient(circle at 50% 15%, rgba(16, 185, 129, 0.16), transparent 60%),
+                radial-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100dvh;
+            margin: 0;
+            padding: calc(12px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom)) 14px;
         }
 
-        /* Top Status Bar */
-        .status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: bold; background: #374151; padding: 10px 16px; border-radius: 8px; margin-bottom: 15px; }
-        .level-badge { background: #3b82f6; padding: 4px 10px; border-radius: 6px; color: #fff; font-weight: 800; }
-        .timer { color: #f59e0b; font-size: 20px; display: inline-block; width: 35px; }
-        .timer.crit-mode { color: #ef4444; font-size: 24px; animation: pulse 0.5s infinite alternate; }
-        .high-score { color: #fbbf24; }
-
-        /* Battle Arena */
-        .battle-field { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-end; 
-            height: 200px; 
-            background: linear-gradient(180deg, #15803d 0%, #166534 60%, #14532d 100%);
-            background-image: radial-gradient(#22c55e 10%, transparent 11%);
-            background-size: 20px 20px;
-            border-bottom: 8px solid #052e16; 
-            padding: 0 20px 10px 20px; 
-            margin-bottom: 15px; 
-            position: relative; 
-            border-radius: 10px; 
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        .game-container {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(17, 24, 39, 0.98) 100%);
+            border: 3px solid #10b981;
+            border-radius: 24px;
+            padding: 16px;
+            width: 100%;
+            max-width: 680px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 25px rgba(16, 185, 129, 0.22);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .character-box { width: 110px; display: flex; flex-direction: column; align-items: center; }
-        .svg-char { width: 100px; height: 110px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); }
-        .zombie-box { transition: transform 0.1s; }
-        .zombie-box.hit { transform: translateX(15px) rotate(8deg); filter: brightness(1.8) drop-shadow(0 0 10px red); }
 
-        /* HP Bar */
-        .hp-bar-bg { width: 100px; height: 12px; background: #4b5563; border-radius: 6px; overflow: hidden; border: 2px solid #fff; margin-bottom: 8px; }
-        .hp-bar-fill { width: 100%; height: 100%; background: #ef4444; transition: width 0.2s; }
+        /* Thanh điều hướng trên cùng */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
 
-        /* Kanji Question Box */
-        .question-box { background: #f3f4f6; color: #1f2937; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); position: relative; }
-        .kanji-text { font-size: 55px; font-weight: 800; line-height: 1.1; }
-        .progress-text { font-size: 13px; color: #6b7280; margin-top: 5px; font-weight: bold; }
-        .combo-badge { position: absolute; top: 10px; right: 15px; background: #f59e0b; color: #111; padding: 3px 8px; font-size: 12px; font-weight: 900; border-radius: 6px; display: none; }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.15s;
+        }
+        .btn-back:hover { background: #334155; color: #fff; }
 
-        /* Input Controls */
-        .input-group { display: flex; gap: 10px; }
-        input[type="text"] { flex: 1; padding: 12px 18px; font-size: 20px; border-radius: 8px; border: 3px solid #3b82f6; outline: none; text-align: center; font-weight: bold; background: #f9fafb; color: #111827; }
-        input[type="text"]:focus { border-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.5); }
-        .btn-submit { background: #10b981; color: white; border: none; padding: 0 24px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .btn-submit:hover { background: #059669; }
+        .level-select-wrap {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: 1.5px solid #60a5fa;
+            border-radius: 10px;
+            padding: 2px 8px;
+            box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+        }
 
-        /* Crit Banner Overlay */
-        .crit-banner { display: none; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; padding: 6px 20px; font-size: 14px; font-weight: 900; border-radius: 20px; box-shadow: 0 0 15px #f59e0b; text-transform: uppercase; letter-spacing: 1px; z-index: 10; animation: pulse 0.6s infinite alternate; }
+        .level-select {
+            background: transparent;
+            color: #fff;
+            border: none;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 4px 2px;
+            outline: none;
+            cursor: pointer;
+        }
+        .level-select option {
+            background: #1e293b;
+            color: #fff;
+        }
 
-        /* Animations & Projectile */
-        @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.1); } }
-        .peashot { position: absolute; width: 22px; height: 22px; background: #10b981; border-radius: 50%; border: 2px solid #fff; bottom: 45px; left: 110px; z-index: 5; box-shadow: 0 0 6px #10b981; }
-        .peashot.crit { background: #ef4444; border-color: #fbbf24; box-shadow: 0 0 12px #f59e0b; width: 30px; height: 30px; }
+        .btn-sound {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            color: #fbbf24;
+            width: 34px;
+            height: 32px;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        /* Result Overlay */
-        .overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); flex-direction: column; justify-content: center; align-items: center; z-index: 20; padding: 20px; }
-        .overlay h2 { font-size: 32px; margin-bottom: 10px; color: #ef4444; }
-        .overlay h2.win { color: #10b981; }
-        .btn-restart { background: #2563eb; color: white; border: none; padding: 12px 32px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; }
-        .btn-restart:hover { background: #1d4ed8; }
+        /* Thanh trạng thái điểm & thời gian */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(30, 41, 59, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 14px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+        }
+
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        .timer-box {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 16px;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+        .timer-num {
+            display: inline-block;
+            min-width: 24px;
+            font-size: 20px;
+        }
+        .timer-box.crit-mode {
+            color: #ef4444;
+            animation: timerPulse 0.45s infinite alternate;
+        }
+        @keyframes timerPulse {
+            from { transform: scale(1); text-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
+            to { transform: scale(1.16); text-shadow: 0 0 14px rgba(239, 68, 68, 0.95); }
+        }
+
+        /* Sân đấu Bãi Cỏ Đêm */
+        .battle-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 205px;
+            background: linear-gradient(180deg, #091326 0%, #112a46 48%, #15803d 49%, #166534 75%, #14532d 100%);
+            border: 2px solid rgba(74, 222, 128, 0.25);
+            border-bottom: 8px solid #052e16;
+            padding: 0 18px 10px 18px;
+            margin-bottom: 14px;
+            position: relative;
+            border-radius: 16px;
+            box-shadow: inset 0 10px 25px rgba(0, 0, 0, 0.65);
+            overflow: hidden;
+        }
+
+        /* Trăng & sao nền trời */
+        .arena-moon {
+            position: absolute;
+            top: 14px;
+            right: 26px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fef9c3, #fde047);
+            box-shadow: 0 0 20px rgba(253, 224, 71, 0.55);
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        /* Họa tiết ô cỏ */
+        .lawn-stripes {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 51%;
+            background-image: repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.04) 0px,
+                rgba(255, 255, 255, 0.04) 48px,
+                transparent 48px,
+                transparent 96px
+            );
+            pointer-events: none;
+        }
+
+        .character-box {
+            width: 105px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+        }
+
+        .svg-char {
+            width: 98px;
+            height: 108px;
+            filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.6));
+        }
+
+        /* Animation nhún thở cho Peashooter & giật khi bắn */
+        .peashooter-wrap {
+            animation: peaIdle 1.8s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+        .peashooter-wrap.shoot {
+            animation: peaRecoil 0.22s ease-out;
+        }
+        @keyframes peaIdle {
+            0%, 100% { transform: scaleY(1) rotate(0deg); }
+            50% { transform: scaleY(1.04) rotate(2deg); }
+        }
+        @keyframes peaRecoil {
+            0% { transform: translateX(-8px) scaleX(0.92) rotate(-6deg); }
+            60% { transform: translateX(4px) scaleX(1.05) rotate(3deg); }
+            100% { transform: translateX(0) scaleX(1) rotate(0deg); }
+        }
+
+        /* Animation Zombie lắc lư & bị đánh */
+        .zombie-box {
+            transition: transform 0.12s ease;
+        }
+        .zombie-svg-wrap {
+            animation: zombieWalk 2.2s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+        @keyframes zombieWalk {
+            0%, 100% { transform: rotate(-2deg) translateY(0); }
+            50% { transform: rotate(2.5deg) translateY(-2px); }
+        }
+        .zombie-box.hit {
+            transform: translateX(14px) rotate(9deg);
+            filter: brightness(1.9) drop-shadow(0 0 12px #ef4444);
+        }
+
+        /* Thanh máu Zombie */
+        .zombie-tag {
+            font-size: 10px;
+            font-weight: 900;
+            color: #fecaca;
+            background: rgba(127, 29, 29, 0.85);
+            padding: 1px 7px;
+            border-radius: 6px;
+            margin-bottom: 3px;
+            letter-spacing: 0.4px;
+        }
+        .hp-bar-bg {
+            width: 94px;
+            height: 11px;
+            background: #1f2937;
+            border-radius: 99px;
+            overflow: hidden;
+            border: 1.5px solid rgba(255, 255, 255, 0.85);
+            margin-bottom: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+        }
+        .hp-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #dc2626, #f87171);
+            transition: width 0.22s ease-out;
+        }
+
+        /* Đạn bắn & Hiệu ứng nổ */
+        .peashot {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle at 35% 35%, #fef9c3, #4ade80 55%, #15803d);
+            border-radius: 50%;
+            border: 2px solid #dcfce7;
+            bottom: 58px;
+            left: 96px;
+            z-index: 6;
+            box-shadow: 0 0 12px #4ade80, -10px 0 14px rgba(74, 222, 128, 0.6);
+        }
+        .peashot.crit {
+            width: 32px;
+            height: 32px;
+            bottom: 54px;
+            background: radial-gradient(circle at 35% 35%, #fef08a, #f97316 55%, #dc2626);
+            border-color: #fef08a;
+            box-shadow: 0 0 18px #f59e0b, -14px 0 20px rgba(239, 68, 68, 0.8);
+        }
+
+        .dmg-float {
+            position: absolute;
+            right: 45px;
+            bottom: 115px;
+            font-size: 20px;
+            font-weight: 900;
+            color: #fde047;
+            text-shadow: 0 2px 0 #000, 0 0 10px rgba(234, 179, 8, 0.8);
+            pointer-events: none;
+            z-index: 12;
+            animation: floatDamage 0.75s ease-out forwards;
+        }
+        .dmg-float.crit {
+            font-size: 24px;
+            color: #ff4d4d;
+            text-shadow: 0 2px 0 #000, 0 0 14px #f59e0b;
+        }
+        @keyframes floatDamage {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            30% { opacity: 1; transform: translateY(-16px) scale(1.15); }
+            100% { opacity: 0; transform: translateY(-42px) scale(0.95); }
+        }
+
+        .hit-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+            animation: particleBurst 0.45s ease-out forwards;
+        }
+        @keyframes particleBurst {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.2); }
+        }
+
+        /* Thẻ hiển thị câu hỏi Kanji */
+        .question-box {
+            background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+            color: #0f172a;
+            border-radius: 18px;
+            padding: 14px 16px 16px 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 2px 0 #fff;
+            border: 3px solid #cbd5e1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Thanh tiến trình thời gian chạy mượt ở mép trên thẻ câu hỏi */
+        .time-progress-track {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: #e2e8f0;
+        }
+        .time-progress-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            transition: width 1s linear, background 0.3s ease;
+        }
+        .time-progress-bar.warn {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+        .time-progress-bar.danger {
+            background: linear-gradient(90deg, #dc2626, #ef4444);
+        }
+
+        /* Lưới tập viết mờ làm nền cho Kanji */
+        .kanji-grid-bg {
+            position: relative;
+            display: inline-block;
+            padding: 4px 22px;
+            margin-top: 4px;
+            border: 1.5px dashed rgba(148, 163, 184, 0.55);
+            border-radius: 14px;
+            background-image: 
+                linear-gradient(to right, transparent 49.5%, rgba(148, 163, 184, 0.25) 50%, transparent 50.5%),
+                linear-gradient(to bottom, transparent 49.5%, rgba(148, 163, 184, 0.25) 50%, transparent 50.5%);
+        }
+
+        .kanji-text {
+            font-size: 58px;
+            font-weight: 900;
+            line-height: 1.12;
+            color: #0f172a;
+            font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .progress-text {
+            font-size: 12.5px;
+            color: #475569;
+            margin-top: 8px;
+            font-weight: 700;
+        }
+
+        .combo-badge {
+            position: absolute;
+            top: 14px;
+            right: 12px;
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 11.5px;
+            font-weight: 900;
+            border-radius: 99px;
+            box-shadow: 0 3px 8px rgba(234, 88, 12, 0.45);
+            display: none;
+            animation: comboPop 0.25s ease-out;
+        }
+        @keyframes comboPop {
+            0% { transform: scale(0.6); }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* Khu vực nhập đáp án */
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 0;
+            padding: 13px 14px;
+            font-size: 19px;
+            border-radius: 14px;
+            border: 3px solid #3b82f6;
+            outline: none;
+            text-align: center;
+            font-weight: 800;
+            background: #f8fafc;
+            color: #0f172a;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25);
+        }
+        input[type="text"].shake {
+            animation: inputShake 0.32s ease;
+            border-color: #ef4444 !important;
+            background: #fef2f2;
+        }
+        @keyframes inputShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        .btn-submit {
+            background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+            color: #fff;
+            border: none;
+            border-bottom: 4px solid #14532d;
+            padding: 0 22px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 900;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: transform 0.1s, filter 0.15s;
+            white-space: nowrap;
+        }
+        .btn-submit:hover { filter: brightness(1.08); }
+        .btn-submit:active {
+            transform: translateY(3px);
+            border-bottom-width: 1px;
+        }
+
+        /* Banner Crit Dame 3s cuối */
+        .crit-banner {
+            display: none;
+            position: absolute;
+            top: 56px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #dc2626, #ea580c);
+            color: #fff;
+            padding: 5px 16px;
+            font-size: 12px;
+            font-weight: 900;
+            border-radius: 99px;
+            border: 1.5px solid #fde047;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.75);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            z-index: 15;
+            white-space: nowrap;
+            animation: critBounce 0.5s infinite alternate;
+        }
+        @keyframes critBounce {
+            from { transform: translateX(-50%) scale(1); }
+            to { transform: translateX(-50%) scale(1.07); }
+        }
+
+        /* Thông báo qua bài (Thay cho alert) */
+        .levelup-toast {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.96), rgba(30, 27, 75, 0.96));
+            border: 2.5px solid #fbbf24;
+            border-radius: 20px;
+            padding: 20px 26px;
+            z-index: 25;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(251, 191, 36, 0.45);
+            text-align: center;
+            width: 85%;
+            max-width: 360px;
+        }
+
+        /* Màn hình Game Over */
+        .overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(9, 13, 22, 0.94);
+            backdrop-filter: blur(8px);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            padding: 24px;
+        }
+        .overlay h2 {
+            font-size: 34px;
+            font-weight: 900;
+            margin: 0 0 12px 0;
+            color: #ef4444;
+            text-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+        }
+        .overlay h2.win { color: #22c55e; }
+
+        .ans-reveal-card {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1.5px solid rgba(251, 191, 36, 0.45);
+            border-radius: 16px;
+            padding: 14px 22px;
+            margin-bottom: 14px;
+            width: 100%;
+            max-width: 320px;
+        }
+        .ans-kanji-big {
+            font-size: 42px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.15;
+        }
+        .ans-reading {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fbbf24;
+            margin-top: 4px;
+        }
+
+        .overlay-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .btn-restart {
+            background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+            color: #fff;
+            border: none;
+            border-bottom: 4px solid #1e3a8a;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .btn-menu-end {
+            background: rgba(51, 65, 85, 0.9);
+            color: #e2e8f0;
+            text-decoration: none;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        @media (max-width: 480px) {
+            .battle-field { height: 175px; padding: 0 12px 8px 12px; }
+            .svg-char { width: 84px; height: 94px; }
+            .character-box { width: 88px; }
+            .kanji-text { font-size: 48px; }
+            .btn-submit { padding: 0 16px; font-size: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -97,65 +612,135 @@
 <div class="game-container">
     <div class="crit-banner" id="crit-banner">🔥 CRIT DAME X2 (3S CUỐI) 🔥</div>
 
+    <!-- Thanh điều hướng & chọn bài -->
+    <div class="top-nav">
+        <a href="index.html" class="btn-back">← Menu</a>
+        <div class="level-select-wrap">
+            <select id="level-select" class="level-select" onchange="jumpToLevel(this.value)" title="Chọn bài Kanji">
+                <!-- Tự động render Bài 1 -> 20 + Vô tận -->
+            </select>
+        </div>
+        <button class="btn-sound" id="btn-sound" onclick="toggleSound()" title="Bật/Tắt âm thanh">🔊</button>
+    </div>
+
+    <!-- Thanh trạng thái -->
     <div class="status-bar">
-        <span class="level-badge" id="level-display">BÀI KANJI 1</span>
-        <div>⏳ <span class="timer" id="timer">10</span>s</div>
-        <div>💀 Diệt: <span id="kills" style="color:#10b981;">0</span> | 🏆 <span class="high-score" id="high-score">0</span></div>
+        <div class="timer-box" id="timer-box">⏳ <span class="timer-num" id="timer">10</span>s</div>
+        <div class="stat-pill">💀 Diệt: <span id="kills" style="color:#4ade80;">0</span></div>
+        <div class="stat-pill">🏆 Kỷ lục: <span id="high-score" style="color:#fbbf24;">0</span></div>
     </div>
 
+    <!-- Sân đấu -->
     <div class="battle-field" id="arena">
+        <div class="arena-moon"></div>
+        <div class="lawn-stripes"></div>
+
+        <!-- Peashooter -->
         <div class="character-box">
-            <svg class="svg-char" viewBox="0 0 100 100">
-                <path d="M 50 60 Q 40 75 20 85 Q 45 80 50 60 Z" fill="#15803d"/>
-                <path d="M 50 60 Q 60 75 80 85 Q 55 80 50 60 Z" fill="#15803d"/>
-                <path d="M 46 45 C 45 60 55 75 50 90" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
-                <circle cx="40" cy="38" r="22" fill="#22c55e"/>
-                <ellipse cx="60" cy="38" rx="12" ry="15" fill="#16a34a"/>
-                <ellipse cx="62" cy="38" rx="7" ry="10" fill="#052e16"/>
-                <circle cx="36" cy="30" r="4.5" fill="#fff"/>
-                <circle cx="37" cy="30" r="2.5" fill="#000"/>
-            </svg>
+            <div class="peashooter-wrap" id="peashooter-wrap">
+                <svg class="svg-char" viewBox="0 0 100 100">
+                    <!-- Lá gốc -->
+                    <path d="M 50 65 Q 32 76 16 86 Q 42 84 50 65 Z" fill="#15803d" stroke="#052e16" stroke-width="1.5"/>
+                    <path d="M 50 65 Q 68 76 84 86 Q 58 84 50 65 Z" fill="#15803d" stroke="#052e16" stroke-width="1.5"/>
+                    <!-- Thân -->
+                    <path d="M 46 45 C 44 62 54 75 50 92" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
+                    <!-- Lá sau đầu -->
+                    <path d="M 22 30 Q 8 20 14 38 Q 20 40 24 34 Z" fill="#16a34a" stroke="#052e16" stroke-width="1.5"/>
+                    <!-- Đầu -->
+                    <circle cx="40" cy="38" r="22" fill="#22c55e" stroke="#052e16" stroke-width="2"/>
+                    <!-- Nòng bắn -->
+                    <ellipse cx="62" cy="38" rx="13" ry="15" fill="#16a34a" stroke="#052e16" stroke-width="2"/>
+                    <ellipse cx="64" cy="38" rx="7.5" ry="10.5" fill="#052e16"/>
+                    <!-- Mắt -->
+                    <circle cx="37" cy="30" r="5" fill="#090d16"/>
+                    <circle cx="38.5" cy="28.5" r="2" fill="#fff"/>
+                </svg>
+            </div>
         </div>
-        
+
+        <!-- Zombie -->
         <div class="character-box zombie-box" id="zombie-box">
+            <div class="zombie-tag" id="zombie-rank">ZOMBIE N5</div>
             <div class="hp-bar-bg"><div class="hp-bar-fill" id="hp-bar"></div></div>
-            <svg class="svg-char" viewBox="0 0 100 100">
-                <rect x="35" y="45" width="30" height="35" fill="#1e3a8a" rx="4"/>
-                <rect x="38" y="78" width="10" height="20" fill="#451a03"/>
-                <rect x="52" y="78" width="10" height="20" fill="#451a03"/>
-                <path d="M 35 50 L 15 52 L 10 58" stroke="#6b7280" stroke-width="6" stroke-linecap="round" fill="none"/>
-                <rect x="30" y="15" width="40" height="32" fill="#6b7280" rx="8"/>
-                <path d="M 35 45 L 45 58 L 50 45 L 60 55 L 65 45 Z" fill="#9ca3af"/>
-                <circle cx="42" cy="26" r="6" fill="#fff" stroke="#000" stroke-width="1"/>
-                <circle cx="43" cy="26" r="2" fill="#000"/>
-                <circle cx="58" cy="28" r="8" fill="#fff" stroke="#000" stroke-width="1"/>
-                <circle cx="57" cy="28" r="2.5" fill="#ef4444"/>
-                <path d="M 40 38 Q 50 44 60 38" stroke="#000" stroke-width="2" fill="none"/>
-            </svg>
+            <div class="zombie-svg-wrap">
+                <svg class="svg-char" viewBox="0 0 100 100">
+                    <!-- Thân áo vest -->
+                    <rect x="35" y="46" width="30" height="34" fill="#1e3a8a" rx="4" stroke="#0f172a" stroke-width="1.5"/>
+                    <!-- Cà vạt đỏ -->
+                    <polygon points="48,47 52,47 53,63 50,67 47,63" fill="#dc2626"/>
+                    <!-- Chân -->
+                    <rect x="38" y="78" width="10" height="19" fill="#451a03"/>
+                    <rect x="52" y="78" width="10" height="19" fill="#451a03"/>
+                    <!-- Tay đưa ra trước -->
+                    <path d="M 35 52 L 14 54 L 9 60" stroke="#6b7280" stroke-width="6" stroke-linecap="round" fill="none"/>
+                    <!-- Đầu -->
+                    <rect x="30" y="16" width="40" height="32" fill="#6b7280" rx="8" stroke="#1f2937" stroke-width="1.5"/>
+                    <!-- Mũ giáp tiến hóa theo cấp độ -->
+                    <g id="zombie-armor-cone" style="display:none;">
+                        <polygon points="34,18 50,0 66,18" fill="#f97316" stroke="#7c2d12" stroke-width="1.5"/>
+                        <rect x="31" y="15" width="38" height="4" rx="2" fill="#ea580c"/>
+                    </g>
+                    <g id="zombie-armor-bucket" style="display:none;">
+                        <path d="M 33 18 L 37 2 L 63 2 L 67 18 Z" fill="#94a3b8" stroke="#334155" stroke-width="1.5"/>
+                        <line x1="34" y1="8" x2="66" y2="8" stroke="#475569" stroke-width="2"/>
+                    </g>
+                    <!-- Mắt -->
+                    <circle cx="42" cy="27" r="5.5" fill="#fff" stroke="#000" stroke-width="1"/>
+                    <circle cx="41" cy="27" r="2" fill="#000"/>
+                    <circle cx="58" cy="29" r="7.5" fill="#fff" stroke="#000" stroke-width="1"/>
+                    <circle cx="56" cy="29" r="2.5" fill="#ef4444"/>
+                    <!-- Miệng -->
+                    <path d="M 40 39 Q 50 44 60 39" stroke="#111827" stroke-width="2.2" fill="none"/>
+                </svg>
+            </div>
         </div>
     </div>
 
+    <!-- Thẻ câu hỏi Kanji -->
     <div class="question-box">
+        <div class="time-progress-track">
+            <div class="time-progress-bar" id="time-progress-bar"></div>
+        </div>
         <div class="combo-badge" id="combo-badge">COMBO x2</div>
-        <div class="kanji-text" id="kanji-display">-</div>
+        <div class="kanji-grid-bg">
+            <div class="kanji-text" id="kanji-display">-</div>
+        </div>
         <div class="progress-text" id="progress-display">Tiến độ bài: 0/0</div>
     </div>
 
+    <!-- Khung nhập đáp án -->
     <div class="input-group">
-        <input type="text" id="type-input" placeholder="Gõ Hiragana hoặc Romaji..." autocomplete="off">
+        <input type="text" id="type-input" placeholder="Gõ Hiragana hoặc Romaji..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go">
         <button class="btn-submit" onclick="submitAnswer()">BẮN ➔</button>
     </div>
 
+    <!-- Thông báo hoàn thành bài -->
+    <div class="levelup-toast" id="levelup-toast">
+        <div style="font-size: 32px; margin-bottom: 6px;">🎉🔥</div>
+        <div style="font-size: 18px; font-weight: 900; color: #fde047;" id="levelup-title">HOÀN THÀNH BÀI 1!</div>
+        <div style="font-size: 13.5px; color: #e2e8f0; margin-top: 4px;" id="levelup-sub">Đang chuyển sang Bài 2...</div>
+    </div>
+
+    <!-- Màn hình Game Over -->
     <div class="overlay" id="end-screen">
         <h2 id="end-title">HẾT GIỜ!</h2>
-        <p style="font-size: 18px; margin: 5px 0;">Đáp án đúng là: <span id="correct-ans" style="color: #f59e0b; font-weight: bold;"></span></p>
-        <p style="font-size: 18px; margin-top: 10px;">Tổng Zombie đã hạ: <span id="final-kills" style="color: #10b981; font-weight: bold; font-size: 24px;">0</span></p>
-        <button class="btn-restart" id="btn-restart" onclick="startGame()">Chơi lại 🔄</button>
+        <div class="ans-reveal-card">
+            <div style="font-size: 12px; color: #94a3b8; font-weight: 700;">CHỮ KANJI VỪA RỒI LÀ:</div>
+            <div class="ans-kanji-big" id="missed-kanji">-</div>
+            <div class="ans-reading" id="correct-ans">-</div>
+        </div>
+        <p style="font-size: 16px; margin: 6px 0; color: #cbd5e1;">
+            Tổng Zombie đã hạ: <span id="final-kills" style="color: #4ade80; font-weight: 900; font-size: 24px;">0</span>
+        </p>
+        <div class="overlay-actions">
+            <button class="btn-restart" id="btn-restart" onclick="startGame()">Chơi lại 🔄</button>
+            <a href="index.html" class="btn-menu-end">Menu 🏠</a>
+        </div>
     </div>
 </div>
 
 <script>
-    // BỘ TỪ VỰNG KANJI N5 ĐẦY ĐỦ 20 BÀI (FIXED TYPOS)
+    // BỘ TỪ VỰNG KANJI N5 ĐẦY ĐỦ 20 BÀI
     const n5LevelsData = {
         1: [
             { kanji: '一', hira: 'いち', romaji: 'ichi' },
@@ -237,26 +822,26 @@
             { kanji: '生きる', hira: 'いきる', romaji: 'ikiru' }
         ],
         8: [
-            { kanji: '山', hira: 'yama', romaji: 'yama' },
-            { kanji: '川', hira: 'kawa', romaji: 'kawa' },
-            { kanji: '天', hira: 'ten', romaji: 'ten' },
-            { kanji: '雨', hira: 'ame', romaji: 'ame' },
-            { kanji: '花', hira: 'hana', romaji: 'hana' },
-            { kanji: '国', hira: 'kuni', romaji: 'kuni' },
-            { kanji: '天気', hira: 'tenki', romaji: 'tenki' },
-            { kanji: '電気', hira: 'denki', romaji: 'denki' },
-            { kanji: '中国', hira: 'chuugoku', romaji: 'chuugoku' }
+            { kanji: '山', hira: 'やま', romaji: 'yama' },
+            { kanji: '川', hira: 'かわ', romaji: 'kawa' },
+            { kanji: '天', hira: 'てん', romaji: 'ten' },
+            { kanji: '雨', hira: 'あめ', romaji: 'ame' },
+            { kanji: '花', hira: 'はな', romaji: 'hana' },
+            { kanji: '国', hira: 'くに', romaji: 'kuni' },
+            { kanji: '天気', hira: 'てんき', romaji: 'tenki' },
+            { kanji: '電気', hira: 'でんき', romaji: 'denki' },
+            { kanji: '中国', hira: 'ちゅうごく', romaji: 'chuugoku' }
         ],
         9: [
-            { kanji: '車', hira: 'kuruma', romaji: 'kuruma' },
-            { kanji: '電車', hira: 'densha', romaji: 'densha' },
-            { kanji: '駅', hira: 'eki', romaji: 'eki' },
-            { kanji: '店', hira: 'mise', romaji: 'mise' },
-            { kanji: '本', hira: 'hon', romaji: 'hon' },
-            { kanji: '書く', hira: 'kaku', romaji: 'kaku' },
-            { kanji: '名', hira: 'na', romaji: 'na' },
-            { kanji: '名前', hira: 'namae', romaji: 'namae' },
-            { kanji: '書店', hira: 'shoten', romaji: 'shoten' }
+            { kanji: '車', hira: 'くるま', romaji: 'kuruma' },
+            { kanji: '電車', hira: 'でんしゃ', romaji: 'densha' },
+            { kanji: '駅', hira: 'えき', romaji: 'eki' },
+            { kanji: '店', hira: 'みせ', romaji: 'mise' },
+            { kanji: '本', hira: 'ほん', romaji: 'hon' },
+            { kanji: '書く', hira: 'かく', romaji: 'kaku' },
+            { kanji: '名', hira: 'な', romaji: 'na' },
+            { kanji: '名前', hira: 'なまえ', romaji: 'namae' },
+            { kanji: '書店', hira: 'しょてん', romaji: 'shoten' }
         ],
         10: [
             { kanji: '行く', hira: 'いく', romaji: 'iku' },
@@ -335,13 +920,12 @@
         ],
         20: [
             { kanji: '魚', hira: 'さかな', romaji: 'sakana' },
-            { kanji: '肉', hira: 'niku', romaji: 'niku' },
+            { kanji: '肉', hira: 'にく', romaji: 'niku' },
             { kanji: '犬', hira: 'いぬ', romaji: 'inu' },
             { kanji: '猫', hira: 'ねこ', romaji: 'neko' }
         ]
     };
 
-    // Chuẩn hóa tự động xóa khoảng trắng
     for (let lvl in n5LevelsData) {
         n5LevelsData[lvl].forEach(item => {
             item.romaji = item.romaji.replace(/\s+/g, '');
@@ -352,10 +936,10 @@
     let currentLevel = 1;
     let levelQueue = [];
     let currentQuestionIndex = 0;
-    
+
     let timeLeft = 10;
     let kills = 0;
-    let highScore = localStorage.getItem('kanji_zombie_best') || 0;
+    let highScore = parseInt(localStorage.getItem('kanji_zombie_best') || '0', 10);
     let combo = 0;
     let currentZombieHP = 100;
     let maxZombieHP = 100;
@@ -363,6 +947,7 @@
     let timerInterval = null;
     let isCritMode = false;
     let isShooting = false;
+    let soundEnabled = true;
 
     // Web Audio API Sound FX
     let audioCtx = null;
@@ -372,7 +957,13 @@
         }
     }
 
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        document.getElementById('btn-sound').innerText = soundEnabled ? '🔊' : '🔇';
+    }
+
     function playSound(type) {
+        if (!soundEnabled) return;
         try {
             initAudio();
             if (!audioCtx) return;
@@ -384,30 +975,61 @@
 
             if (type === 'shoot') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.14);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
                 osc.start(now);
-                osc.stop(now + 0.15);
+                osc.stop(now + 0.14);
             } else if (type === 'hit') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(120, now);
-                osc.frequency.linearRampToValueAtTime(40, now + 0.1);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.frequency.setValueAtTime(isCritMode ? 180 : 130, now);
+                osc.frequency.linearRampToValueAtTime(45, now + 0.12);
+                gain.gain.setValueAtTime(isCritMode ? 0.35 : 0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
                 osc.start(now);
-                osc.stop(now + 0.1);
+                osc.stop(now + 0.12);
+            } else if (type === 'levelup') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
             } else if (type === 'gameover') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.linearRampToValueAtTime(80, now + 0.5);
-                gain.gain.setValueAtTime(0.4, now);
+                osc.frequency.setValueAtTime(210, now);
+                osc.frequency.linearRampToValueAtTime(75, now + 0.5);
+                gain.gain.setValueAtTime(0.35, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
                 osc.start(now);
                 osc.stop(now + 0.5);
             }
-        } catch(e) {}
+        } catch (e) {}
+    }
+
+    // Khởi tạo danh sách chọn Bài 1 -> 20 + Vô tận
+    function initLevelSelect() {
+        const sel = document.getElementById('level-select');
+        const maxLvl = Object.keys(n5LevelsData).length;
+        for (let i = 1; i <= maxLvl; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.innerText = `📘 BÀI KANJI ${i} (${n5LevelsData[i].length} từ)`;
+            sel.appendChild(opt);
+        }
+        const infOpt = document.createElement('option');
+        infOpt.value = maxLvl + 1;
+        infOpt.innerText = `🔥 CHẾ ĐỘ VÔ TẬN (160+ từ)`;
+        sel.appendChild(infOpt);
+    }
+
+    function jumpToLevel(lvlVal) {
+        clearInterval(timerInterval);
+        isShooting = false;
+        loadLevel(parseInt(lvlVal, 10));
     }
 
     document.getElementById('high-score').innerText = highScore;
@@ -419,7 +1041,8 @@
         }
     });
 
-    window.onload = function() {
+    window.onload = function () {
+        initLevelSelect();
         startGame();
     };
 
@@ -428,30 +1051,32 @@
         combo = 0;
         currentLevel = 1;
         currentZombieHP = 100;
+        updateZombieAppearance();
         document.getElementById('kills').innerText = kills;
         document.getElementById('combo-badge').style.display = 'none';
         document.getElementById('end-screen').style.display = 'none';
         document.getElementById('hp-bar').style.width = '100%';
-        
+
         loadLevel(currentLevel);
     }
 
     function loadLevel(lvl) {
         currentLevel = lvl;
         const maxDefinedLevel = Object.keys(n5LevelsData).length;
-        
+        const sel = document.getElementById('level-select');
+
         if (currentLevel <= maxDefinedLevel) {
-            document.getElementById('level-display').innerText = `BÀI KANJI ${currentLevel}`;
+            sel.value = currentLevel;
             levelQueue = [...n5LevelsData[currentLevel]].sort(() => Math.random() - 0.5);
         } else {
-            document.getElementById('level-display').innerText = `CẤP ${currentLevel} (VÔ TẬN)`;
+            sel.value = maxDefinedLevel + 1;
             let allKanji = [];
             for (let i = 1; i <= maxDefinedLevel; i++) {
                 allKanji = allKanji.concat(n5LevelsData[i]);
             }
             levelQueue = allKanji.sort(() => Math.random() - 0.5);
         }
-        
+
         currentQuestionIndex = 0;
         spawnNextQuestion();
     }
@@ -460,9 +1085,19 @@
         timeLeft = 10;
         isCritMode = false;
 
+        const timerBox = document.getElementById('timer-box');
+        const progressBar = document.getElementById('time-progress-bar');
+
         document.getElementById('timer').innerText = timeLeft;
-        document.getElementById('timer').classList.remove('crit-mode');
+        timerBox.classList.remove('crit-mode');
         document.getElementById('crit-banner').style.display = 'none';
+
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '100%';
+        progressBar.className = 'time-progress-bar';
+        void progressBar.offsetWidth; // Force reflow
+        progressBar.style.transition = 'width 1s linear, background 0.3s ease';
+        progressBar.style.width = '90%';
 
         clearInterval(timerInterval);
         timerInterval = setInterval(updateTimer, 1000);
@@ -470,12 +1105,21 @@
 
     function updateTimer() {
         timeLeft--;
-        document.getElementById('timer').innerText = timeLeft;
+        document.getElementById('timer').innerText = Math.max(0, timeLeft);
+
+        const progressBar = document.getElementById('time-progress-bar');
+        const nextPercent = Math.max(0, (timeLeft - 1) * 10);
+        progressBar.style.width = nextPercent + '%';
+
+        if (timeLeft <= 5 && timeLeft > 3) {
+            progressBar.className = 'time-progress-bar warn';
+        }
 
         if (timeLeft <= 3 && !isCritMode) {
             isCritMode = true;
-            document.getElementById('timer').classList.add('crit-mode');
+            document.getElementById('timer-box').classList.add('crit-mode');
             document.getElementById('crit-banner').style.display = 'block';
+            progressBar.className = 'time-progress-bar danger';
         }
 
         if (timeLeft <= 0) {
@@ -485,16 +1129,17 @@
 
     function spawnNextQuestion() {
         if (currentQuestionIndex >= levelQueue.length) {
+            const finishedLvl = currentLevel;
             currentLevel++;
-            alert(`🎉 EXCELLENT! HOÀN THÀNH BÀI KANJI ${currentLevel - 1}! CHUYỂN SANG BÀI TIẾP THEO!`);
-            loadLevel(currentLevel);
+            playSound('levelup');
+            showLevelUpToast(finishedLvl, currentLevel);
             return;
         }
 
         currentQuestion = levelQueue[currentQuestionIndex];
 
         document.getElementById('kanji-display').innerText = currentQuestion.kanji;
-        document.getElementById('progress-display').innerText = `Tiến độ: ${currentQuestionIndex + 1}/${levelQueue.length}`;
+        document.getElementById('progress-display').innerText = `Tiến độ bài: ${currentQuestionIndex + 1} / ${levelQueue.length}`;
         inputField.value = '';
 
         resetQuestionTimer();
@@ -502,10 +1147,26 @@
         isShooting = false;
     }
 
+    function showLevelUpToast(oldLvl, nextLvl) {
+        clearInterval(timerInterval);
+        const toast = document.getElementById('levelup-toast');
+        const maxDefinedLevel = Object.keys(n5LevelsData).length;
+        document.getElementById('levelup-title').innerText = `HOÀN THÀNH BÀI KANJI ${oldLvl}!`;
+        document.getElementById('levelup-sub').innerText = nextLvl <= maxDefinedLevel
+            ? `Đang tiến vào Bài Kanji ${nextLvl}...`
+            : `Mở khóa Chế Độ Vô Tận!`;
+        toast.style.display = 'block';
+
+        setTimeout(() => {
+            toast.style.display = 'none';
+            loadLevel(nextLvl);
+        }, 1500);
+    }
+
     function submitAnswer() {
         if (isShooting || !currentQuestion) return;
 
-        const userTyped = inputField.value.trim().toLowerCase();
+        const userTyped = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
         if (!userTyped) return;
 
         const targetRomaji = currentQuestion.romaji;
@@ -517,45 +1178,117 @@
             combo++;
             if (combo > 1) {
                 const cb = document.getElementById('combo-badge');
-                cb.innerText = `COMBO x${combo}`;
+                cb.innerText = `🔥 COMBO x${combo}`;
                 cb.style.display = 'block';
             }
             shootPea();
         } else {
             combo = 0;
             document.getElementById('combo-badge').style.display = 'none';
-            inputField.style.borderColor = '#ef4444';
-            setTimeout(() => inputField.style.borderColor = '#3b82f6', 300);
+            inputField.classList.remove('shake');
+            void inputField.offsetWidth;
+            inputField.classList.add('shake');
+            setTimeout(() => inputField.classList.remove('shake'), 350);
         }
     }
 
     function shootPea() {
         playSound('shoot');
+
+        // Hiệu ứng giật nòng Peashooter
+        const peaWrap = document.getElementById('peashooter-wrap');
+        peaWrap.classList.remove('shoot');
+        void peaWrap.offsetWidth;
+        peaWrap.classList.add('shoot');
+
         const arena = document.getElementById('arena');
         const pea = document.createElement('div');
         pea.className = `peashot ${isCritMode ? 'crit' : ''}`;
         arena.appendChild(pea);
 
-        let position = 110;
-        const shotAnimation = setInterval(() => {
-            position += 25;
-            pea.style.left = position + 'px';
+        // Tính tọa độ chuẩn theo độ rộng màn hình thực tế (PC & Mobile đều trúng đích)
+        const startX = 92;
+        const targetX = Math.max(200, arena.offsetWidth - 105);
+        const duration = 220; // ms
+        const startTime = performance.now();
 
-            if (position >= 500) {
-                clearInterval(shotAnimation);
+        function animateShot(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const currentX = startX + (targetX - startX) * progress;
+            pea.style.left = currentX + 'px';
+
+            if (progress < 1) {
+                requestAnimationFrame(animateShot);
+            } else {
                 pea.remove();
+                spawnHitParticles(targetX + 10);
                 damageZombie();
                 currentQuestionIndex++;
                 spawnNextQuestion();
             }
-        }, 10);
+        }
+        requestAnimationFrame(animateShot);
+    }
+
+    function spawnHitParticles(hitX) {
+        const arena = document.getElementById('arena');
+        const color = isCritMode ? '#f97316' : '#4ade80';
+        for (let i = 0; i < 8; i++) {
+            const p = document.createElement('div');
+            p.className = 'hit-particle';
+            p.style.background = color;
+            p.style.boxShadow = `0 0 8px ${color}`;
+            p.style.left = hitX + 'px';
+            p.style.bottom = '64px';
+            const angle = (Math.PI * 2 * i) / 8;
+            const dist = 24 + Math.random() * 22;
+            p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+            p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+            arena.appendChild(p);
+            setTimeout(() => p.remove(), 460);
+        }
+    }
+
+    function showFloatingDamage(dmg, crit) {
+        const arena = document.getElementById('arena');
+        const el = document.createElement('div');
+        el.className = `dmg-float ${crit ? 'crit' : ''}`;
+        el.innerText = crit ? `CRIT -${dmg}!` : `-${dmg}`;
+        arena.appendChild(el);
+        setTimeout(() => el.remove(), 760);
+    }
+
+    function updateZombieAppearance() {
+        const cone = document.getElementById('zombie-armor-cone');
+        const bucket = document.getElementById('zombie-armor-bucket');
+        const rank = document.getElementById('zombie-rank');
+
+        if (kills >= 15) {
+            cone.style.display = 'none';
+            bucket.style.display = 'block';
+            rank.innerText = 'BUCKET ZOMBIE';
+            rank.style.background = 'rgba(71, 85, 105, 0.9)';
+        } else if (kills >= 5) {
+            cone.style.display = 'block';
+            bucket.style.display = 'none';
+            rank.innerText = 'CONE ZOMBIE';
+            rank.style.background = 'rgba(194, 65, 12, 0.9)';
+        } else {
+            cone.style.display = 'none';
+            bucket.style.display = 'none';
+            rank.innerText = 'ZOMBIE N5';
+            rank.style.background = 'rgba(127, 29, 29, 0.85)';
+        }
     }
 
     function damageZombie() {
         playSound('hit');
         const baseDamage = isCritMode ? 50 : 25;
-        const damage = baseDamage + Math.min(combo * 5, 25); // Combo bonus
+        const damage = baseDamage + Math.min(combo * 5, 25);
         currentZombieHP -= damage;
+
+        showFloatingDamage(damage, isCritMode);
 
         const zombieBox = document.getElementById('zombie-box');
         zombieBox.classList.add('hit');
@@ -570,6 +1303,7 @@
                 document.getElementById('high-score').innerText = highScore;
             }
             currentZombieHP = 100;
+            updateZombieAppearance();
         }
 
         const hpPercent = Math.max(0, (currentZombieHP / maxZombieHP) * 100);
@@ -579,8 +1313,9 @@
     function endGame(isWin) {
         playSound('gameover');
         clearInterval(timerInterval);
-        document.getElementById('end-title').innerText = isWin ? "VICTORY!" : "GAME OVER!";
+        document.getElementById('end-title').innerText = isWin ? "VICTORY!" : "HẾT GIỜ RỒI!";
         document.getElementById('end-title').className = isWin ? "win" : "";
+        document.getElementById('missed-kanji').innerText = currentQuestion.kanji;
         document.getElementById('correct-ans').innerText = `${currentQuestion.hira} (${currentQuestion.romaji})`;
         document.getElementById('final-kills').innerText = kills;
         document.getElementById('end-screen').style.display = 'flex';
