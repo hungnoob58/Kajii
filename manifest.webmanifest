@@ -1,0 +1,11 @@
+{
+  "name": "Kanji vs Zombie",
+  "short_name": "Kanji Zombie",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070b14",
+  "theme_color": "#064e3b",
+  "icons": [{ "src": "icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }]
+}
