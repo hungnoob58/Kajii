@@ -837,6 +837,100 @@
         .kz-it button { flex: 1; text-align: left; padding: 7px 10px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,.2); background: rgba(255,255,255,.07); color: #fff; font-weight: 700; cursor: pointer; }
         .kz-it button.sel { border-color: #fbbf24; background: rgba(251,191,36,.18); }
         .kz-it button:disabled { opacity: .4; cursor: default; }
+
+        .kz-ov .kz-box { font-family: Georgia, 'Hiragino Mincho ProN', 'Yu Mincho', serif; background: radial-gradient(ellipse at 50% 0%, #0f4c4a, #07161f 70%); border: 1px solid #c9a24a; box-shadow: 0 0 0 4px #07161f, 0 0 0 5px rgba(201,162,74,.55), 0 20px 50px rgba(0,0,0,.7); border-radius: 6px; position: relative; }
+        .kz-ov .kz-box::before, .kz-ov .kz-box::after { content: '❖'; position: absolute; color: #c9a24a; font-size: 16px; top: 4px; }
+        .kz-ov .kz-box::before { left: 8px; } .kz-ov .kz-box::after { right: 8px; }
+        .kz-ov .kz-box h3 { font-weight: 400; letter-spacing: 1px; color: #f2deaa; padding-bottom: 8px; background: linear-gradient(90deg, transparent, #c9a24a, transparent) bottom / 100% 1px no-repeat; }
+        .kz-ov .kz-box h4 { font-weight: 400; color: #e7c87a; letter-spacing: .5px; }
+        .kz-ov .kz-btn { background: linear-gradient(#1c6a63, #0f4a47); color: #f2deaa; border: 1px solid #c9a24a; border-radius: 4px; font-family: inherit; font-weight: 400; letter-spacing: 1px; }
+        .kz-ov .kz-btn.alt { background: rgba(0,0,0,.35); }
+        .kz-ov .kz-row input[type=range] { accent-color: #c9a24a; }
+        .kz-tf { display: block; margin: 2px auto; padding: 4px 12px; border: 1px solid #60a5fa; border-radius: 99px; background: rgba(37,99,235,.3); color: #bfdbfe; font-weight: 800; font-size: 12px; cursor: pointer; }
+        .kz-tf:disabled { opacity: .4; }
+        .kz-frozen #read-zombie-box { filter: hue-rotate(160deg) brightness(1.2); }
+        .kz-low .kz-par, .kz-low .floating-kanji { display: none !important; }
+        .kz-low * { box-shadow: none !important; text-shadow: none !important; backdrop-filter: none !important; }
+
+        .zs-leg.a { animation: zsLeg .9s ease-in-out infinite; } .zs-leg.b { animation: zsLeg .9s ease-in-out infinite reverse; }
+        @keyframes zsLeg { 0%,100% { transform: rotate(13deg); } 50% { transform: rotate(-13deg); } }
+        .zs-arm { transform-origin: 38px 53px; animation: zsArm 1.1s ease-in-out infinite; } .zs-arm.b { animation-delay: -.55s; }
+        @keyframes zsArm { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(9deg); } }
+        .zs-head { animation: zsHead 1.8s ease-in-out infinite; }
+        @keyframes zsHead { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg) translateY(1px); } }
+        .zs-jaw { transform-origin: 50px 38px; animation: zsJaw 1.6s ease-in-out infinite; }
+        @keyframes zsJaw { 0%,100% { transform: translateY(0); } 50% { transform: translateY(1.5px); } }
+        .zombie-box.hit .zs-head { animation: none; transform: rotate(-15deg) translateX(3px); }
+        .zombie-box.kz-atk .zs-arm { animation: zsAtk .28s ease-in-out infinite; } .zombie-box.kz-atk .zs-arm.b { animation-delay: -.14s; }
+        @keyframes zsAtk { 0%,100% { transform: rotate(-30deg); } 50% { transform: rotate(-10deg); } }
+        .zombie-box.kz-atk .zs-jaw { animation: zsChomp .22s ease-in-out infinite; }
+        @keyframes zsChomp { 0%,100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+        .zs-ghost { position: fixed; z-index: 6; pointer-events: none; margin: 0; transform-origin: 70% 100%; animation: zsDie .95s ease-in forwards; }
+        .zs-ghost * { animation: none !important; }
+        @keyframes zsDie { 0% { transform: none; opacity: 1; filter: brightness(2); } 30% { transform: rotate(-12deg); filter: none; } 100% { transform: rotate(78deg) translate(10px, 14px); opacity: 0; filter: grayscale(1); } }
+        .kz-scene { position: fixed; right: 2%; bottom: 8vh; width: min(300px, 55vw); z-index: 0; pointer-events: none; opacity: .22; }
+        .kz-petal { position: fixed; top: -20px; width: 9px; height: 7px; background: #fbcfe8; border-radius: 80% 0; opacity: .7; z-index: 0; pointer-events: none; animation: kzSak linear infinite; }
+        @keyframes kzSak { from { transform: translate(0,-5vh) rotate(0); } to { transform: translate(70px,108vh) rotate(420deg); } }
+        .kz-low .kz-petal, .kz-low .kz-scene, .kz-calm .kz-petal { display: none; }
+        .menu-audio-bar { position: relative !important; top: auto !important; right: auto !important; left: auto !important; display: flex !important; justify-content: center; flex-wrap: wrap; gap: 6px; margin: 0 0 12px !important; }
+
+        #read-arena { isolation: isolate; background: linear-gradient(180deg, var(--s1,#091326) 0%, var(--s2,#112a46) 48%, #15803d 49%, #166534 75%, #14532d 100%) !important; --st: .9; }
+        #read-arena.kz-z-garden { --s1:#2e1065; --s2:#fb7185; --st:.25; } #read-arena.kz-z-forest { --s1:#022c22; --s2:#0f766e; --st:.9; --ff:#fde047; }
+        #read-arena.kz-z-battle { --s1:#3b0a0a; --s2:#ea580c; --st:.2; --ff:#fb923c; } #read-arena.kz-z-epic { --s1:#1e1b4b; --s2:#a855f7; --st:1; }
+        #read-arena.kz-z-n4 { --s1:#020617; --s2:#1d4ed8; --st:1; --ff:#67e8f9; } #read-arena.kz-z-blood { --s1:#1c0505; --s2:#991b1b; --st:.6; }
+        #read-arena.kz-z-boss { --s1:#1a0000; --s2:#7f1d1d; --st:.4; --ff:#ef4444; }
+        .kz-sky { position: absolute; inset: 0 0 51% 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .kz-sky svg { width: 100%; height: 100%; display: block; }
+        .kz-st { fill: #fff; opacity: var(--st,.9); animation: kzTw 2.6s ease-in-out infinite; } @keyframes kzTw { 50% { opacity: calc(var(--st,.9) * .25); } }
+        .kz-cl { animation: kzCl 80s linear infinite; } @keyframes kzCl { from { transform: translateX(-140px); } to { transform: translateX(480px); } }
+        .kz-aur { position: absolute; inset: 0 0 51% 0; z-index: -1; pointer-events: none; opacity: 0; filter: blur(9px); background: linear-gradient(100deg, transparent 15%, rgba(74,222,128,.4) 38%, rgba(34,211,238,.35) 62%, transparent 85%); animation: kzAur 9s ease-in-out infinite; }
+        .kz-z-epic .kz-aur, .kz-z-n4 .kz-aur { opacity: .85; } @keyframes kzAur { 0%,100% { transform: translateX(-8%); } 50% { transform: translateX(8%); } }
+        .kz-ff { position: absolute; z-index: -1; width: 4px; height: 4px; border-radius: 50%; display: none; background: var(--ff,#fde047); box-shadow: 0 0 8px 2px var(--ff,#fde047); animation: kzFf 6s ease-in-out infinite; pointer-events: none; }
+        .kz-z-forest .kz-ff, .kz-z-n4 .kz-ff, .kz-z-battle .kz-ff, .kz-z-boss .kz-ff { display: block; }
+        @keyframes kzFf { 0%,100% { transform: translate(0,0); opacity: .2; } 50% { transform: translate(14px,-18px); opacity: 1; } }
+        .kz-low .kz-aur, .kz-low .kz-ff, .kz-calm .kz-ff { display: none !important; }
+        .kz-skin-bamboo .peashot { background: radial-gradient(circle at 30% 30%, #ecfccb, #84cc16) !important; box-shadow: 0 0 8px #84cc16 !important; }
+        .kz-skin-sakura .peashot { background: radial-gradient(circle at 30% 30%, #fff1f2, #f472b6) !important; box-shadow: 0 0 8px #f9a8d4 !important; }
+        .kz-skin-ice .peashot { background: radial-gradient(circle at 30% 30%, #fff, #22d3ee) !important; box-shadow: 0 0 10px #67e8f9 !important; }
+        .kz-skin-fire .peashot { background: radial-gradient(circle at 30% 30%, #fef08a, #f97316) !important; box-shadow: 0 0 12px #ef4444 !important; }
+        .kz-skin-cactus .peashot { background: radial-gradient(circle at 30% 30%, #fff, #facc15) !important; box-shadow: 0 0 8px #fde047 !important; }
+        .kz-sg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .kz-sc { border: 1.5px solid rgba(255,255,255,.18); border-radius: 6px; background: rgba(0,0,0,.28); padding: 6px; text-align: center; color: #fff; font-family: inherit; font-size: 12px; cursor: pointer; }
+        .kz-sc svg { width: 64px; height: 64px; } .kz-sc.sel { border-color: #fbbf24; background: rgba(251,191,36,.15); } .kz-sc:disabled { opacity: .45; cursor: default; }
+
+        #kz-ytbox { position: fixed; left: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); width: 200px; z-index: 60; background: #000; border: 1px solid #c9a24a; border-radius: 8px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.6); }
+        #kz-ytbox.top { bottom: auto; top: calc(8px + env(safe-area-inset-top, 0px)); }
+        #kz-ytbox .kz-ytbar { display: flex; justify-content: space-between; align-items: center; background: #0b1f1d; color: #f2deaa; font-size: 11px; padding: 2px 6px; }
+        #kz-ytbox .kz-ytbar button { background: none; border: 0; color: #f2deaa; font-size: 13px; cursor: pointer; padding: 2px 5px; }
+        #kz-ytbox iframe { display: block; width: 200px; height: 113px; }
+        .kz-ytin { flex: 1; min-width: 0; padding: 7px 8px; border-radius: 4px; border: 1px solid #c9a24a; background: rgba(0,0,0,.4); color: #fff; font-size: 12px; }
+        .kz-ytnote { font-size: 11px; line-height: 1.5; color: #a7f3d0; font-weight: 400; }
+        .kz-ytnote a { color: #fde047; }
+
+        #screen-menu .modes-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+        #screen-menu .mode-card { padding: 12px 8px !important; min-height: 0 !important; }
+        #screen-menu .mode-desc { display: none !important; }
+        #screen-menu .mode-icon { font-size: 30px !important; margin: 2px 0 !important; }
+        #screen-menu .mode-name { font-size: 14px !important; }
+        #screen-menu .mode-tag { font-size: 9px !important; }
+        #screen-menu .mode-record { font-size: 11px !important; padding: 4px !important; }
+        #screen-menu .menu-audio-bar .btn-sound:nth-child(n+3) { display: none !important; }
+        #screen-menu .total-stats, #screen-menu #kz-xp, #screen-menu .hero-logo-wrap, #screen-menu .badge-edition { display: none !important; }
+        #screen-menu .game-title { margin-top: 0 !important; font-size: 30px !important; }
+        .kz-hub { border: 1px solid #c9a24a; border-radius: 10px; background: linear-gradient(160deg, rgba(15,76,74,.75), rgba(7,22,31,.85)); padding: 10px; margin: 8px 0 10px; }
+        .kz-hub-top { display: flex; gap: 10px; align-items: center; }
+        .kz-hub-av { width: 64px; height: 64px; flex: none; border-radius: 10px; background: radial-gradient(circle, #14532d, #052e16); border: 1px solid #c9a24a; }
+        .kz-hub-av svg { width: 100%; height: 100%; }
+        .kz-hub-info { flex: 1; min-width: 0; text-align: left; }
+        .kz-hub-lv { font-size: 15px; font-weight: 900; color: #fde68a; }
+        .kz-hub-bar i { display: block; height: 8px; border-radius: 9px; background: rgba(255,255,255,.14); overflow: hidden; margin: 4px 0 2px; }
+        .kz-hub-bar i b { display: block; height: 100%; background: linear-gradient(90deg, #f59e0b, #fde047); }
+        .kz-hub-bar span { font-size: 11px; color: #cbd5e1; }
+        .kz-hub-mini { font-size: 11px; color: #a7f3d0; font-weight: 700; margin-top: 2px; }
+        .kz-cont { width: 100%; margin-top: 9px; padding: 11px; border: 1px solid #fde68a; border-radius: 8px; background: linear-gradient(#16a34a, #166534); color: #fff; font-weight: 900; font-size: 15px; cursor: pointer; letter-spacing: .5px; }
+        .kz-dock { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 10px; }
+        .kz-dock button { padding: 7px 2px; border-radius: 8px; border: 1px solid rgba(201,162,74,.5); background: rgba(0,0,0,.35); color: #f2deaa; font-size: 10px; font-weight: 800; cursor: pointer; line-height: 1.3; }
+        .kz-dock button span { display: block; font-size: 19px; }
     </style>
 </head>
 <body>
@@ -854,12 +948,12 @@
 
         <div class="hero-logo-wrap">
             <img id="hero-logo-img" class="hero-logo-img" alt="Kanji vs Zombie Logo">
-            <span class="hero-level-tag">N5 EDITION</span>
+            <span class="hero-level-tag">N5 + N4</span>
         </div>
 
-        <div class="badge-edition">Full 20 Bài Kanji Look & Learn</div>
+        <div class="badge-edition">30 Bài · N5 + N4</div>
         <h1 class="game-title">KANJI VS ZOMBIE</h1>
-        <div class="game-subtitle">Ôn Luyện Trọn Bộ 160+ Từ Vựng Kanji N5</div>
+        <div class="game-subtitle">Ôn Luyện Trọn Bộ 260+ Từ Vựng Kanji N5 + N4</div>
 
         <div class="total-stats">
             <span>🧟 Tổng tiêu diệt:</span>
@@ -961,25 +1055,26 @@
                 <div class="hp-bar-bg"><div class="hp-bar-fill" id="read-hp-bar"></div></div>
                 <div class="zombie-svg-wrap">
                     <svg class="svg-char" viewBox="0 0 100 100">
-                        <rect x="35" y="46" width="30" height="34" fill="#1e3a8a" rx="4" stroke="#0f172a" stroke-width="1.5"/>
-                        <polygon points="48,47 52,47 53,63 50,67 47,63" fill="#dc2626"/>
-                        <rect x="38" y="78" width="10" height="19" fill="#451a03"/>
-                        <rect x="52" y="78" width="10" height="19" fill="#451a03"/>
-                        <path d="M 35 52 L 14 54 L 9 60" stroke="#6b7280" stroke-width="6" stroke-linecap="round" fill="none"/>
-                        <rect x="30" y="16" width="40" height="32" fill="#6b7280" rx="8" stroke="#1f2937" stroke-width="1.5"/>
-                        <g id="read-armor-cone" style="display:none;">
-                            <polygon points="34,18 50,0 66,18" fill="#f97316" stroke="#7c2d12" stroke-width="1.5"/>
-                            <rect x="31" y="15" width="38" height="4" rx="2" fill="#ea580c"/>
+                        <ellipse cx="50" cy="97" rx="26" ry="3" fill="rgba(0,0,0,.35)"/>
+                        <g class="zs-leg b" style="transform-origin:58px 78px"><rect x="53" y="78" width="10" height="16" rx="3" fill="#2f3b57" stroke="#111827" stroke-width="1.2"/><path d="M50 94 h16 q2 4 -2 4 h-14 z" fill="#2b1d12" stroke="#111" stroke-width="1"/></g>
+                        <g class="zs-arm b"><path d="M38 54 L20 61" stroke="#2d3b25" stroke-width="8" stroke-linecap="round"/><path d="M38 54 L20 61" stroke="#9bb88a" stroke-width="5.5" stroke-linecap="round"/><circle cx="17" cy="62" r="4.5" fill="#9bb88a" stroke="#2d3b25" stroke-width="1.2"/></g>
+                        <g class="zs-leg a" style="transform-origin:42px 78px"><rect x="35" y="78" width="10" height="17" rx="3" fill="#3b4a6b" stroke="#111827" stroke-width="1.2"/><path d="M32 94 h16 q2 4 -2 4 h-14 z" fill="#2b1d12" stroke="#111" stroke-width="1"/><path d="M36 84 l4 3 -4 3" stroke="#111827" stroke-width="1" fill="none"/></g>
+                        <path d="M33 47 L67 47 L65 70 L68 74 L63 79 L58 75 L52 80 L46 75 L40 80 L36 74 L35 70 Z" fill="#7f3b2e" stroke="#3b1a12" stroke-width="1.5"/>
+                        <path d="M44 47 L50 66 L56 47 Z" fill="#9bb88a" opacity=".85"/><path d="M42 60 l6 2 M44 66 l6 1 M56 58 l-5 2" stroke="#e5e7eb" stroke-width="1.6" stroke-linecap="round"/>
+                        <path d="M60 52 q4 3 3 9" stroke="#b91c1c" stroke-width="2" fill="none"/>
+                        <g class="zs-arm a"><path d="M36 51 L14 53" stroke="#2d3b25" stroke-width="8.5" stroke-linecap="round"/><path d="M36 51 L14 53" stroke="#9bb88a" stroke-width="6" stroke-linecap="round"/><path d="M22 52 l-1 6" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="53" r="5" fill="#9bb88a" stroke="#2d3b25" stroke-width="1.2"/><path d="M8 50 l-3 -2 M7 53 l-4 0 M8 56 l-3 2" stroke="#2d3b25" stroke-width="1.6" stroke-linecap="round"/></g>
+                        <g class="zs-head" style="transform-origin:50px 46px">
+                            <rect x="30" y="14" width="40" height="33" fill="#9bb88a" rx="14" stroke="#2d3b25" stroke-width="1.6"/>
+                            <path d="M33 18 q4 -8 9 -3 q3 -6 8 -2 q5 -5 9 1 q5 -3 8 4" stroke="#3f3f2a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <g id="read-armor-cone" style="display:none;"><polygon points="34,18 50,0 66,18" fill="#f97316" stroke="#7c2d12" stroke-width="1.5"/><rect x="31" y="15" width="38" height="4" rx="2" fill="#ea580c"/></g>
+                            <g id="read-armor-bucket" style="display:none;"><path d="M 33 18 L 37 2 L 63 2 L 67 18 Z" fill="#94a3b8" stroke="#334155" stroke-width="1.5"/><line x1="34" y1="8" x2="66" y2="8" stroke="#475569" stroke-width="2"/></g>
+                            <circle cx="42" cy="28" r="5.5" fill="#fff" stroke="#000" stroke-width="1"/><circle cx="41" cy="28" r="2" fill="#000"/>
+                            <circle cx="58" cy="30" r="7.5" fill="#fff" stroke="#000" stroke-width="1"/><circle cx="56" cy="30" r="3" fill="#dc2626"/><circle cx="56" cy="30" r="1.2" fill="#000"/>
+                            <path d="M36 22 l11 3" stroke="#2d3b25" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M38 17 l4 4 M40 17 l-3 4" stroke="#6b7a5a" stroke-width="1.2"/>
+                            <g class="zs-jaw"><path d="M38 38 Q50 45 62 38 Q60 43 50 44 Q40 43 38 38 Z" fill="#3a0f0f" stroke="#111" stroke-width="1.2"/><path d="M41 39 l2 3 2 -2 2 3 2 -2 2 3 2 -2 2 3 2 -3" stroke="#f8fafc" stroke-width="1.6" fill="none" stroke-linejoin="round"/></g>
+                            <path d="M62 40 q1 5 0 9" stroke="#b91c1c" stroke-width="2" fill="none" stroke-linecap="round"/>
                         </g>
-                        <g id="read-armor-bucket" style="display:none;">
-                            <path d="M 33 18 L 37 2 L 63 2 L 67 18 Z" fill="#94a3b8" stroke="#334155" stroke-width="1.5"/>
-                            <line x1="34" y1="8" x2="66" y2="8" stroke="#475569" stroke-width="2"/>
-                        </g>
-                        <circle cx="42" cy="27" r="5.5" fill="#fff" stroke="#000" stroke-width="1"/>
-                        <circle cx="41" cy="27" r="2" fill="#000"/>
-                        <circle cx="58" cy="29" r="7.5" fill="#fff" stroke="#000" stroke-width="1"/>
-                        <circle cx="56" cy="29" r="2.5" fill="#ef4444"/>
-                        <path d="M 40 39 Q 50 44 60 39" stroke="#111827" stroke-width="2.2" fill="none"/>
                     </svg>
                 </div>
             </div>
@@ -1564,15 +1659,15 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
 
     function initReadSelect() {
         const sel = document.getElementById('read-level-select');
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= 30; i++) {
             const opt = document.createElement('option');
             opt.value = i;
-            opt.innerText = `📘 BÀI ${i} (${n5LevelsData[i].length} từ)`;
+            opt.innerText = `${i > 20 ? '📗 N4 · BÀI ' + (i - 20) : '📘 BÀI ' + i} (${n5LevelsData[i].length} từ)`;
             sel.appendChild(opt);
         }
         const inf = document.createElement('option');
-        inf.value = 21;
-        inf.innerText = `🔥 VÔ TẬN (160+ từ)`;
+        inf.value = 31;
+        inf.innerText = `🔥 VÔ TẬN (260+ từ)`;
         sel.appendChild(inf);
     }
 
@@ -1606,13 +1701,13 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         }
         readLevel = lvl;
         const sel = document.getElementById('read-level-select');
-        if (lvl <= 20) {
+        if (lvl <= 30) {
             sel.value = lvl;
             readQueue = [...n5LevelsData[lvl]].sort(() => Math.random() - 0.5);
         } else {
-            sel.value = 21;
+            sel.value = 31;
             let all = [];
-            for (let i = 1; i <= 20; i++) all = all.concat(n5LevelsData[i]);
+            for (let i = 1; i <= 30; i++) all = all.concat(n5LevelsData[i]);
             readQueue = all.sort(() => Math.random() - 0.5);
         }
         readIdx = 0;
@@ -1627,7 +1722,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
             clearInterval(timerInterval);
             const toast = document.getElementById('levelup-toast');
             document.getElementById('levelup-title').innerText = `HOÀN THÀNH BÀI ${old}!`;
-            document.getElementById('levelup-sub').innerText = readLevel <= 20 ? `Đang vào Bài ${readLevel}...` : `Mở khóa Chế Độ Vô Tận!`;
+            document.getElementById('levelup-sub').innerText = readLevel <= 30 ? `Đang vào Bài ${readLevel > 20 ? 'N4 ' + (readLevel - 20) : readLevel}...` : `Mở khóa Chế Độ Vô Tận!`;
             toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; loadReadLevel(readLevel); }, 1400);
             return;
@@ -1651,7 +1746,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
-            if (KZ.paused) return;
+            if (KZ.paused || KZ.frozen) return;
             timeLeft--;
             document.getElementById('timer').innerText = Math.max(0, timeLeft);
             bar.style.width = Math.max(0, (timeLeft - 1) * 10) + '%';
@@ -2261,15 +2356,16 @@ const KZ = (function () {
 (function () {
     const K = KZ, $ = id => document.getElementById(id), XK = 'kz_extra_v1';
     let x; try { x = JSON.parse(localStorage.getItem(XK)); } catch (e) {}
-    x = Object.assign({ pw: 0, sc: 0, ach: {}, ok: 0, kill: 0, maxc: 0, boss: 0, day: '', dok: 0, dkill: 0, q1: 0, q2: 0 }, x || {});
+    x = Object.assign({ pw: 0, sc: 0, ks: 0, cm: 0, tf: 0, ach: {}, ok: 0, kill: 0, maxc: 0, boss: 0, day: '', dok: 0, dkill: 0, q1: 0, q2: 0 }, x || {});
     x.ach = x.ach || {};
     const sv = () => { try { localStorage.setItem(XK, JSON.stringify(x)); } catch (e) {} };
     const today = () => new Date().toISOString().slice(0, 10);
     function roll() { if (x.day !== today()) { x.day = today(); x.dok = x.dkill = x.q1 = x.q2 = 0; sv(); } }
     const lvl = () => { try { return Math.floor(Math.sqrt(JSON.parse(localStorage.getItem('kz_save_v2')).xp / 40)) + 1; } catch (e) { return 1; } };
-    const pts = () => lvl() - 1 - x.pw - x.sc;
+    const pts = () => lvl() - 1 - x.pw - x.sc - x.ks - x.cm - x.tf;
     const toast = (t, c) => { const d = document.createElement('div'); d.className = 'kz-toast ' + (c || ''); d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); };
-    K.dmgBonus = () => x.pw * 3;
+    K.dmgBonus = () => x.pw * 3 + (typeof timeLeft !== 'undefined' && timeLeft >= 7 ? x.cm * 6 : 0);
+    K.sk = k => x[k] || 0;
 
     // kỹ năng Học giả: +10% XP mỗi cấp
     const oAdd = K.addXp; K.addXp = n => oAdd(Math.round(n * (1 + .1 * x.sc)));
@@ -2301,7 +2397,7 @@ const KZ = (function () {
         oRec(q, ok); roll();
         if (ok && q) {
             x.ok++; x.dok++; if (typeof readCombo !== 'undefined') x.maxc = Math.max(x.maxc, readCombo + 1);
-            const m = meaning[q.kanji];
+            const m = meaning[q.kanji] || (window.KZ_MEAN || {})[q.kanji];
             let e = $('kz-explain');
             if (!e) { e = document.createElement('div'); e.id = 'kz-explain'; e.className = 'kz-explain'; ($('kz-hint') || $('kanji-display')).insertAdjacentElement('afterend', e); }
             e.style.opacity = 1; e.textContent = '✅ ' + q.kanji + ' = ' + q.hira + ' (' + q.romaji + ')' + (m ? ' — ' + m : '');
@@ -2332,7 +2428,7 @@ const KZ = (function () {
             (pts() > 0 && x[k] < 5 ? '<button onclick="KZ.rpgUp(\'' + k + '\')">+</button>' : '') + '</div>';
         const q = (d, t) => '<div class="kz-q' + (d ? ' done' : '') + '">' + (d ? '✅ ' : '⬜ ') + t + '</div>';
         ov.firstChild.innerHTML = '<h3>🎒 Kỹ năng & Nhiệm vụ</h3><div style="text-align:center;font-weight:800;color:#fde047">Cấp ' + lvl() + ' · Điểm kỹ năng: ' + pts() + '</div>' +
-            '<h4>⚔️ Kỹ năng</h4>' + sk('pw', '💪 Sức mạnh', '+3 sát thương mỗi cấp') + sk('sc', '📖 Học giả', '+10% XP mỗi cấp') +
+            '<h4>⚔️ Kỹ năng</h4>' + sk('pw', '🟢 Green Shot', '+3 sát thương đạn mỗi cấp') + sk('sc', '📖 Học giả', '+10% XP mỗi cấp') + sk('ks', '🛡️ Kanji Shield', 'Đỡ 1 lần sai/trận mỗi cấp, bảo vệ combo (tối đa 3)') + sk('cm', '⚡ Critical Master', 'Trả lời nhanh (3 giây đầu): +6 sát thương mỗi cấp') + sk('tf', '❄️ Time Freeze', 'Nút ❄️ đóng băng timer 1 câu, 1 lần/trận mỗi cấp (tối đa 3)') +
             '<h4>📅 Nhiệm vụ hôm nay</h4>' + q(x.q1, '20 từ đúng (' + Math.min(x.dok, 20) + '/20)') + q(x.q2, 'Diệt 3 zombie (' + Math.min(x.dkill, 3) + '/3)') +
             '<h4>🏅 Thành tựu</h4>' + ACH.map(a => q(x.ach[a[0]], a[1])).join('') +
             '<button class="kz-btn" onclick="KZ.rpgClose()">Đóng</button>';
@@ -2372,7 +2468,7 @@ const KZ = (function () {
     const oAdd = K.addXp; K.addXp = n => oAdd(Math.round(n * (1 + cur('c')[2])));
     K.sh = 0;
     K.shield = () => { if (K.sh > 0) { K.sh--; toast('🛡️ Giáp đỡ! Giữ combo (' + K.sh + ' còn lại)'); return true; } return false; };
-    const oReset = K.resetZ; K.resetZ = function () { K.sh = cur('a')[2]; K.ph = 1; oReset(); };
+    const oReset = K.resetZ; K.resetZ = function () { K.sh = cur('a')[2] + Math.min(3, K.sk('ks')); K.ph = 1; oReset(); };
 
     // boss nhiều giai đoạn
     K.ph = 1;
@@ -2455,6 +2551,321 @@ const KZ = (function () {
         }
         if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
     }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+<script>
+(function () {
+    const K = KZ, $ = id => document.getElementById(id);
+    K.frozen = false; K.tfLeft = 0;
+    const toast = t => { const d = document.createElement('div'); d.className = 'kz-toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1800); };
+
+    // ---- Time Freeze ----
+    K.tfUpd = function () { const b = $('kz-tf'); if (!b) return; b.textContent = '❄️ Đóng băng (' + K.tfLeft + ')'; b.disabled = K.tfLeft <= 0 || K.frozen; };
+    K.freeze = function () {
+        if (K.tfLeft <= 0 || K.frozen) return;
+        K.tfLeft--; K.frozen = true; document.body.classList.add('kz-frozen'); toast('❄️ Thời gian đóng băng 1 câu!'); K.tfUpd();
+        if (typeof playSound === 'function') playSound('combo');
+    };
+    const oR = K.resetZ; K.resetZ = function () { K.frozen = false; document.body.classList.remove('kz-frozen'); K.tfLeft = Math.min(3, K.sk('tf')); oR(); K.tfUpd(); };
+    const oH = K.hint; K.hint = function (q) { if (K.frozen) { K.frozen = false; document.body.classList.remove('kz-frozen'); } oH(q); K.tfUpd(); };
+
+    // ---- nhạc theo khu vực ----
+    const HIRA = [293.66, 329.63, 349.23, 440, 466.16], ZONE = l => l <= 5 ? 'garden' : l <= 10 ? 'forest' : l <= 15 ? 'battle' : 'epic';
+    function t(f, d, type, v, to, delay) {
+        const at = audioCtx.currentTime + (delay || 0), o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = type; o.frequency.setValueAtTime(f, at); if (to) o.frequency.exponentialRampToValueAtTime(to, at + d);
+        g.gain.setValueAtTime(v, at); g.gain.exponentialRampToValueAtTime(.001, at + d);
+        o.connect(g); g.connect(getBus('bgm')); o.start(at); o.stop(at + d + .05);
+    }
+    const pluck = (oct, v) => t(HIRA[Math.random() * 5 | 0] * oct, .35, 'triangle', v);
+    let n = 0, mood = 'menu';
+    const oM = K.setMood;
+    K.setMood = function (m) {
+        if (m === 'over' && mood !== 'over' && audioCtx) { try { t(130, 3, 'sine', .25, 98); t(196, 3.2, 'sine', .12, 147, .4); } catch (e) {} }
+        mood = m; oM(m);
+    };
+    setInterval(() => {
+        if (!bgmEnabled || !audioCtx || audioCtx.state !== 'running' || K.paused || document.hidden) return;
+        if (mood !== 'play' && mood !== 'tense' && mood !== 'boss') return;
+        n++;
+        const z = K.boss ? 'boss' : ZONE(typeof readLevel === 'number' ? readLevel : 1), beat = n % 8;
+        if (z === 'garden') { if (beat === 0 || beat === 5) pluck(1, .07); }
+        else if (z === 'forest') { if (beat % 2 === 0 && Math.random() < .7) pluck(2, .09); }
+        else if (z === 'battle') { if (beat % 4 === 0) t(75, .35, 'sine', .3, 38); if (beat % 2 === 1) pluck(2, .08); }
+        else { // epic + boss
+            if (beat % 2 === 0) t(70, .4, 'sine', .34, 34);
+            if (beat === 0) { [220, 277.18, 329.63].forEach(f => t(f, 1.6, 'sawtooth', .035)); }
+            if (beat % 2 === 1) pluck(2, .09);
+        }
+    }, 428);
+
+    function init() {
+        const kd = $('kanji-display');
+        if (kd) { const b = document.createElement('button'); b.type = 'button'; b.id = 'kz-tf'; b.className = 'kz-tf'; b.onclick = K.freeze; kd.insertAdjacentElement('afterend', b); K.tfUpd(); }
+        // chất lượng đồ họa
+        let g = 'mid'; try { g = localStorage.getItem('kz_gfx') || 'mid'; } catch (e) {}
+        const apply = v => { document.body.classList.toggle('kz-low', v === 'low'); try { localStorage.setItem('kz_gfx', v); } catch (e) {} };
+        apply(g);
+        const box = $('kz-set') && $('kz-set').firstChild, first = box && box.querySelector('.kz-btn');
+        if (first) {
+            const r = document.createElement('div'); r.className = 'kz-row';
+            r.innerHTML = '<span>🖼️ Đồ họa</span>' + [['low', 'Thấp'], ['mid', 'Vừa'], ['high', 'Cao']].map(o =>
+                '<label style="font-weight:400"><input type="radio" name="kzg" value="' + o[0] + '"' + (g === o[0] ? ' checked' : '') + '> ' + o[1] + '</label>').join(' ');
+            first.insertAdjacentElement('beforebegin', r);
+            r.addEventListener('change', e => apply(e.target.value));
+        }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+<script>
+(function () {
+    const K = KZ, $ = id => document.getElementById(id);
+    // trạng thái tấn công khi sắp hết giờ / boss
+    const oM = K.setMood;
+    K.setMood = function (m) { const z = $('read-zombie-box'); if (z) z.classList.toggle('kz-atk', m === 'tense' || m === 'boss'); oM(m); };
+    // zombie ngã xuống khi bị hạ
+    const oS = K.spawnZ;
+    K.spawnZ = function (k) {
+        try {
+            const w = document.querySelector('#read-zombie-box .zombie-svg-wrap');
+            if (w && !document.body.classList.contains('kz-low')) {
+                const r = w.getBoundingClientRect(), g = w.cloneNode(true);
+                g.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));
+                g.className = 'zs-ghost'; Object.assign(g.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', animation: '' });
+                document.body.appendChild(g); setTimeout(() => g.remove(), 1000);
+            }
+        } catch (e) {}
+        oS(k);
+    };
+    // cảnh nền menu: trăng + cổng torii + cánh hoa anh đào
+    const sc = document.createElement('div'); sc.className = 'kz-scene';
+    sc.innerHTML = '<svg viewBox="0 0 300 220"><circle cx="190" cy="70" r="46" fill="#fde68a"/><path d="M0 220 L70 120 L120 175 L190 100 L260 190 L300 160 L300 220Z" fill="#064e3b"/>' +
+        '<g fill="#b91c1c"><rect x="70" y="95" width="12" height="125"/><rect x="170" y="95" width="12" height="125"/><path d="M48 78 Q126 98 204 78 L212 92 Q126 112 40 92Z"/><rect x="62" y="108" width="128" height="9"/></g></svg>';
+    document.body.appendChild(sc);
+    for (let i = 0; i < 10; i++) { const p = document.createElement('span'); p.className = 'kz-petal'; p.style.left = (i * 10 + Math.random() * 8) + '%'; p.style.animationDuration = (9 + Math.random() * 8) + 's'; p.style.animationDelay = (-Math.random() * 14) + 's'; document.body.appendChild(p); }
+})();
+</script>
+
+<script>
+(function(){const D={"21": [{"kanji": "春", "hira": "はる", "romaji": "haru"}, {"kanji": "夏", "hira": "なつ", "romaji": "natsu"}, {"kanji": "秋", "hira": "あき", "romaji": "aki"}, {"kanji": "冬", "hira": "ふゆ", "romaji": "fuyu"}, {"kanji": "雪", "hira": "ゆき", "romaji": "yuki"}, {"kanji": "風", "hira": "かぜ", "romaji": "kaze"}, {"kanji": "空", "hira": "そら", "romaji": "sora"}, {"kanji": "海", "hira": "うみ", "romaji": "umi"}, {"kanji": "森", "hira": "もり", "romaji": "mori"}, {"kanji": "星", "hira": "ほし", "romaji": "hoshi"}], "22": [{"kanji": "家族", "hira": "かぞく", "romaji": "kazoku"}, {"kanji": "兄", "hira": "あに", "romaji": "ani"}, {"kanji": "姉", "hira": "あね", "romaji": "ane"}, {"kanji": "弟", "hira": "おとうと", "romaji": "otouto"}, {"kanji": "妹", "hira": "いもうと", "romaji": "imouto"}, {"kanji": "親", "hira": "おや", "romaji": "oya"}, {"kanji": "子供", "hira": "こども", "romaji": "kodomo"}, {"kanji": "彼", "hira": "かれ", "romaji": "kare"}, {"kanji": "彼女", "hira": "かのじょ", "romaji": "kanojo"}, {"kanji": "友達", "hira": "ともだち", "romaji": "tomodachi"}], "23": [{"kanji": "買う", "hira": "かう", "romaji": "kau"}, {"kanji": "売る", "hira": "うる", "romaji": "uru"}, {"kanji": "開ける", "hira": "あける", "romaji": "akeru"}, {"kanji": "閉める", "hira": "しめる", "romaji": "shimeru"}, {"kanji": "歩く", "hira": "あるく", "romaji": "aruku"}, {"kanji": "走る", "hira": "はしる", "romaji": "hashiru"}, {"kanji": "泳ぐ", "hira": "およぐ", "romaji": "oyogu"}, {"kanji": "歌う", "hira": "うたう", "romaji": "utau"}, {"kanji": "習う", "hira": "ならう", "romaji": "narau"}, {"kanji": "使う", "hira": "つかう", "romaji": "tsukau"}], "24": [{"kanji": "試験", "hira": "しけん", "romaji": "shiken"}, {"kanji": "質問", "hira": "しつもん", "romaji": "shitsumon"}, {"kanji": "宿題", "hira": "しゅくだい", "romaji": "shukudai"}, {"kanji": "授業", "hira": "じゅぎょう", "romaji": "jugyou"}, {"kanji": "意味", "hira": "いみ", "romaji": "imi"}, {"kanji": "会社", "hira": "かいしゃ", "romaji": "kaisha"}, {"kanji": "仕事", "hira": "しごと", "romaji": "shigoto"}, {"kanji": "社長", "hira": "しゃちょう", "romaji": "shachou"}, {"kanji": "会議", "hira": "かいぎ", "romaji": "kaigi"}, {"kanji": "研究", "hira": "けんきゅう", "romaji": "kenkyuu"}], "25": [{"kanji": "駅", "hira": "えき", "romaji": "eki"}, {"kanji": "空港", "hira": "くうこう", "romaji": "kuukou"}, {"kanji": "病院", "hira": "びょういん", "romaji": "byouin"}, {"kanji": "銀行", "hira": "ぎんこう", "romaji": "ginkou"}, {"kanji": "図書館", "hira": "としょかん", "romaji": "toshokan"}, {"kanji": "公園", "hira": "こうえん", "romaji": "kouen"}, {"kanji": "工場", "hira": "こうじょう", "romaji": "koujou"}, {"kanji": "店", "hira": "みせ", "romaji": "mise"}, {"kanji": "教室", "hira": "きょうしつ", "romaji": "kyoushitsu"}, {"kanji": "町", "hira": "まち", "romaji": "machi"}], "26": [{"kanji": "新しい", "hira": "あたらしい", "romaji": "atarashii"}, {"kanji": "古い", "hira": "ふるい", "romaji": "furui"}, {"kanji": "明るい", "hira": "あかるい", "romaji": "akarui"}, {"kanji": "暗い", "hira": "くらい", "romaji": "kurai"}, {"kanji": "安い", "hira": "やすい", "romaji": "yasui"}, {"kanji": "高い", "hira": "たかい", "romaji": "takai"}, {"kanji": "近い", "hira": "ちかい", "romaji": "chikai"}, {"kanji": "遠い", "hira": "とおい", "romaji": "tooi"}, {"kanji": "太い", "hira": "ふとい", "romaji": "futoi"}, {"kanji": "細い", "hira": "ほそい", "romaji": "hosoi"}], "27": [{"kanji": "体", "hira": "からだ", "romaji": "karada"}, {"kanji": "頭", "hira": "あたま", "romaji": "atama"}, {"kanji": "顔", "hira": "かお", "romaji": "kao"}, {"kanji": "目", "hira": "め", "romaji": "me"}, {"kanji": "耳", "hira": "みみ", "romaji": "mimi"}, {"kanji": "口", "hira": "くち", "romaji": "kuchi"}, {"kanji": "足", "hira": "あし", "romaji": "ashi"}, {"kanji": "手", "hira": "て", "romaji": "te"}, {"kanji": "薬", "hira": "くすり", "romaji": "kusuri"}, {"kanji": "病気", "hira": "びょうき", "romaji": "byouki"}], "28": [{"kanji": "電車", "hira": "でんしゃ", "romaji": "densha"}, {"kanji": "自転車", "hira": "じてんしゃ", "romaji": "jitensha"}, {"kanji": "飛行機", "hira": "ひこうき", "romaji": "hikouki"}, {"kanji": "地図", "hira": "ちず", "romaji": "chizu"}, {"kanji": "旅行", "hira": "りょこう", "romaji": "ryokou"}, {"kanji": "切符", "hira": "きっぷ", "romaji": "kippu"}, {"kanji": "道", "hira": "みち", "romaji": "michi"}, {"kanji": "橋", "hira": "はし", "romaji": "hashi"}, {"kanji": "港", "hira": "みなと", "romaji": "minato"}, {"kanji": "運転", "hira": "うんてん", "romaji": "unten"}], "29": [{"kanji": "今朝", "hira": "けさ", "romaji": "kesa"}, {"kanji": "昨日", "hira": "きのう", "romaji": "kinou"}, {"kanji": "去年", "hira": "きょねん", "romaji": "kyonen"}, {"kanji": "毎日", "hira": "まいにち", "romaji": "mainichi"}, {"kanji": "週末", "hira": "しゅうまつ", "romaji": "shuumatsu"}, {"kanji": "最近", "hira": "さいきん", "romaji": "saikin"}, {"kanji": "将来", "hira": "しょうらい", "romaji": "shourai"}, {"kanji": "以前", "hira": "いぜん", "romaji": "izen"}, {"kanji": "突然", "hira": "とつぜん", "romaji": "totsuzen"}, {"kanji": "特別", "hira": "とくべつ", "romaji": "tokubetsu"}], "30": [{"kanji": "地震", "hira": "じしん", "romaji": "jishin"}, {"kanji": "事故", "hira": "じこ", "romaji": "jiko"}, {"kanji": "約束", "hira": "やくそく", "romaji": "yakusoku"}, {"kanji": "準備", "hira": "じゅんび", "romaji": "junbi"}, {"kanji": "心配", "hira": "しんぱい", "romaji": "shinpai"}, {"kanji": "説明", "hira": "せつめい", "romaji": "setsumei"}, {"kanji": "趣味", "hira": "しゅみ", "romaji": "shumi"}, {"kanji": "失敗", "hira": "しっぱい", "romaji": "shippai"}, {"kanji": "練習", "hira": "れんしゅう", "romaji": "renshuu"}, {"kanji": "経験", "hira": "けいけん", "romaji": "keiken"}]};Object.keys(D).forEach(k=>{n5LevelsData[k]=D[k];});window.KZ_MEAN={"春": "Mùa xuân", "夏": "Mùa hè", "秋": "Mùa thu", "冬": "Mùa đông", "雪": "Tuyết", "風": "Gió", "空": "Bầu trời", "海": "Biển", "森": "Rừng", "星": "Ngôi sao", "家族": "Gia đình", "兄": "Anh trai (của mình)", "姉": "Chị gái (của mình)", "弟": "Em trai", "妹": "Em gái", "親": "Cha mẹ", "子供": "Trẻ con", "彼": "Anh ấy", "彼女": "Cô ấy", "友達": "Bạn bè", "買う": "Mua", "売る": "Bán", "開ける": "Mở", "閉める": "Đóng", "歩く": "Đi bộ", "走る": "Chạy", "泳ぐ": "Bơi", "歌う": "Hát", "習う": "Học (từ ai đó)", "使う": "Sử dụng", "試験": "Kỳ thi", "質問": "Câu hỏi", "宿題": "Bài tập về nhà", "授業": "Giờ học", "意味": "Ý nghĩa", "会社": "Công ty", "仕事": "Công việc", "社長": "Giám đốc", "会議": "Cuộc họp", "研究": "Nghiên cứu", "駅": "Nhà ga", "空港": "Sân bay", "病院": "Bệnh viện", "銀行": "Ngân hàng", "図書館": "Thư viện", "公園": "Công viên", "工場": "Nhà máy", "店": "Cửa hàng", "教室": "Lớp học", "町": "Thị trấn", "新しい": "Mới", "古い": "Cũ", "明るい": "Sáng", "暗い": "Tối", "安い": "Rẻ", "高い": "Cao / đắt", "近い": "Gần", "遠い": "Xa", "太い": "Dày, to", "細い": "Mảnh, gầy", "体": "Cơ thể", "頭": "Đầu", "顔": "Khuôn mặt", "目": "Mắt", "耳": "Tai", "口": "Miệng", "足": "Chân", "手": "Tay", "薬": "Thuốc", "病気": "Bệnh", "電車": "Tàu điện", "自転車": "Xe đạp", "飛行機": "Máy bay", "地図": "Bản đồ", "旅行": "Du lịch", "切符": "Vé", "道": "Con đường", "橋": "Cây cầu", "港": "Cảng", "運転": "Lái xe", "今朝": "Sáng nay", "昨日": "Hôm qua", "去年": "Năm ngoái", "毎日": "Mỗi ngày", "週末": "Cuối tuần", "最近": "Gần đây", "将来": "Tương lai", "以前": "Trước đây", "突然": "Đột nhiên", "特別": "Đặc biệt", "地震": "Động đất", "事故": "Tai nạn", "約束": "Lời hứa, cuộc hẹn", "準備": "Chuẩn bị", "心配": "Lo lắng", "説明": "Giải thích", "趣味": "Sở thích", "失敗": "Thất bại", "練習": "Luyện tập", "経験": "Kinh nghiệm"};})();
+</script>
+
+<script>
+(function () {
+    const K = KZ, $ = id => document.getElementById(id);
+    const O = '#1a2e05';
+    const eyes = (x, y) => '<circle cx="' + x + '" cy="' + y + '" r="5" fill="#fff" stroke="#111" stroke-width="1"/><circle cx="' + (x + 1.8) + '" cy="' + y + '" r="2.4" fill="#111"/>';
+    const SK = {
+        peas: { n: 'Mầm Đậu', lv: 1, c: 'peas', svg: null },
+        bamboo: { n: 'Trúc Xạ', lv: 2, c: 'bamboo', svg:
+            '<path d="M50 94 Q38 98 30 90 Q42 88 50 94Z" fill="#4d7c0f" stroke="' + O + '" stroke-width="1.5"/><rect x="42" y="52" width="14" height="42" rx="3" fill="#65a30d" stroke="' + O + '" stroke-width="2"/>' +
+            '<path d="M42 66 h14 M42 80 h14" stroke="' + O + '" stroke-width="2"/><path d="M42 72 Q26 62 22 76 Q34 80 42 72Z" fill="#84cc16" stroke="' + O + '" stroke-width="1.5"/><path d="M56 62 Q70 54 76 66 Q64 70 56 62Z" fill="#84cc16" stroke="' + O + '" stroke-width="1.5"/>' +
+            '<rect x="28" y="22" width="32" height="32" rx="9" fill="#84cc16" stroke="' + O + '" stroke-width="2"/><path d="M28 34 h32" stroke="' + O + '" stroke-width="1.5"/><rect x="56" y="29" width="26" height="17" rx="4" fill="#65a30d" stroke="' + O + '" stroke-width="2"/><path d="M68 29 v17" stroke="' + O + '" stroke-width="1.5"/><ellipse cx="82" cy="37.5" rx="4" ry="8.5" fill="' + O + '"/>' + eyes(41, 42) },
+        sakura: { n: 'Anh Đào', lv: 4, c: 'sakura', svg:
+            '<path d="M50 94 C46 80 54 68 48 54" stroke="#4d7c0f" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50 82 Q34 74 30 86 Q42 90 50 82Z" fill="#65a30d" stroke="#1a2e05" stroke-width="1.5"/>' +
+            [0, 72, 144, 216, 288].map(a => '<ellipse cx="40" cy="26" rx="9" ry="13" transform="rotate(' + a + ' 40 38)" fill="#f9a8d4" stroke="#9d174d" stroke-width="1.5"/>').join('') +
+            '<circle cx="40" cy="38" r="13" fill="#fbcfe8" stroke="#9d174d" stroke-width="1.5"/><rect x="50" y="32" width="26" height="12" rx="6" fill="#f472b6" stroke="#831843" stroke-width="1.8"/><ellipse cx="76" cy="38" rx="3.5" ry="5.5" fill="#500724"/>' + eyes(37, 38) },
+        ice: { n: 'Sen Băng', lv: 6, c: 'ice', svg:
+            '<ellipse cx="50" cy="92" rx="28" ry="6" fill="#0e7490" stroke="#083344" stroke-width="1.5"/><path d="M50 90 C46 76 54 64 50 52" stroke="#0891b2" stroke-width="7" fill="none" stroke-linecap="round"/>' +
+            '<path d="M40 52 L22 28 L38 34 L36 14 L46 32 L56 18 L56 36 L68 30 L56 52Z" fill="#bae6fd" stroke="#0c4a6e" stroke-width="2" stroke-linejoin="round"/><circle cx="46" cy="38" r="13" fill="#e0f2fe" stroke="#0c4a6e" stroke-width="1.8"/>' +
+            '<polygon points="56,29 86,37 56,45" fill="#67e8f9" stroke="#164e63" stroke-width="2"/><path d="M60 34 L78 37 L60 40" fill="#ecfeff"/>' + eyes(43, 38) },
+        fire: { n: 'Ớt Lửa', lv: 8, c: 'fire', svg:
+            '<path d="M30 34 C20 54 32 82 54 94 C48 72 64 58 62 40 C60 22 38 18 30 34Z" fill="#dc2626" stroke="#450a0a" stroke-width="2" stroke-linejoin="round"/><path d="M33 24 Q42 10 54 22 L46 28Z" fill="#16a34a" stroke="#14532d" stroke-width="1.5"/>' +
+            '<path d="M36 14 Q30 2 42 6 Q44 -4 52 8 Q60 2 56 16Z" fill="#f97316" stroke="#9a3412" stroke-width="1.2"/><path d="M58 36 L86 41 L58 48Z" fill="#ef4444" stroke="#450a0a" stroke-width="2"/><path d="M86 41 q6 -2 4 -8 q-6 2 -4 8z" fill="#fde047"/>' +
+            '<circle cx="42" cy="40" r="5" fill="#fff" stroke="#111"/><circle cx="44" cy="40" r="2.4" fill="#111"/><path d="M36 33 l12 4" stroke="#450a0a" stroke-width="2.2" stroke-linecap="round"/>' },
+        cactus: { n: 'Xương Rồng', lv: 11, c: 'cactus', svg:
+            '<path d="M30 86 h26 l-3 11 h-20z" fill="#b45309" stroke="#451a03" stroke-width="1.8"/><rect x="31" y="34" width="24" height="54" rx="12" fill="#22c55e" stroke="#14532d" stroke-width="2"/>' +
+            '<path d="M31 58 q-14 0 -14 -12 q0 -6 5 -6" stroke="#14532d" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M31 58 q-14 0 -14 -12 q0 -6 5 -6" stroke="#22c55e" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
+            '<rect x="52" y="44" width="28" height="15" rx="7.5" fill="#22c55e" stroke="#14532d" stroke-width="2"/><ellipse cx="80" cy="51.5" rx="3.5" ry="6.5" fill="#14532d"/><path d="M40 40 l-2 -3 M48 42 l2 -3 M36 70 l-3 0 M50 74 l3 0" stroke="#fef9c3" stroke-width="1.6" stroke-linecap="round"/>' +
+            '<circle cx="43" cy="27" r="4" fill="#f472b6" stroke="#9d174d"/><circle cx="37" cy="30" r="4" fill="#f9a8d4" stroke="#9d174d"/><circle cx="49" cy="30" r="4" fill="#f9a8d4" stroke="#9d174d"/>' + eyes(40, 52) }
+    };
+    let orig = null, cur = 'peas';
+    try { cur = localStorage.getItem('kz_skin') || 'peas'; } catch (e) {}
+    const lvl = () => { try { return Math.floor(Math.sqrt(JSON.parse(localStorage.getItem('kz_save_v2')).xp / 40)) + 1; } catch (e) { return 1; } };
+    function apply() {
+        if (!SK[cur] || lvl() < SK[cur].lv) cur = 'peas';
+        const sv = document.querySelector('#peashooter-wrap svg'); if (!sv) return;
+        if (orig === null) orig = sv.innerHTML;
+        sv.innerHTML = SK[cur].svg || orig;
+        Object.keys(SK).forEach(k => document.body.classList.remove('kz-skin-' + k)); document.body.classList.add('kz-skin-' + SK[cur].c);
+        try { localStorage.setItem('kz_skin', cur); } catch (e) {}
+    }
+    K.skinInfo = () => ({ n: SK[cur].n, svg: SK[cur].svg || orig || '' });
+    K.skinPick = id => { if (lvl() >= SK[id].lv) { cur = id; apply(); K.skins(); } };
+    K.skinClose = () => { K.panel = false; K.paused = document.hidden; $('kz-sk').classList.remove('on'); };
+    K.skins = function () {
+        let ov = $('kz-sk');
+        if (!ov) { ov = document.createElement('div'); ov.id = 'kz-sk'; ov.className = 'kz-ov'; ov.innerHTML = '<div class="kz-box"></div>'; document.body.appendChild(ov); }
+        const L = lvl();
+        ov.firstChild.innerHTML = '<h3>🌱 Chọn cây chiến đấu</h3><div class="kz-sg">' + Object.keys(SK).map(k => {
+            const s = SK[k], lock = L < s.lv;
+            return '<button class="kz-sc' + (cur === k ? ' sel' : '') + '"' + (lock ? ' disabled' : '') + ' onclick="KZ.skinPick(\'' + k + '\')"><svg viewBox="0 0 100 100">' + (s.svg || orig || '') + '</svg><div>' + s.n + '</div><div style="opacity:.7">' + (lock ? '🔒 Cấp ' + s.lv : (cur === k ? '✔ Đang dùng' : 'Dùng')) + '</div></button>';
+        }).join('') + '</div><button class="kz-btn" onclick="KZ.skinClose()">Đóng</button>';
+        K.panel = true; K.paused = true; ov.classList.add('on');
+    };
+
+    // ---- bầu trời theo khu vực ----
+    const ZN = l => l <= 5 ? 'garden' : l <= 10 ? 'forest' : l <= 15 ? 'battle' : l <= 20 ? 'epic' : l <= 30 ? 'n4' : 'blood';
+    K.zone = function () {
+        const a = $('read-arena'); if (!a) return;
+        a.className = a.className.replace(/\s*kz-z-\S+/g, '');
+        a.classList.add('kz-z-' + ZN(typeof readLevel === 'number' ? readLevel : 1)); if (K.boss) a.classList.add('kz-z-boss');
+    };
+    function sky() {
+        const a = $('read-arena'); if (!a) return;
+        let st = ''; for (let i = 0; i < 22; i++) st += '<circle class="kz-st" cx="' + (Math.random() * 400 | 0) + '" cy="' + (Math.random() * 55 | 0) + '" r="' + (Math.random() * 1.1 + .5).toFixed(1) + '" style="animation-delay:' + (-Math.random() * 3).toFixed(1) + 's"/>';
+        const d = document.createElement('div'); d.className = 'kz-sky';
+        d.innerHTML = '<svg viewBox="0 0 400 80" preserveAspectRatio="xMidYMax slice">' + st +
+            '<g class="kz-cl"><ellipse cx="60" cy="20" rx="28" ry="6" fill="#fff" opacity=".2"/><ellipse cx="82" cy="15" rx="18" ry="6" fill="#fff" opacity=".2"/><ellipse cx="42" cy="16" rx="15" ry="5" fill="#fff" opacity=".2"/></g>' +
+            '<g class="kz-cl" style="animation-duration:120s;animation-delay:-60s"><ellipse cx="40" cy="38" rx="24" ry="5" fill="#fff" opacity=".14"/><ellipse cx="58" cy="34" rx="14" ry="5" fill="#fff" opacity=".14"/></g>' +
+            '<path d="M0 80 L0 58 L40 36 L70 54 L110 28 L150 52 L200 34 L240 56 L290 30 L340 54 L400 40 L400 80Z" fill="#000" opacity=".3"/>' +
+            '<g fill="#7f1d1d" opacity=".75"><rect x="318" y="38" width="2.5" height="18"/><rect x="332" y="38" width="2.5" height="18"/><path d="M312 38 Q327 42 342 38 L343 41 Q327 46 311 41Z"/></g>' +
+            '<path d="M0 80 L0 66 L50 52 L90 64 L140 48 L190 66 L250 50 L310 66 L360 54 L400 64 L400 80Z" fill="#000" opacity=".45"/></svg>';
+        a.insertBefore(d, a.firstChild);
+        const au = document.createElement('div'); au.className = 'kz-aur'; a.insertBefore(au, a.firstChild);
+        for (let i = 0; i < 7; i++) { const f = document.createElement('span'); f.className = 'kz-ff'; f.style.left = (8 + Math.random() * 84) + '%'; f.style.bottom = (8 + Math.random() * 38) + '%'; f.style.animationDelay = (-Math.random() * 6) + 's'; f.style.animationDuration = (4 + Math.random() * 4) + 's'; a.insertBefore(f, a.firstChild); }
+    }
+    const oH = K.hint; K.hint = function (q) { K.zone(); oH(q); };
+    const oS = K.spawnZ; K.spawnZ = function (k) { oS(k); K.zone(); };
+    const oO = window.openMode; window.openMode = function (m) { oO(m); K.zone(); };
+
+    // ---- nhạc: chuông chiến thắng + lấp lánh N4 ----
+    function bell() {
+        if (!audioCtx) return;
+        [1, 2.76, 5.4].forEach((r, i) => {
+            const t = audioCtx.currentTime + .25, o = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o.type = 'sine'; o.frequency.value = 523.25 * r; g.gain.setValueAtTime(.14 / (i + 1), t); g.gain.exponentialRampToValueAtTime(.001, t + 3);
+            o.connect(g); g.connect(getBus('sfx')); o.start(t); o.stop(t + 3.1);
+        });
+    }
+    const oP = window.playSound; window.playSound = function (type, c) { oP(type, c); if (type === 'levelup' && soundEnabled) { try { bell(); } catch (e) {} } };
+    setInterval(() => {
+        if (!bgmEnabled || !audioCtx || audioCtx.state !== 'running' || K.paused || document.hidden || typeof readLevel !== 'number' || readLevel <= 20) return;
+        if (Math.random() < .5) { const t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'sine'; o.frequency.value = [880, 987.77, 1174.66, 1318.5, 1567.98][Math.random() * 5 | 0]; g.gain.setValueAtTime(.05, t); g.gain.exponentialRampToValueAtTime(.001, t + 1.2); o.connect(g); g.connect(getBus('bgm')); o.start(t); o.stop(t + 1.3); }
+    }, 856);
+
+    function init() {
+        sky(); K.zone(); apply();
+        document.querySelectorAll('.menu-audio-bar, .nav-right-btns').forEach(bar => {
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-sound'; b.textContent = '🌱'; b.title = 'Chọn cây'; b.onclick = K.skins; bar.appendChild(b);
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+<script>
+(function () {
+    const K = KZ, $ = id => document.getElementById(id);
+    let player = null, cfg = null, dummy = null, dctx = null, ready = false;
+    K.yt = false;
+    const baseVol = () => { try { return JSON.parse(localStorage.getItem('kz_save_v2')).vol.bgm * 100; } catch (e) { return 70; } };
+    const MULT = { menu: 1, play: .6, tense: .75, boss: .8, over: .3 };
+    let mood = 'menu';
+    const setVol = () => { try { if (player && player.setVolume) player.setVolume(Math.round(baseVol() * (MULT[mood] || 1))); } catch (e) {} };
+    const toast = t => { const d = document.createElement('div'); d.className = 'kz-toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); };
+
+    // khi dùng nhạc YouTube thì nhạc tự tạo bị tắt tiếng
+    const oGB = window.getBus;
+    window.getBus = function (n) {
+        if (n === 'bgm' && K.yt) { if (!dummy || dctx !== audioCtx) { dctx = audioCtx; dummy = audioCtx.createGain(); } return dummy; }
+        return oGB(n);
+    };
+
+    function parse(u) {
+        const l = u.match(/[?&]list=([\w-]+)/), v = u.match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/);
+        return (l || v) ? { list: l && l[1], v: v && v[1] } : null;
+    }
+    function api(cb) {
+        if (window.YT && YT.Player) return cb();
+        window.onYouTubeIframeAPIReady = cb;
+        if (!document.getElementById('kz-yt-api')) { const s = document.createElement('script'); s.id = 'kz-yt-api'; s.src = 'https://www.youtube.com/iframe_api'; s.onerror = () => toast('Không tải được YouTube, kiểm tra mạng nhé'); document.head.appendChild(s); }
+    }
+    K.ytStop = function (keep) {
+        try { if (player && player.destroy) player.destroy(); } catch (e) {}
+        player = null; K.yt = false; const b = $('kz-ytbox'); if (b) b.remove();
+        if (!keep) { try { localStorage.removeItem('kz_yt'); } catch (e) {} }
+    };
+    K.ytPlay = function (url) {
+        const c = parse((url || '').trim());
+        if (!c) { toast('Link YouTube chưa đúng, thử dán lại nhé'); return; }
+        K.ytStop(true); cfg = c;
+        try { localStorage.setItem('kz_yt', url.trim()); } catch (e) {}
+        const box = document.createElement('div'); box.id = 'kz-ytbox';
+        box.innerHTML = '<div class="kz-ytbar"><span>🎶 Nhạc chill</span><span><button title="Đổi vị trí" onclick="document.getElementById(\'kz-ytbox\').classList.toggle(\'top\')">⇅</button><button title="Tắt, dùng nhạc tự tạo" onclick="KZ.ytStop()">✕</button></span></div><div id="kz-ytp"></div>';
+        document.body.appendChild(box); K.yt = true;
+        api(() => {
+            const vars = { playsinline: 1, rel: 0, controls: 1, modestbranding: 1 };
+            if (c.list) { vars.listType = 'playlist'; vars.list = c.list; } else { vars.loop = 1; vars.playlist = c.v; }
+            player = new YT.Player('kz-ytp', { width: 200, height: 113, videoId: c.list && !c.v ? undefined : c.v, playerVars: vars, events: {
+                onReady: e => { try { if (c.list) { e.target.setShuffle(true); e.target.setLoop(true); } } catch (x) {} setVol(); if (bgmEnabled) e.target.playVideo(); },
+                onError: () => toast('Video này không cho phát nhúng, thử link khác nhé')
+            } });
+        });
+    };
+
+    // nút 🎵 điều khiển luôn nhạc YouTube
+    const oT = window.toggleBgm;
+    window.toggleBgm = function () { oT(); try { if (player && player.playVideo) bgmEnabled ? player.playVideo() : player.pauseVideo(); } catch (e) {} };
+    const oM = K.setMood; K.setMood = function (m) { mood = m; setVol(); oM(m); };
+    document.addEventListener('input', e => { if (e.target.id === 'kz-v-bgm') setTimeout(setVol, 0); });
+    // trình duyệt chặn tự phát: lần chạm đầu tiên sẽ phát tiếp
+    document.addEventListener('pointerdown', () => { try { if (player && player.getPlayerState && bgmEnabled && player.getPlayerState() !== 1 && player.getPlayerState() !== 3) player.playVideo(); } catch (e) {} }, { passive: true });
+
+    function init() {
+        const box = $('kz-set') && $('kz-set').firstChild, first = box && box.querySelector('.kz-btn');
+        if (first) {
+            const w = document.createElement('div');
+            w.innerHTML = '<h4 style="margin:10px 0 4px">🎶 Nhạc nền YouTube</h4><div class="kz-row"><input id="kz-ytin" class="kz-ytin" placeholder="Dán link video / playlist nhạc chill"><button class="kz-btn" style="width:auto;margin:0;padding:7px 12px" id="kz-ytgo">▶ Phát</button></div>' +
+                '<div class="kz-ytnote">Chưa dán thì game dùng nhạc tự tạo. Gợi ý: <a target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=nh%E1%BA%A1c+chill+vi%E1%BB%87t+nam+t%E1%BB%95ng+h%E1%BB%A3p&sp=CAM%253D">tìm "nhạc chill Việt Nam tổng hợp" (xếp theo lượt xem)</a>, chọn video rồi copy link dán vào đây. Dán link <b>playlist</b> để nhạc chạy ngẫu nhiên liên tục.</div>';
+            first.insertAdjacentElement('beforebegin', w);
+            $('kz-ytgo').onclick = () => K.ytPlay($('kz-ytin').value);
+            let saved = ''; try { saved = localStorage.getItem('kz_yt') || ''; } catch (e) {}
+            if (saved) { $('kz-ytin').value = saved; K.ytPlay(saved); }
+        }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+<script>
+(function () {
+    const K = KZ, $ = id => document.getElementById(id);
+    const J = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+    function upd() {
+        if (!$('kz-hub')) return;
+        const s = J('kz_save_v2', { xp: 0 }), x = J('kz_extra_v1', {}), xp = s.xp || 0;
+        const L = Math.floor(Math.sqrt(xp / 40)) + 1, a = 40 * (L - 1) * (L - 1), b = 40 * L * L;
+        const sk = K.skinInfo ? K.skinInfo() : { n: 'Mầm Đậu', svg: '' };
+        $('kz-h-av').innerHTML = sk.svg;
+        $('kz-h-lv').innerHTML = 'Cấp ' + L + ' · ' + sk.n;
+        $('kz-h-bar').style.width = Math.round((xp - a) / (b - a) * 100) + '%';
+        $('kz-h-xp').textContent = xp + ' / ' + b + ' XP';
+        const today = new Date().toISOString().slice(0, 10), qd = x.day === today ? (x.q1 ? 1 : 0) + (x.q2 ? 1 : 0) : 0;
+        const rv = K.weak ? K.weak().length : 0, kills = ($('total-kills') || {}).textContent || '0 Zombie';
+        $('kz-h-mini').textContent = '🧟 ' + kills + ' · 📅 ' + qd + '/2 · 🧠 ' + rv;
+        const last = parseInt(localStorage.getItem('kz_last') || '1', 10);
+        $('kz-cont').textContent = '▶ TIẾP TỤC · ' + (last > 30 ? 'Vô Tận' : last > 20 ? 'N4 Bài ' + (last - 20) : 'Bài ' + last);
+    }
+    function build() {
+        const sub = document.querySelector('#screen-menu .game-subtitle'); if (!sub) return;
+        const h = document.createElement('div'); h.id = 'kz-hub'; h.className = 'kz-hub';
+        h.innerHTML = '<div class="kz-hub-top"><div class="kz-hub-av"><svg id="kz-h-av" viewBox="0 0 100 100"></svg></div><div class="kz-hub-info"><div class="kz-hub-lv" id="kz-h-lv"></div><div class="kz-hub-bar"><i><b id="kz-h-bar"></b></i><span id="kz-h-xp"></span></div><div class="kz-hub-mini" id="kz-h-mini"></div></div></div><button type="button" class="kz-cont" id="kz-cont"></button>';
+        const d = document.createElement('div'); d.className = 'kz-dock';
+        [['🌱', 'Cây', 'skins'], ['🎒', 'Kỹ năng', 'rpg'], ['⚔️', 'Trang bị', 'eq'], ['🎶', 'Nhạc', 'open'], ['⚙️', 'Cài đặt', 'open']].forEach(o => {
+            const b = document.createElement('button'); b.type = 'button'; b.innerHTML = '<span>' + o[0] + '</span>' + o[1]; b.onclick = () => K[o[2]](); d.appendChild(b);
+        });
+        sub.insertAdjacentElement('afterend', d); sub.insertAdjacentElement('afterend', h);
+        $('kz-cont').onclick = () => { const L = parseInt(localStorage.getItem('kz_last') || '1', 10); openMode('read'); setTimeout(() => jumpToReadLevel(L), 150); };
+    }
+    const oM = K.menu; K.menu = function () { oM(); upd(); };
+    const oH = K.hint; K.hint = function (q) { if (!K.review && !K.listen && typeof readLevel === 'number') { try { localStorage.setItem('kz_last', readLevel); } catch (e) {} } oH(q); };
+    const oO = window.openMode; window.openMode = function (m) { oO(m); if (m === 'menu') upd(); };
+    function init() { build(); upd(); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
