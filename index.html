@@ -555,6 +555,21 @@
         .peashot.pe-needle::after { content: ''; position: absolute; right: -6px; top: -2px; border-left: 8px solid #fff; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
         .peashot.pe-bamboo { width: 34px !important; height: 9px !important; border-radius: 4px !important; bottom: 51px !important;
             background: repeating-linear-gradient(90deg, #65a30d 0 9px, #365314 9px 11px) !important; border: 1px solid #1a2e05 !important; }
+        .peashot.pe-needle, .peashot.pe-bamboo { filter: drop-shadow(0 0 5px var(--pg)); }
+        .peashot.s2 { filter: drop-shadow(0 0 8px var(--pg)) drop-shadow(0 0 3px var(--pg)); }
+        .peashot.s3 { filter: drop-shadow(0 0 10px var(--pg)) drop-shadow(0 0 5px #fff) drop-shadow(0 0 14px var(--pg)); }
+        .peashot.s4 { filter: drop-shadow(0 0 12px var(--pg)) drop-shadow(0 0 6px #fff) drop-shadow(0 0 18px #fde047); }
+        .peashot.s5 { filter: drop-shadow(0 0 14px #fde047) drop-shadow(0 0 7px #fff) drop-shadow(0 0 22px var(--pg)); }
+        .peashot.crit.s2, .peashot.crit.s3, .peashot.crit.s4, .peashot.crit.s5 { filter: drop-shadow(0 0 14px #f97316) drop-shadow(0 0 6px #fff) drop-shadow(0 0 20px var(--pg)); }
+        .pe-orb { position: absolute; inset: -9px; pointer-events: none; animation: peOrb .42s linear infinite; }
+        .pe-orb::before, .pe-orb::after { content: ''; position: absolute; left: calc(50% - 3px); width: 6px; height: 6px; border-radius: 50%;
+            background: #fff; box-shadow: 0 0 7px 2px var(--pg); }
+        .pe-orb::before { top: 0; } .pe-orb::after { bottom: 0; }
+        .pe-orb.o2 { inset: -14px; animation-duration: .6s; animation-direction: reverse; }
+        .pe-orb.o2::before, .pe-orb.o2::after { background: #fde047; width: 4px; height: 4px; left: calc(50% - 2px); }
+        @keyframes peOrb { to { transform: rotate(360deg); } }
+        .pe-ring { position: absolute; z-index: 7; border-radius: 50%; pointer-events: none; }
+        .pe-spark { position: absolute; z-index: 6; pointer-events: none; font-size: 11px; }
         .pe-trail { position: absolute; z-index: 5; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; }
         .pe-burst { position: absolute; z-index: 8; font-size: 18px; pointer-events: none; }
 
@@ -1849,33 +1864,65 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         phoenix:['☄️','#f97316','#fde047',0,'#ea580c','🔥'],
         world:['🍃','#4ade80','#bbf7d0',1,'#4ade80','🌳']
     };
+    const KZ_PEAS = ['', '#4ade80', '#bbf7d0', 0, '#4ade80', '🌱', 'ball'];
     function KZ_PROJ() {
         const m = document.body.className.match(/kz-skin-(\w+)/);
-        return m && KZ_PROJS[m[1]] ? KZ_PROJS[m[1]] : null; // peas = đạn tròn gốc
+        return m && KZ_PROJS[m[1]] ? KZ_PROJS[m[1]] : KZ_PEAS;
     }
-    function kzTrail(arena, pea, color) {
+    function KZ_STAR() {
+        const m = document.body.className.match(/kz-st(\d)/);
+        return m ? Math.max(1, Math.min(5, +m[1])) : 1;
+    }
+    function kzTrail(arena, pea, color, st) {
+        const x = pea.offsetLeft + 6, y = parseFloat(getComputedStyle(pea).bottom) + 6;
         const t = document.createElement('div');
         t.className = 'pe-trail';
-        t.style.background = color; t.style.boxShadow = '0 0 8px ' + color;
-        t.style.left = (pea.offsetLeft + 6) + 'px';
-        t.style.bottom = (parseFloat(getComputedStyle(pea).bottom) + 6) + 'px';
+        const c = st >= 5 ? 'hsl(' + ((performance.now() / 2) % 360 | 0) + ',95%,65%)' : color; // ★5: vệt cầu vồng
+        const sz = 7 + st * 2;
+        t.style.width = t.style.height = sz + 'px';
+        t.style.background = c; t.style.boxShadow = '0 0 ' + (6 + st * 2) + 'px ' + c;
+        t.style.left = x + 'px'; t.style.bottom = y + 'px';
         arena.appendChild(t);
-        const a = t.animate([{ opacity: .85, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.2)' }], { duration: 260, easing: 'ease-out' });
+        const a = t.animate([{ opacity: .9, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.15)' }], { duration: 230 + st * 50, easing: 'ease-out' });
         a.onfinish = () => t.remove();
+        if (st >= 3 && Math.random() < .6) { // tia sáng lấp lánh bay tản ra
+            const sp = document.createElement('div');
+            sp.className = 'pe-spark'; sp.textContent = st >= 4 ? '✨' : '✦'; sp.style.color = c;
+            sp.style.left = x + 'px'; sp.style.bottom = y + 'px';
+            arena.appendChild(sp);
+            const dy = (Math.random() - .5) * 34, dx = -10 - Math.random() * 18;
+            const b = sp.animate([{ opacity: 1, transform: 'translate(0,0) scale(1)' }, { opacity: 0, transform: `translate(${dx}px,${dy}px) scale(.3) rotate(180deg)` }], { duration: 420, easing: 'ease-out' });
+            b.onfinish = () => sp.remove();
+        }
     }
-    function kzBurst(arena, x, emoji) {
-        for (let i = 0; i < 4; i++) {
+    function kzBurst(arena, x, emoji, color, st) {
+        // vòng sóng xung kích: càng nhiều sao càng nhiều vòng
+        const rings = st >= 5 ? 3 : st >= 3 ? 2 : 1;
+        for (let r = 0; r < rings; r++) {
+            const g = document.createElement('div');
+            g.className = 'pe-ring';
+            const col = (r === 2 || (st >= 5 && r === 1)) ? '#fde047' : color;
+            g.style.cssText += `left:${x - 12}px;bottom:${40}px;width:24px;height:24px;border:${3 - (r ? 1 : 0)}px solid ${col};box-shadow:0 0 12px ${col},inset 0 0 8px ${col}`;
+            arena.appendChild(g);
+            const a = g.animate([{ opacity: .95, transform: 'scale(.4)' }, { opacity: 0, transform: `scale(${2.6 + st * .45 + r * .8})` }], { duration: 380 + r * 110, delay: r * 70, easing: 'ease-out', fill: 'backwards' });
+            a.onfinish = () => g.remove();
+        }
+        // biểu tượng nổ tung: 4 → 10 cái theo sao
+        const n = 3 + st;
+        for (let i = 0; i < n; i++) {
             const b = document.createElement('div');
             b.className = 'pe-burst'; b.textContent = emoji;
             b.style.left = x + 'px'; b.style.bottom = '48px';
+            b.style.fontSize = (15 + st * 1.5) + 'px';
             arena.appendChild(b);
-            const ang = (-60 + i * 40) * Math.PI / 180, d = 28 + Math.random() * 18;
+            const ang = (-80 + i * (160 / Math.max(1, n - 1))) * Math.PI / 180, d = 26 + st * 4 + Math.random() * 18;
             const a = b.animate([
-                { transform: 'translate(0,0) scale(.6) rotate(0)', opacity: 1 },
-                { transform: `translate(${Math.cos(ang) * d}px,${-Math.sin(ang) * d}px) scale(1.15) rotate(${(i - 1.5) * 90}deg)`, opacity: 0 }
-            ], { duration: 520, easing: 'ease-out' });
+                { transform: 'translate(0,0) scale(.5) rotate(0)', opacity: 1 },
+                { transform: `translate(${Math.cos(ang) * d}px,${-Math.sin(ang) * d}px) scale(1.2) rotate(${(i - n / 2) * 80}deg)`, opacity: 0 }
+            ], { duration: 520 + st * 40, easing: 'ease-out' });
             a.onfinish = () => b.remove();
         }
+        if (st >= 5) arena.animate([{ filter: 'brightness(1.6) saturate(1.3)' }, { filter: 'none' }], { duration: 220 }); // ★5: chớp sáng cả màn
     }
 
     function shootPea() {
@@ -1885,9 +1932,11 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
 
         const arena = document.getElementById('read-arena');
         const pea = document.createElement('div');
-        const PJ = KZ_PROJ(); // [emoji, glow, trail, spin, hit, burstEmoji, kind]
-        pea.className = `peashot ${isCritMode ? 'crit' : ''}` + (PJ ? (PJ[6] ? ' pe-' + PJ[6] : ' pe') : '');
-        if (PJ) { pea.style.setProperty('--pg', PJ[1]); if (!PJ[6]) pea.textContent = PJ[0]; }
+        const PJ = KZ_PROJ(), ST = KZ_STAR(), SC = 1 + (ST - 1) * 0.14; // PJ: [emoji, glow, trail, spin, hit, burstEmoji, kind]
+        pea.className = `peashot ${isCritMode ? 'crit' : ''}` + (PJ[6] ? ' pe-' + PJ[6] : ' pe') + ' s' + ST;
+        pea.style.setProperty('--pg', PJ[1]); if (!PJ[6]) pea.textContent = PJ[0];
+        if (ST >= 3) { const o = document.createElement('i'); o.className = 'pe-orb'; pea.appendChild(o); }
+        if (ST >= 5) { const o = document.createElement('i'); o.className = 'pe-orb o2'; pea.appendChild(o); }
         arena.appendChild(pea);
         let lastTrail = 0;
 
@@ -1895,15 +1944,14 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         function anim(now) {
             const p = Math.min((now - t0) / dur, 1);
             pea.style.left = (startX + (targetX - startX) * p) + 'px';
-            if (PJ) {
-                if (PJ[3]) pea.style.transform = 'rotate(' + (p * 720) + 'deg)';
-                if (now - lastTrail > 28 && p < 1) { lastTrail = now; kzTrail(arena, pea, PJ[2]); }
-            }
+            pea.style.transform = 'rotate(' + (PJ[3] ? p * 720 : 0) + 'deg) scale(' + SC + ')';
+            if (now - lastTrail > (ST >= 3 ? 18 : 30) && p < 1) { lastTrail = now; kzTrail(arena, pea, PJ[2], ST); }
             if (p < 1) requestAnimationFrame(anim);
             else {
                 pea.remove();
-                spawnParticles(arena, targetX + 10, 52, isCritMode ? '#f97316' : (PJ ? PJ[4] : '#4ade80'));
-                if (PJ) kzBurst(arena, targetX + 6, PJ[5] || PJ[0]);
+                spawnParticles(arena, targetX + 10, 52, isCritMode ? '#f97316' : PJ[4]);
+                if (ST >= 3) spawnParticles(arena, targetX + 10, 52, PJ[2]);
+                kzBurst(arena, targetX + 6, PJ[5] || PJ[0], PJ[4], ST, arena);
                 const dmg = (isCritMode ? 50 : 25) + Math.min(readCombo * 5, 25) + KZ.dmgBonus();
                 readZombieHP -= dmg;
                 showDmg(arena, isCritMode ? `CRIT -${dmg}!` : `-${dmg}`, isCritMode);
