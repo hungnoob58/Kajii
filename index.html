@@ -3382,6 +3382,7 @@ body.kz-st5 #peashooter-wrap svg{animation:v4st 1.8s ease-in-out infinite}
                 sv(); apply(); K.menu(); go(); toast('Đã áp dụng');
             });
         };
+        if (pass !== undefined && String(pass).trim().toLowerCase() === 'fullcay') { K.skinClose(); K.fullCheat(); return; }
         if (pass !== undefined && String(pass).trim().toLowerCase() !== CODE) { toast('Sai mã admin'); return; }
         if (pass !== undefined) { go(); K.panel = true; K.paused = true; o.classList.add('on'); return; }
         o.innerHTML = '<div class="v3-box v4-adm"><button class="v3-x" onclick="KZ.skinClose()">✕</button><h3>🔑 Nhập mã admin</h3><label>Mã bí mật</label><input id="v4-code" type="password" autocomplete="off"><div class="row"><button id="v4-ok">Xác nhận</button><button onclick="KZ.skinClose()">Hủy</button></div></div>';
@@ -3413,6 +3414,15 @@ body.kz-st5 #peashooter-wrap svg{animation:v4st 1.8s ease-in-out infinite}
             kb.push(k); if (kb.length > KON.length) kb.shift();
             if (buf.endsWith('fullcay') || (kb.length === KON.length && kb.every((x, i) => x === KON[i]))) { buf = ''; kb = []; K.fullCheat(); }
         });
+    })();
+    // ---------- cheat cho điện thoại (iOS / Android) ----------
+    // 1) Chạm 3 ngón tay cùng lúc vào bất kỳ đâu trên màn hình => FULL XU + FULL CÂY ★5
+    // 2) Chạm 5 lần vào banner => ô nhập mã => gõ "fullcay" (hoặc mã admin)
+    (function () {
+        let last = 0;
+        document.addEventListener('touchstart', e => {
+            if (e.touches && e.touches.length === 3 && Date.now() - last > 1500) { last = Date.now(); K.fullCheat(); }
+        }, { passive: true });
     })();
     function init() {
         apply();
