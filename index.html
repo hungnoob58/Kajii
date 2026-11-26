@@ -548,7 +548,7 @@
         /* ===== ĐẠN RIÊNG CHO TỪNG CÂY ===== */
         .peashot.pe { background: none !important; border: 0 !important; box-shadow: none !important;
             display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1;
-            filter: drop-shadow(0 0 6px var(--pg, #fff)) drop-shadow(0 0 2px var(--pg, #fff)); will-change: transform, left; }
+            filter: drop-shadow(0 0 6px var(--pg, #fff)) drop-shadow(0 0 2px var(--pg, #fff)); will-change: transform; }
         .peashot.pe.crit { font-size: 30px; filter: drop-shadow(0 0 10px #f97316) drop-shadow(0 0 4px var(--pg, #fff)); }
         .peashot.pe-needle { width: 30px !important; height: 4px !important; border-radius: 3px !important; bottom: 54px !important;
             background: linear-gradient(90deg, #14532d, #86efac 70%, #fff) !important; }
@@ -983,7 +983,7 @@
 
         <div class="badge-edition">30 Bài · N5 + N4</div>
         <h1 class="game-title">KANJI VS ZOMBIE</h1>
-        <div class="game-subtitle">Ôn Luyện Trọn Bộ 260+ Từ Vựng Kanji N5 + N4</div>
+        <div class="game-subtitle">Ôn luyện 242 mục Kanji N5 + N4</div>
 
         <div class="total-stats">
             <span>🧟 Tổng tiêu diệt:</span>
@@ -1690,6 +1690,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
     function initReadSelect() {
         const sel = document.getElementById('read-level-select');
         for (let i = 1; i <= 30; i++) {
+            if (!n5LevelsData[i] || !n5LevelsData[i].length) continue;
             const opt = document.createElement('option');
             opt.value = i;
             opt.innerText = `${i > 20 ? '📗 N4 · BÀI ' + (i - 20) : '📘 BÀI ' + i} (${n5LevelsData[i].length} từ)`;
@@ -1697,7 +1698,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         }
         const inf = document.createElement('option');
         inf.value = 31;
-        inf.innerText = `🔥 VÔ TẬN (260+ từ)`;
+        inf.innerText = `🔥 VÔ TẬN (${Object.values(n5LevelsData).reduce((t, a) => t + a.length, 0)} từ)`;
         sel.appendChild(inf);
     }
 
@@ -1737,7 +1738,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         } else {
             sel.value = 31;
             let all = [];
-            for (let i = 1; i <= 30; i++) all = all.concat(n5LevelsData[i]);
+            for (let i = 1; i <= 30; i++) all = all.concat(n5LevelsData[i] || []);
             readQueue = all.sort(() => Math.random() - 0.5);
         }
         readIdx = 0;
@@ -1873,9 +1874,15 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         const m = document.body.className.match(/kz-st(\d)/);
         return m ? Math.max(1, Math.min(5, +m[1])) : 1;
     }
-    function kzTrail(arena, pea, color, st) {
-        const x = pea.offsetLeft + 6, y = parseFloat(getComputedStyle(pea).bottom) + 6;
-        const t = document.createElement('div');
+    // Pool DOM cho hiệu ứng: tái sử dụng node thay vì tạo/xóa liên tục (giảm GC giật)
+    const KZFX = window.KZFX = {
+        k: 1, pool: {},
+        get(cls) { const p = this.pool[cls]; let e = p && p.pop(); if (!e) e = document.createElement('div'); e._c = cls; e.className = cls; e.style.cssText = ''; e.textContent = ''; return e; },
+        put(e) { e.remove(); const p = this.pool[e._c] || (this.pool[e._c] = []); if (p.length < 40) p.push(e); }
+    };
+    function kzTrail(arena, px, pb, color, st) {
+        const x = px + 6, y = pb + 6;
+        const t = KZFX.get('pe-trail');
         t.className = 'pe-trail';
         const c = st >= 5 ? 'hsl(' + ((performance.now() / 2) % 360 | 0) + ',95%,65%)' : color; // ★5: vệt cầu vồng
         const sz = 7 + st * 2;
@@ -1884,33 +1891,33 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         t.style.left = x + 'px'; t.style.bottom = y + 'px';
         arena.appendChild(t);
         const a = t.animate([{ opacity: .9, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.15)' }], { duration: 230 + st * 50, easing: 'ease-out' });
-        a.onfinish = () => t.remove();
-        if (st >= 3 && Math.random() < .6) { // tia sáng lấp lánh bay tản ra
-            const sp = document.createElement('div');
+        a.onfinish = () => KZFX.put(t);
+        if (st >= 3 && Math.random() < .6 * KZFX.k) { // tia sáng lấp lánh bay tản ra
+            const sp = KZFX.get('pe-spark');
             sp.className = 'pe-spark'; sp.textContent = st >= 4 ? '✨' : '✦'; sp.style.color = c;
             sp.style.left = x + 'px'; sp.style.bottom = y + 'px';
             arena.appendChild(sp);
             const dy = (Math.random() - .5) * 34, dx = -10 - Math.random() * 18;
             const b = sp.animate([{ opacity: 1, transform: 'translate(0,0) scale(1)' }, { opacity: 0, transform: `translate(${dx}px,${dy}px) scale(.3) rotate(180deg)` }], { duration: 420, easing: 'ease-out' });
-            b.onfinish = () => sp.remove();
+            b.onfinish = () => KZFX.put(sp);
         }
     }
     function kzBurst(arena, x, emoji, color, st) {
         // vòng sóng xung kích: càng nhiều sao càng nhiều vòng
         const rings = st >= 5 ? 3 : st >= 3 ? 2 : 1;
         for (let r = 0; r < rings; r++) {
-            const g = document.createElement('div');
+            const g = KZFX.get('pe-ring');
             g.className = 'pe-ring';
             const col = (r === 2 || (st >= 5 && r === 1)) ? '#fde047' : color;
             g.style.cssText += `left:${x - 12}px;bottom:${40}px;width:24px;height:24px;border:${3 - (r ? 1 : 0)}px solid ${col};box-shadow:0 0 12px ${col},inset 0 0 8px ${col}`;
             arena.appendChild(g);
             const a = g.animate([{ opacity: .95, transform: 'scale(.4)' }, { opacity: 0, transform: `scale(${2.6 + st * .45 + r * .8})` }], { duration: 380 + r * 110, delay: r * 70, easing: 'ease-out', fill: 'backwards' });
-            a.onfinish = () => g.remove();
+            a.onfinish = () => KZFX.put(g);
         }
         // biểu tượng nổ tung: 4 → 10 cái theo sao
         const n = 3 + st;
         for (let i = 0; i < n; i++) {
-            const b = document.createElement('div');
+            const b = KZFX.get('pe-burst');
             b.className = 'pe-burst'; b.textContent = emoji;
             b.style.left = x + 'px'; b.style.bottom = '48px';
             b.style.fontSize = (15 + st * 1.5) + 'px';
@@ -1920,7 +1927,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
                 { transform: 'translate(0,0) scale(.5) rotate(0)', opacity: 1 },
                 { transform: `translate(${Math.cos(ang) * d}px,${-Math.sin(ang) * d}px) scale(1.2) rotate(${(i - n / 2) * 80}deg)`, opacity: 0 }
             ], { duration: 520 + st * 40, easing: 'ease-out' });
-            a.onfinish = () => b.remove();
+            a.onfinish = () => KZFX.put(b);
         }
         if (st >= 5) arena.animate([{ filter: 'brightness(1.6) saturate(1.3)' }, { filter: 'none' }], { duration: 220 }); // ★5: chớp sáng cả màn
     }
@@ -1941,11 +1948,12 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         let lastTrail = 0;
 
         const startX = 82, targetX = Math.max(180, arena.offsetWidth - 94), dur = 210, t0 = performance.now();
+        pea.style.left = startX + 'px';
+        const pBottom = parseFloat(getComputedStyle(pea).bottom) || 0; // đọc layout 1 lần/viên, không đọc mỗi frame
         function anim(now) {
-            const p = Math.min((now - t0) / dur, 1);
-            pea.style.left = (startX + (targetX - startX) * p) + 'px';
-            pea.style.transform = 'rotate(' + (PJ[3] ? p * 720 : 0) + 'deg) scale(' + SC + ')';
-            if (now - lastTrail > (ST >= 3 ? 18 : 30) && p < 1) { lastTrail = now; kzTrail(arena, pea, PJ[2], ST); }
+            const p = Math.min((now - t0) / dur, 1), dx = (targetX - startX) * p;
+            pea.style.transform = 'translate3d(' + dx + 'px,0,0) rotate(' + (PJ[3] ? p * 720 : 0) + 'deg) scale(' + SC + ')';
+            if (now - lastTrail > (ST >= 3 ? 18 : 30) / KZFX.k && p < 1) { lastTrail = now; kzTrail(arena, startX + dx, pBottom, PJ[2], ST); }
             if (p < 1) requestAnimationFrame(anim);
             else {
                 pea.remove();
@@ -2020,6 +2028,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         mix.value = 'all'; mix.innerText = '🔥 TRỘN TẤT CẢ N5';
         sel.appendChild(mix);
         for (let i = 1; i <= 20; i++) {
+            if (!n5KanjiWriteData[i]) continue;
             const opt = document.createElement('option');
             opt.value = i; opt.innerText = `🖌️ BÀI ${i} (${n5KanjiWriteData[i].length} chữ)`;
             sel.appendChild(opt);
@@ -2040,6 +2049,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         if (strokeHistory.length > 25) strokeHistory.shift();
         isDrawing = true; hasDrawn = true;
         const pos = getPos(e);
+        userStrokes.push([{ x: pos.x, y: pos.y }]);
         ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
         e.preventDefault();
     }
@@ -2048,6 +2058,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         if (!isDrawing || isCasting) return;
         const pos = getPos(e);
         ctx.lineWidth = 10; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#111827';
+        if (userStrokes.length) userStrokes[userStrokes.length - 1].push({ x: pos.x, y: pos.y });
         ctx.lineTo(pos.x, pos.y); ctx.stroke();
         e.preventDefault();
     }
@@ -2062,12 +2073,13 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
     function undoStroke() {
         if (isCasting || strokeHistory.length === 0) return;
         ctx.putImageData(strokeHistory.pop(), 0, 0);
+        userStrokes.pop();
         if (strokeHistory.length === 0) hasDrawn = false;
     }
 
     function clearCanvas() {
         ctx.clearRect(0, 0, 240, 240);
-        strokeHistory = []; hasDrawn = false;
+        strokeHistory = []; hasDrawn = false; userStrokes = [];
     }
 
     function toggleHint() {
@@ -2093,7 +2105,7 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         document.getElementById('write-kills').innerText = writeKills;
         const val = document.getElementById('write-level-select').value;
         let list = [];
-        if (val === 'all') { for (let i = 1; i <= 20; i++) list = list.concat(n5KanjiWriteData[i]); }
+        if (val === 'all') { for (let i = 1; i <= 20; i++) list = list.concat(n5KanjiWriteData[i] || []); }
         else list = [...n5KanjiWriteData[val]];
         writeQueue = list.sort(() => Math.random() - 0.5);
         writeIdx = 0;
@@ -2133,34 +2145,104 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
     }
 
+    // ==================== CHẤM CHỮ: hình dạng + vị trí/tỷ lệ + số nét + hướng ====================
+    // Số nét chuẩn của 109 chữ luyện viết. Thứ tự nét cần dữ liệu đường nét (KanjiVG) để chấm; xem KZ_STROKE_PATHS bên dưới.
+    var userStrokes = [];
+    const KZ_STROKE_N = {'一':1,'二':2,'三':3,'四':5,'五':4,'六':4,'七':2,'八':2,'九':2,'十':2,'百':6,'千':3,'万':3,'円':4,'時':10,'分':4,'半':5,'日':4,'月':4,'火':4,'水':4,'木':4,'金':8,'土':3,'上':3,'下':3,'中':4,'外':5,'前':9,'後':9,'左':5,'右':5,'東':8,'西':6,'南':9,'北':5,'口':3,'人':2,'男':7,'女':3,'子':3,'父':4,'母':5,'友':4,'先':6,'生':5,'学':8,'校':10,'山':3,'川':3,'天':4,'雨':8,'花':7,'国':8,'気':6,'車':7,'電':13,'駅':14,'店':8,'本':5,'書':10,'名':6,'行':6,'来':7,'帰':10,'出':5,'入':2,'食':9,'飲':12,'見':7,'聞':14,'読':14,'買':12,'話':13,'会':6,'休':6,'大':3,'小':3,'高':10,'安':6,'新':13,'古':5,'長':8,'多':6,'少':4,'白':5,'赤':7,'青':8,'黒':11,'今':4,'年':6,'毎':6,'週':11,'間':12,'目':5,'足':7,'手':4,'立':5,'言':7,'思':9,'心':4,'知':8,'田':5,'町':7,'村':7,'魚':11,'肉':6,'犬':4,'猫':11};
+    // Muốn chấm THỨ TỰ nét: thêm KZ_STROKE_PATHS['日'] = [[[x,y],...], ...] (toạ độ 0-1, đúng thứ tự & hướng) rồi so từng nét theo index.
+    const KZ_STROKE_PATHS = {};
+    const KZ_CFG = { N: 64, minPrecision: 0.80, minRecall: 0.70, tolP: 2, tolR: 3 }; // chỉnh ngưỡng tại đây sau khi playtest
+
+    function kzDense(strokes) {
+        const out = [];
+        strokes.forEach(st => {
+            for (let i = 0; i < st.length; i++) {
+                out.push(st[i]);
+                if (i) { const a = st[i - 1], b = st[i], n = Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / 2);
+                    for (let k = 1; k < n; k++) out.push({ x: a.x + (b.x - a.x) * k / n, y: a.y + (b.y - a.y) * k / n }); }
+            }
+        });
+        return out;
+    }
+    function kzDilate(m, N, r) {
+        const o = new Uint8Array(N * N);
+        for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (m[y * N + x])
+            for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+                const X = x + dx, Y = y + dy; if (X >= 0 && Y >= 0 && X < N && Y < N) o[Y * N + X] = 1; }
+        return o;
+    }
+    function gradeKanji(ch) {
+        const C = KZ_CFG, N = C.N, real = userStrokes.filter(st => st.length > 2 || (st.length > 1 && Math.hypot(st[1].x - st[0].x, st[1].y - st[0].y) > 3));
+        const up = kzDense(real);
+        if (!up.length) return { error: "⚠️ Viết ngắn quá! Vẽ rõ nét hơn chút nhé." };
+        if (real.length > 40) return { error: "⚠️ Viết gọn tay lại chút nhé ông tướng!" };
+        // bbox người chơi
+        let ux0 = 1e9, uy0 = 1e9, ux1 = -1e9, uy1 = -1e9;
+        up.forEach(p => { ux0 = Math.min(ux0, p.x); uy0 = Math.min(uy0, p.y); ux1 = Math.max(ux1, p.x); uy1 = Math.max(uy1, p.y); });
+        const uw = ux1 - ux0, uh = uy1 - uy0;
+        if (Math.max(uw, uh) < 30) return { error: "⚠️ Viết ngắn quá! Vẽ rõ nét hơn chút nhé." };
+        // glyph mẫu (tô đặc, không làm dày)
+        const tc = document.createElement('canvas'); tc.width = tc.height = 240;
+        const g = tc.getContext('2d');
+        g.font = 'bold 160px "Hiragino Kaku Gothic Pro", "Yu Gothic", "Meiryo", sans-serif';
+        g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#000'; g.fillText(ch, 120, 125);
+        const gd = g.getImageData(0, 0, 240, 240).data, gp = [];
+        let tx0 = 1e9, ty0 = 1e9, tx1 = -1e9, ty1 = -1e9;
+        for (let y = 0; y < 240; y++) for (let x = 0; x < 240; x++) if (gd[(y * 240 + x) * 4 + 3] > 128) {
+            gp.push(x, y); tx0 = Math.min(tx0, x); ty0 = Math.min(ty0, y); tx1 = Math.max(tx1, x); ty1 = Math.max(ty1, y); }
+        if (!gp.length) return { ok: true, note: "" }; // font không có chữ này: bỏ qua phần hình dạng
+        // chuẩn hoá: tịnh tiến + co giãn giữ tỷ lệ về lưới N×N → viết lệch/to/nhỏ vẫn đúng
+        const norm = (x0, y0, x1, y1) => { const sc = (N - 8) / Math.max(x1 - x0, y1 - y0, 1), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+            return (x, y) => [Math.min(N - 1, Math.max(0, Math.round((x - cx) * sc + N / 2))), Math.min(N - 1, Math.max(0, Math.round((y - cy) * sc + N / 2)))]; };
+        const nu = norm(ux0, uy0, ux1, uy1), nt = norm(tx0, ty0, tx1, ty1);
+        const U = new Uint8Array(N * N), T = new Uint8Array(N * N);
+        up.forEach(p => { const [a, b] = nu(p.x, p.y); U[b * N + a] = 1; });
+        for (let i = 0; i < gp.length; i += 2) { const [a, b] = nt(gp[i], gp[i + 1]); T[b * N + a] = 1; }
+        const Td = kzDilate(T, N, C.tolP), Ud = kzDilate(U, N, C.tolR);
+        let uc = 0, ui = 0, tc2 = 0, ti = 0, mx = 0, my = 0, mn = 0;
+        for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const k = y * N + x;
+            if (U[k]) { uc++; if (Td[k]) ui++; }
+            if (T[k]) { tc2++; if (Ud[k]) ti++; else { mx += x - N / 2; my += y - N / 2; mn++; } } }
+        const precision = ui / Math.max(1, uc), recall = ti / Math.max(1, tc2);
+        // số nét
+        const want = KZ_STROKE_N[ch];
+        if (want && real.length !== want)
+            return { ok: false, msg: `❌ Chữ "${ch}" có ${want} nét, ông viết ${real.length} nét. ${real.length < want ? "Có thể thiếu nét hoặc nối nét." : "Có thể thừa nét hoặc tách nét."}` };
+        if (precision < C.minPrecision || recall < C.minRecall) {
+            let hint = precision < C.minPrecision ? "Có nét bị lệch hoặc thừa so với chữ mẫu." : "Có nét chưa đủ dài/đủ vị trí.";
+            if (recall < C.minRecall && mn > 8) { const h = Math.abs(mx) > Math.abs(my) ? (mx < 0 ? "bên trái" : "bên phải") : (my < 0 ? "phía trên" : "phía dưới"); hint = `Còn thiếu nét ở ${h}.`; }
+            return { ok: false, msg: `❌ Chưa đúng chữ "${ch}" lắm! ${hint} (khớp ${Math.round(precision * 100)}%/${Math.round(recall * 100)}%)` };
+        }
+        // hướng nét (quy tắc chung: ngang trái→phải, dọc trên→dưới)
+        let note = "";
+        const big = Math.max(uw, uh) * 0.25;
+        for (const st of real) { const a = st[0], b = st[st.length - 1], dx = b.x - a.x, dy = b.y - a.y;
+            if (Math.hypot(dx, dy) < big) continue;
+            if (Math.abs(dx) > 3 * Math.abs(dy) && dx < 0) { note = "nét ngang nên viết từ trái sang phải"; break; }
+            if (Math.abs(dy) > 3 * Math.abs(dx) && dy < 0) { note = "nét dọc nên viết từ trên xuống dưới"; break; } }
+        return { ok: true, note };
+    }
+
     function checkKanji() {
         if (isCasting || !currentWriteQ) return;
         if (!hasDrawn) { padError("⚠️ Ông chưa vẽ nét nào lên lá bùa kìa!"); return; }
 
-        const uData = ctx.getImageData(0, 0, 240, 240).data;
-        const tData = targetCtx.getImageData(0, 0, 240, 240).data;
-        let tPix = 0, mPix = 0, uPix = 0;
-        for (let i = 3; i < tData.length; i += 4) {
-            if (tData[i] > 50) tPix++;
-            if (uData[i] > 50) { uPix++; if (tData[i] > 50) mPix++; }
-        }
-        if (uPix < 30) { padError("⚠️ Viết ngắn quá! Vẽ rõ nét hơn chút nhé."); return; }
-        if (uPix > 9000) { padError("⚠️ Viết gọn tay lại chút nhé ông tướng!"); return; }
-
-        if (mPix / Math.max(1, tPix) >= 0.12) {
+        const res = gradeKanji(currentWriteQ.kanji);
+        if (res.error) { padError(res.error); return; }
+        if (res.ok) {
             isCasting = true;
             writeCombo++;
             if (writeCombo > 1) {
                 const cb = document.getElementById('write-combo-badge');
                 cb.innerText = `🔥 COMBO x${writeCombo}`; cb.style.display = 'block';
             }
-            setFeedback(`✨ CHÍNH XÁC! Phóng bùa "${currentWriteQ.kanji}"!`, "#4ade80");
+            setFeedback(`✨ CHÍNH XÁC! Phóng bùa "${currentWriteQ.kanji}"!` + (res.note ? " · " + res.note : ""), "#4ade80");
             castSpell(currentWriteQ.kanji);
         } else {
             writeCombo = 0;
             document.getElementById('write-combo-badge').style.display = 'none';
             playSound('fail');
-            padError(`❌ Chưa đúng chữ "${currentWriteQ.kanji}" lắm! Thử viết lại xem.`);
+            padError(res.msg);
         }
     }
 
@@ -2173,11 +2255,12 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         const spell = document.createElement('div');
         spell.className = 'spell-shot'; spell.innerText = char;
         arena.appendChild(spell);
+        spell.style.left = '80px';
 
         const startX = 80, targetX = Math.max(180, arena.offsetWidth - 90), dur = 250, t0 = performance.now();
         function anim(now) {
             const p = Math.min((now - t0) / dur, 1);
-            spell.style.left = (startX + (targetX - startX) * p) + 'px';
+            spell.style.transform = 'translate3d(' + ((targetX - startX) * p) + 'px,0,0)';
             if (p < 1) requestAnimationFrame(anim);
             else {
                 spell.remove();
@@ -2210,15 +2293,15 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
 
     // ==================== HIỆU ỨNG DÙNG CHUNG ====================
     function spawnParticles(arena, x, y, color) {
-        for (let i = 0; i < 8; i++) {
-            const p = document.createElement('div');
-            p.className = 'hit-particle';
+        const N = Math.max(5, Math.round(8 * KZFX.k));
+        for (let i = 0; i < N; i++) {
+            const p = KZFX.get('hit-particle');
             p.style.background = color; p.style.left = x + 'px'; p.style.bottom = y + 'px';
-            const a = (Math.PI * 2 * i) / 8, d = 22 + Math.random() * 20;
+            const a = (Math.PI * 2 * i) / N, d = 22 + Math.random() * 20;
             p.style.setProperty('--dx', Math.cos(a) * d + 'px');
             p.style.setProperty('--dy', Math.sin(a) * d + 'px');
             arena.appendChild(p);
-            setTimeout(() => p.remove(), 460);
+            setTimeout(() => KZFX.put(p), 460);
         }
     }
 
@@ -2263,6 +2346,14 @@ catch (e) { const m = {}; Object.defineProperty(window, 'localStorage', { value:
         updateMenuScores();
         initReadSelect();
         initWriteSelect();
+        {   // Nhãn quảng cáo lấy từ dữ liệu thật, không ghi cứng
+            const lv = Object.keys(n5LevelsData).length;
+            const tot = Object.values(n5LevelsData).reduce((t, a) => t + a.length, 0);
+            const wr = Object.values(n5KanjiWriteData).reduce((t, a) => t + a.length, 0);
+            const b = document.querySelector('.badge-edition'), g = document.querySelector('.game-subtitle');
+            if (b) b.textContent = `${lv} Bài · N5 + N4`;
+            if (g) g.textContent = `Ôn luyện ${tot} mục Kanji N5 + N4 · Luyện viết: ${wr} chữ N5`;
+        }
 
         const kanjiList = ['日', '月', '火', '水', '木', '金', '土', '山', '川', '漢', '字', '学'];
         const container = document.getElementById('floating-kanji');
@@ -2417,9 +2508,9 @@ const KZ = (function () {
     }
     K.resetZ = function () { K.maxHP = 100; K.boss = false; paint(0); };
     K.spawnZ = function (kills) {
-        if (K.boss) K.addXp(40);
+        if (K.boss) K.addXp(75);
         K.boss = bossNext(kills);
-        K.maxHP = K.boss ? 160 : 100; readZombieHP = K.maxHP; paint(kills);
+        K.maxHP = K.boss ? Math.min(340, 160 + 6 * kills) : Math.min(190, 100 + 3 * kills); readZombieHP = K.maxHP; paint(kills);
         if (K.boss) {
             const d = document.createElement('div'); d.className = 'kz-toast boss'; d.textContent = '⚠️ BOSS XUẤT HIỆN!';
             document.body.appendChild(d); setTimeout(() => d.remove(), 1800); playSound('boss');
@@ -2496,7 +2587,7 @@ const KZ = (function () {
     const lvl = () => { try { return Math.floor(Math.sqrt(JSON.parse(localStorage.getItem('kz_save_v2')).xp / 40)) + 1; } catch (e) { return 1; } };
     const pts = () => lvl() - 1 - x.pw - x.sc - x.ks - x.cm - x.tf;
     const toast = (t, c) => { const d = document.createElement('div'); d.className = 'kz-toast ' + (c || ''); d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); };
-    K.dmgBonus = () => x.pw * 3 + (typeof timeLeft !== 'undefined' && timeLeft >= 7 ? x.cm * 6 : 0);
+    K.dmgBonus = () => x.pw * 2 + (typeof timeLeft !== 'undefined' && timeLeft >= 7 ? x.cm * 4 : 0);
     K.sk = k => x[k] || 0;
 
     // kỹ năng Học giả: +10% XP mỗi cấp
@@ -2550,17 +2641,17 @@ const KZ = (function () {
     }
 
     // bảng kỹ năng / nhiệm vụ
-    K.rpgUp = function (k) { if (pts() > 0 && x[k] < 5) { x[k]++; sv(); K.rpg(true); } };
+    K.rpgUp = function (k) { if (pts() > 0 && x[k] < (k === 'ks' || k === 'tf' ? 3 : 5)) { x[k]++; sv(); K.rpg(true); } };
     K.rpgClose = function () { K.panel = false; K.paused = document.hidden; $('kz-rpg').classList.remove('on'); };
     K.rpg = function (keep) {
         roll();
         let ov = $('kz-rpg');
         if (!ov) { ov = document.createElement('div'); ov.id = 'kz-rpg'; ov.className = 'kz-ov'; ov.innerHTML = '<div class="kz-box"></div>'; document.body.appendChild(ov); }
-        const sk = (k, n, d) => '<div class="kz-sk"><span style="flex:1">' + n + ' Lv ' + x[k] + '/5<br><small style="font-weight:600;color:#a7f3d0">' + d + '</small></span>' +
-            (pts() > 0 && x[k] < 5 ? '<button onclick="KZ.rpgUp(\'' + k + '\')">+</button>' : '') + '</div>';
+        const sk = (k, n, d) => '<div class="kz-sk"><span style="flex:1">' + n + ' Lv ' + x[k] + '/' + (k === 'ks' || k === 'tf' ? 3 : 5) + '<br><small style="font-weight:600;color:#a7f3d0">' + d + '</small></span>' +
+            (pts() > 0 && x[k] < (k === 'ks' || k === 'tf' ? 3 : 5) ? '<button onclick="KZ.rpgUp(\'' + k + '\')">+</button>' : '') + '</div>';
         const q = (d, t) => '<div class="kz-q' + (d ? ' done' : '') + '">' + (d ? '✅ ' : '⬜ ') + t + '</div>';
         ov.firstChild.innerHTML = '<h3>🎒 Kỹ năng & Nhiệm vụ</h3><div style="text-align:center;font-weight:800;color:#fde047">Cấp ' + lvl() + ' · Điểm kỹ năng: ' + pts() + '</div>' +
-            '<h4>⚔️ Kỹ năng</h4>' + sk('pw', '🟢 Green Shot', '+3 sát thương đạn mỗi cấp') + sk('sc', '📖 Học giả', '+10% XP mỗi cấp') + sk('ks', '🛡️ Kanji Shield', 'Đỡ 1 lần sai/trận mỗi cấp, bảo vệ combo (tối đa 3)') + sk('cm', '⚡ Critical Master', 'Trả lời nhanh (3 giây đầu): +6 sát thương mỗi cấp') + sk('tf', '❄️ Time Freeze', 'Nút ❄️ đóng băng timer 1 câu, 1 lần/trận mỗi cấp (tối đa 3)') +
+            '<h4>⚔️ Kỹ năng</h4>' + sk('pw', '🟢 Green Shot', '+2 sát thương đạn mỗi cấp') + sk('sc', '📖 Học giả', '+10% XP mỗi cấp') + sk('ks', '🛡️ Kanji Shield', 'Đỡ 1 lần sai/trận mỗi cấp, bảo vệ combo (tối đa 3)') + sk('cm', '⚡ Critical Master', 'Trả lời nhanh (3 giây đầu): +4 sát thương mỗi cấp') + sk('tf', '❄️ Time Freeze', 'Nút ❄️ đóng băng timer 1 câu, 1 lần/trận mỗi cấp (tối đa 3)') +
             '<h4>📅 Nhiệm vụ hôm nay</h4>' + q(x.q1, '20 từ đúng (' + Math.min(x.dok, 20) + '/20)') + q(x.q2, 'Diệt 3 zombie (' + Math.min(x.dkill, 3) + '/3)') +
             '<h4>🏅 Thành tựu</h4>' + ACH.map(a => q(x.ach[a[0]], a[1])).join('') +
             '<button class="kz-btn" onclick="KZ.rpgClose()">Đóng</button>';
@@ -2600,7 +2691,7 @@ const KZ = (function () {
     const oAdd = K.addXp; K.addXp = n => oAdd(Math.round(n * (1 + cur('c')[2])));
     K.sh = 0;
     K.shield = () => { if (K.sh > 0) { K.sh--; toast('🛡️ Giáp đỡ! Giữ combo (' + K.sh + ' còn lại)'); return true; } return false; };
-    const oReset = K.resetZ; K.resetZ = function () { K.sh = cur('a')[2] + Math.min(3, K.sk('ks')); K.ph = 1; oReset(); };
+    const oReset = K.resetZ; K.resetZ = function () { K.sh = Math.min(4, cur('a')[2] + Math.min(3, K.sk('ks'))); K.ph = 1; oReset(); };
 
     // boss nhiều giai đoạn
     K.ph = 1;
@@ -2612,7 +2703,7 @@ const KZ = (function () {
         const z = $('read-zombie-box'); z.classList.remove('kz-ph2', 'kz-ph3'); z.classList.add('kz-ph' + ph);
         playSound('boss'); K.setMood('boss');
         if (ph === 2) toast('⚠️ BOSS GIAI ĐOẠN 2: tức giận!', 'boss');
-        else { readZombieHP = Math.min(K.maxHP, readZombieHP + 20); $('read-hp-bar').style.width = readZombieHP / K.maxHP * 100 + '%'; toast('🔥 GIAI ĐOẠN 3: boss hồi 20 máu, cuồng nộ!', 'boss'); }
+        else { readZombieHP = Math.min(K.maxHP, readZombieHP + Math.round(K.maxHP * .1)); $('read-hp-bar').style.width = readZombieHP / K.maxHP * 100 + '%'; toast('🔥 GIAI ĐOẠN 3: boss hồi 10% máu, cuồng nộ!', 'boss'); }
     };
     const oSp = K.spawnZ;
     K.spawnZ = function (k) {
@@ -3485,5 +3576,454 @@ body.kz-st5 #peashooter-wrap svg{animation:v4st 1.8s ease-in-out infinite}
 })();
 </script>
 
+<style id="kz-v5-css">
+/* ===== V5: hiệu năng (không đổi hình ảnh) ===== */
+button, select, .btn-pad { touch-action: manipulation; }
+body { overscroll-behavior: none; -webkit-touch-callout: none; }
+.kz-par { background: none !important; animation: none !important; overflow: hidden; }
+.kz-par i { position: absolute; left: 0; bottom: 0; display: block; will-change: transform; animation: kzParX 90s linear infinite; }
+.kz-par i.l3 { width: calc(100vw + 1700px); height: 100%; background: radial-gradient(ellipse 60% 100% at 20% 100%, #0f3d33 0 60%, transparent 61%) 0 100% / 80vw 100% repeat-x; --sx: -1600px; }
+.kz-par i.l2 { width: calc(100vw + 1700px); height: 70%; background: radial-gradient(ellipse 60% 100% at 20% 100%, #064e3b 0 60%, transparent 61%) 0 100% / 55vw 100% repeat-x; --sx: -1100px; }
+.kz-par i.l1 { inset: 0; width: auto; animation: none; will-change: auto; background: linear-gradient(180deg, transparent, rgba(2,6,23,.85)); }
+@keyframes kzParX { to { transform: translate3d(var(--sx), 0, 0); } }
+.kz-aur, .kz-cl, .floating-kanji span, .kz-petal { will-change: transform; }
+.kz-playing .floating-kanji span, .kz-playing .kz-petal, .kz-playing .kz-par i { animation-play-state: paused; }
+.kz-pause #screen-read *, .kz-pause #screen-write *, .kz-pause .kz-par i, .kz-pause .floating-kanji span, .kz-pause .kz-petal { animation-play-state: paused !important; }
+.kz-calm .kz-par i { animation: none; }
+
+/* ===== V5: Hành trình (nhiệm vụ / thành tựu / bản đồ) ===== */
+#kz5-ov .kz-box { max-width: 420px; width: 94vw; max-height: 88dvh; overflow-y: auto; position: relative; }
+.k5-tabs { display: flex; gap: 6px; margin: 4px 0 10px; }
+.k5-tabs button { flex: 1; padding: 8px 4px; border-radius: 6px; border: 1px solid rgba(201,162,74,.5); background: rgba(0,0,0,.35); color: #f2deaa; font-weight: 700; font-size: 13px; cursor: pointer; }
+.k5-tabs button.on { background: linear-gradient(#1c6a63, #0f4a47); border-color: #c9a24a; }
+.k5-sec { margin: 12px 0 6px; font-size: 13px; color: #e7c87a; letter-spacing: .5px; display: flex; justify-content: space-between; }
+.k5-sec small { color: #94a3b8; font-weight: 600; }
+.k5-card { display: flex; gap: 10px; align-items: center; padding: 8px 10px; margin: 5px 0; border-radius: 10px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); font-size: 13px; }
+.k5-card.done { border-color: #4ade80; background: rgba(74,222,128,.1); }
+.k5-ic { font-size: 24px; width: 32px; text-align: center; flex: none; }
+.k5-bd { flex: 1; min-width: 0; }
+.k5-bd b { display: block; font-weight: 800; }
+.k5-bd small { color: #a7f3d0; font-weight: 600; }
+.k5-bar { height: 6px; border-radius: 9px; background: rgba(255,255,255,.14); margin-top: 5px; overflow: hidden; }
+.k5-bar i { display: block; height: 100%; width: 100%; transform-origin: left; background: linear-gradient(90deg, #f59e0b, #fde047); }
+.k5-card.done .k5-bar i { background: #4ade80; }
+.k5-xp { flex: none; font-weight: 800; color: #fde047; font-size: 12px; }
+.k5-pips { letter-spacing: 2px; color: #fbbf24; font-size: 11px; }
+.k5-map { width: 100%; display: block; border-radius: 12px; border: 1px solid rgba(201,162,74,.5); background: #07161f; }
+.k5-node { cursor: pointer; }
+.k5-pulse { transform-box: fill-box; transform-origin: center; animation: k5p 1.6s ease-out infinite; }
+@keyframes k5p { from { transform: scale(.7); opacity: .9; } to { transform: scale(1.8); opacity: 0; } }
+.k5-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.k5-chip { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.07); color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
+.k5-chip.c { border-color: #4ade80; background: rgba(74,222,128,.18); }
+.k5-chip.v { border-color: #fbbf24; }
+.k5-b { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 58px); z-index: 1100; transform: translate3d(-50%, -140%, 0); display: flex; gap: 10px; align-items: center; padding: 10px 16px; border-radius: 14px; max-width: 92vw; color: #fff; font-weight: 800; font-size: 13px; background: linear-gradient(135deg, #854d0e, #ca8a04); border: 1px solid #fde047; pointer-events: none; will-change: transform; }
+.k5-b.quest { background: linear-gradient(135deg, #14532d, #16a34a); border-color: #86efac; }
+.k5-b.zone { background: linear-gradient(135deg, #1e3a8a, #2563eb); border-color: #93c5fd; }
+.k5-b span { font-size: 24px; }
+.k5-b small { display: block; font-weight: 600; opacity: .9; }
+</style>
+<script>
+(function () {
+    const K = KZ, F = window.KZFX, B = document.body;
+    // Thanh song song: cây đổ "kz-par" thành 3 lớp transform (GPU) thay vì animate background-position (repaint mỗi frame)
+    const par = document.querySelector('.kz-par');
+    if (par) par.innerHTML = '<i class="l3"></i><i class="l2"></i><i class="l1"></i>';
+    // Tạm dừng animation khi mở bảng / ẩn tab / đang chơi (nền menu)
+    setInterval(() => { B.classList.toggle('kz-pause', !!(K.paused || document.hidden)); }, 250);
+    // Chế độ chơi: dừng hiệu ứng nền chỉ dành cho menu
+    const oO = window.openMode;
+    window.openMode = function (m) { oO(m); B.classList.toggle('kz-playing', m !== 'menu'); if (m !== 'menu') govern(); };
+    // Bộ điều tốc: chỉ giảm độ dày vệt đạn/hạt khi FPS tụt kéo dài; không đụng độ phân giải/đồ họa
+    let on = false;
+    function govern() {
+        if (on) return; on = true;
+        let last = performance.now(), acc = 0, n = 0, bad = 0, good = 0;
+        (function loop(t) {
+            const dt = t - last; last = t;
+            if (!B.classList.contains('kz-playing')) { on = false; return; }
+            if (!K.paused && !document.hidden && dt < 200) {
+                acc += dt; n++;
+                if (acc >= 2000) {
+                    const avg = acc / n;
+                    if (avg > 26) { bad++; good = 0; } else if (avg < 19) { good++; bad = 0; } else bad = good = 0;
+                    if (bad >= 2 && F.k > .5) { F.k = Math.max(.5, F.k - .25); bad = 0; }
+                    if (good >= 4 && F.k < 1) { F.k = Math.min(1, F.k + .25); good = 0; }
+                    acc = n = 0;
+                }
+            } else { acc = n = 0; }
+            requestAnimationFrame(loop);
+        })(last);
+    }
+})();
+</script>
+<script>
+(function () {
+    const K = KZ;
+    let C = null, nbuf = null, active = 0;
+    const last = {}, PREF = 'kz_v5_audio';
+    let hap = true; try { hap = JSON.parse(localStorage.getItem(PREF)).hap !== false; } catch (e) {}
+
+    // ---- chuỗi master: bus -> (bgm: lowpass -> duck) -> master -> compressor -> out; sfx gửi thêm vào reverb ----
+    function impulse(ctx, sec, decay) {
+        const n = ctx.sampleRate * sec | 0, b = ctx.createBuffer(2, n, ctx.sampleRate);
+        for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, decay); }
+        return b;
+    }
+    function chain() {
+        if (!audioCtx) return null;
+        if (C && C.ctx === audioCtx) return C;
+        const ctx = audioCtx, comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = -14; comp.knee.value = 18; comp.ratio.value = 4; comp.attack.value = .004; comp.release.value = .2;
+        const master = ctx.createGain(); master.gain.value = .9; master.connect(comp); comp.connect(ctx.destination);
+        const conv = ctx.createConvolver(); conv.buffer = impulse(ctx, 1.4, 2.6);
+        const wet = ctx.createGain(); wet.gain.value = .2; conv.connect(wet); wet.connect(master);
+        const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 20000;
+        const duck = ctx.createGain(); lp.connect(duck); duck.connect(master);
+        nbuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+        const nd = nbuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+        C = { ctx, master, conv, lp, duck };
+        return C;
+    }
+    const og = window.getBus;
+    window.getBus = function (n) {
+        const b = og(n), c = chain();
+        if (c && !c.wired) {
+            c.wired = true;
+            const bgm = og('bgm'), sfx = og('sfx'), amb = og('amb');
+            [bgm, sfx, amb].forEach(x => x.disconnect());
+            bgm.connect(c.lp); sfx.connect(c.master); sfx.connect(c.conv); amb.connect(c.master);
+            c.ctx.onstatechange = () => { if (c.ctx.state !== 'running') unlockOnce = false; };
+        }
+        return b;
+    };
+
+    // ---- khóa âm thanh trên iOS/Android: mở ở lần chạm đầu và sau khi bị ngắt ----
+    let unlockOnce = false;
+    function unlock() {
+        try {
+            ensureAudioCtx();
+            if (audioCtx && audioCtx.state === 'running' && unlockOnce) return;
+            if (audioCtx) { const s = audioCtx.createBufferSource(); s.buffer = audioCtx.createBuffer(1, 1, 22050); s.connect(audioCtx.destination); s.start(0); unlockOnce = true; }
+        } catch (e) {}
+    }
+    ['pointerdown', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, unlock, { passive: true }));
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => {}); });
+
+    // nhạc nền bị "đục" khi tạm dừng / mở bảng
+    setInterval(() => { if (C && C.ctx === audioCtx) C.lp.frequency.setTargetAtTime(K.paused ? 700 : 20000, audioCtx.currentTime, .12); }, 250);
+
+    // ---- công cụ tổng hợp ----
+    const R = () => 1 + (Math.random() - .5) * .08;       // ±4% pitch
+    const V = () => .9 + Math.random() * .1;              // volume ngẫu nhiên nhẹ
+    function dest(pan) {
+        const out = getBus('sfx');
+        if (pan && audioCtx.createStereoPanner) { const p = audioCtx.createStereoPanner(); p.pan.value = pan; p.connect(out); return p; }
+        return out;
+    }
+    function osc(type, f, t, d, v, o) {
+        o = o || {};
+        const ctx = audioCtx, os = ctx.createOscillator(), g = ctx.createGain(), at = o.a || .004;
+        os.type = type; os.frequency.setValueAtTime(f, t); if (o.to) os.frequency.exponentialRampToValueAtTime(o.to, t + d);
+        if (o.det) os.detune.value = o.det;
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + at); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+        let n = os; if (o.lp) { const f2 = ctx.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = o.lp; os.connect(f2); n = f2; }
+        n.connect(g); g.connect(dest(o.pan)); os.start(t); os.stop(t + d + .03); active++; os.onended = () => active--;
+    }
+    function noise(t, d, v, o) {
+        o = o || {};
+        const ctx = audioCtx, s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+        s.buffer = nbuf; f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f || 1000, t); if (o.to) f.frequency.exponentialRampToValueAtTime(o.to, t + d); f.Q.value = o.q || 1;
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + (o.a || .005)); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+        s.connect(f); f.connect(g); g.connect(dest(o.pan)); s.start(t, Math.random() * .5); s.stop(t + d + .03); active++; s.onended = () => active--;
+    }
+    function duck(level, hold) {
+        const t = audioCtx.currentTime, g = C.duck.gain;
+        g.cancelScheduledValues(t); g.setTargetAtTime(level, t, .015); g.setTargetAtTime(1, t + hold, .25);
+    }
+    const vib = p => { try { if (hap && navigator.vibrate && !document.body.classList.contains('kz-calm')) navigator.vibrate(p); } catch (e) {} };
+
+    const S = {
+        click: t => { osc('sine', 1500 * R(), t, .035, .05, { to: 900 }); },
+        shoot: t => { osc('triangle', 520 * R(), t, .12, .16 * V(), { to: 140 }); noise(t, .1, .07, { f: 2800, to: 800, q: .8 }); },
+        hit: (t, c) => {
+            osc('sine', (c ? 190 : 150) * R(), t, .17, .3 * V(), { to: 48 }); noise(t, .08, c ? .2 : .12, { type: 'lowpass', f: 2200, to: 400 });
+            if (c) { osc('square', 1200 * R(), t, .12, .06, { to: 600, lp: 3000 }); osc('sine', 70, t, .3, .28, { to: 40 }); duck(.7, .12); vib([16, 20, 24]); } else vib(10);
+        },
+        ok: t => { const r = R(); osc('sine', 784 * r, t, .22, .11 * V()); osc('sine', 1175 * r, t, .22, .06); osc('sine', 1047 * r, t + .07, .3, .11 * V()); osc('sine', 1568 * r, t + .07, .3, .05); },
+        wrong: t => { osc('square', 160 * R(), t, .22, .08, { to: 110, lp: 900 }); osc('sawtooth', 166, t, .22, .06, { to: 105, lp: 800 }); vib(30); },
+        combo: t => { [523, 659, 784, 1047, 1319].forEach((f, i) => osc('triangle', f * R(), t + i * .055, .18, .12, {})); noise(t + .15, .3, .04, { type: 'highpass', f: 6000 }); duck(.7, .3); },
+        levelup: t => { [523, 659, 784].forEach((f, i) => { osc('triangle', f, t + i * .1, .25, .13); osc('sine', f * 2, t + i * .1, .25, .04); }); osc('triangle', 1047, t + .32, .6, .14); osc('sine', 1047, t + .32, .6, .1, { det: 8 }); duck(.5, .6); vib([20, 40, 20]); },
+        boss: t => { osc('sawtooth', 72, t, .9, .22, { to: 44, lp: 500 }); osc('square', 54, t + .12, .7, .12, { to: 38, lp: 400 }); noise(t, .8, .1, { type: 'lowpass', f: 300, to: 90 }); [0, .28, .56].forEach(d => osc('sine', 90, t + d, .25, .3, { to: 40 })); duck(.35, .9); vib([40, 30, 60]); },
+        cast: t => { osc('sine', 320, t, .28, .2, { to: 980 }); osc('triangle', 640, t, .28, .06, { to: 1960 }); noise(t, .25, .05, { type: 'highpass', f: 5000 }); },
+        fail: t => { osc('sawtooth', 210 * R(), t, .45, .18, { to: 80, lp: 1200 }); vib(30); },
+        gameover: t => { osc('sawtooth', 220, t, .8, .2, { to: 70, lp: 1000 }); osc('sawtooth', 185, t + .1, .8, .12, { to: 58, lp: 900 }); osc('sine', 55, t + .3, 1, .2, { to: 40 }); duck(.3, 1); vib([60, 40, 80]); },
+        zdie: t => { osc('sawtooth', 150, t, .55, .12, { to: 55, lp: 700 }); osc('sawtooth', 156, t, .55, .08, { to: 52, lp: 600 }); noise(t, .5, .08, { f: 700, to: 250, q: 2 }); noise(t + .35, .12, .06, { type: 'lowpass', f: 900 }); },
+        zspawn: t => { osc('sawtooth', 100 * R(), t, .35, .07, { to: 70, lp: 500 }); noise(t, .3, .04, { f: 500, to: 300, q: 2 }); },
+        ach: t => { [880, 1175, 1568, 2093].forEach((f, i) => { osc('sine', f, t + i * .07, .5, .1); osc('sine', f * 2.76, t + i * .07, .3, .03); }); noise(t + .2, .4, .03, { type: 'highpass', f: 7000 }); duck(.6, .7); vib(25); },
+        quest: t => { [659, 880, 1319].forEach((f, i) => osc('triangle', f, t + i * .09, .3, .12)); noise(t, .18, .05, { type: 'highpass', f: 4500 }); noise(t + .1, .18, .05, { type: 'highpass', f: 4500 }); duck(.7, .45); },
+        map: t => { noise(t, .3, .08, { f: 400, to: 2400, q: 1.2 }); osc('triangle', 392, t + .12, .35, .1); osc('triangle', 587, t + .2, .35, .08); }
+    };
+    const MIN = { shoot: 60, hit: 40, click: 30, zspawn: 120 };
+    const prev = window.playSound;
+    window.playSound = function (type, crit) {
+        try {
+            if (type === 'cast' && K.emit) K.emit('writeOk'); else if (type === 'fail' && K.emit) K.emit('writeNg'); else if (type === 'hit' && crit && K.emit) K.emit('crit');
+        } catch (e) {}
+        if (!soundEnabled) return;
+        try { ensureAudioCtx(); } catch (e) {}
+        if (!audioCtx) return prev(type, crit);
+        if (S[type]) {
+            try {
+                if (audioCtx.state !== 'running') return;
+                chain(); getBus('sfx');
+                const now = performance.now();
+                if (last[type] && now - last[type] < (MIN[type] || 0)) return;
+                last[type] = now;
+                if (active > 26 && type !== 'boss' && type !== 'levelup') return;
+                S[type](audioCtx.currentTime + .005, crit);
+            } catch (e) {}
+            return;
+        }
+        prev(type, crit);
+    };
+    // tiếng zombie ngã & xuất hiện
+    const oS = K.spawnZ;
+    K.spawnZ = function (k) { const was = K.boss; oS(k); try { playSound('zdie'); if (!K.boss && !was) setTimeout(() => playSound('zspawn'), 450); } catch (e) {} };
+    K.sfx = (t, c) => playSound(t, c);
+
+    // công tắc rung trong Cài đặt
+    document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
+        const box = document.getElementById('kz-set'), first = box && box.querySelector('.kz-btn');
+        if (!first) return;
+        const r = document.createElement('div'); r.className = 'kz-row';
+        r.innerHTML = '<label><input type="checkbox" id="kz-hap-chk"' + (hap ? ' checked' : '') + '> 📳 Rung khi đánh trúng (Android)</label>';
+        first.insertAdjacentElement('beforebegin', r);
+        r.addEventListener('change', e => { hap = e.target.checked; try { localStorage.setItem(PREF, JSON.stringify({ hap })); } catch (x) {} });
+    }, 100));
+})();
+</script>
+<script>
+(function () {
+    const K = KZ, $ = id => document.getElementById(id), KEY = 'kz_v5';
+    const J = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+    const p2 = n => (n < 10 ? '0' : '') + n;
+    const ymd = (d = new Date()) => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+    const week = () => { const d = new Date(); d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7); const y = d.getFullYear(), j = new Date(y, 0, 4); return y + '-W' + p2(1 + Math.round(((d - j) / 864e5 - 3 + (j.getDay() + 6) % 7) / 7)); };
+    function rng(seed) { let h = 1779033703 ^ seed.length; for (let i = 0; i < seed.length; i++) { h = Math.imul(h ^ seed.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; } return () => { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
+
+    // ================= DỮ LIỆU (thêm nhiệm vụ / thành tựu / vùng chỉ cần thêm dòng) =================
+    const DAILY = [
+        { id: 'ok', ic: '✅', t: 'Trả lời đúng {n} từ', ev: 'ok', n: [15, 25, 40], xp: 40 },
+        { id: 'kill', ic: '🧟', t: 'Hạ {n} zombie', ev: 'kill', n: [3, 5, 8], xp: 45 },
+        { id: 'combo', ic: '🔥', t: 'Đạt combo x{n}', ev: 'combo', max: 1, n: [5, 8, 12], xp: 50 },
+        { id: 'write', ic: '✍️', t: 'Viết đúng {n} chữ Kanji', ev: 'writeOk', n: [3, 5, 8], xp: 50 },
+        { id: 'crit', ic: '⚡', t: 'Tung {n} đòn CRIT', ev: 'crit', n: [3, 5, 8], xp: 40 },
+        { id: 'level', ic: '🏁', t: 'Hoàn thành {n} bài', ev: 'levelDone', n: [1, 2, 3], xp: 60 },
+        { id: 'boss', ic: '👹', t: 'Hạ {n} boss', ev: 'boss', n: [1, 1, 2], xp: 70 }
+    ];
+    const WEEKLY = [
+        { id: 'wok', ic: '📚', t: 'Trả lời đúng {n} từ', ev: 'ok', n: [120, 180, 250], xp: 150 },
+        { id: 'wkill', ic: '🧟', t: 'Hạ {n} zombie', ev: 'kill', n: [30, 45, 60], xp: 150 },
+        { id: 'wlevel', ic: '🏁', t: 'Hoàn thành {n} bài', ev: 'levelDone', n: [4, 6, 8], xp: 180 },
+        { id: 'wboss', ic: '👹', t: 'Hạ {n} boss', ev: 'boss', n: [3, 5, 7], xp: 200 }
+    ];
+    const ZONES = [
+        { id: 'garden', n: 'Vườn Sakura', ic: '🌸', lv: [1, 5], x: 70, y: 385, c: '#f472b6' },
+        { id: 'forest', n: 'Rừng Tre', ic: '🎋', lv: [6, 10], x: 245, y: 315, c: '#34d399' },
+        { id: 'battle', n: 'Chiến Trường', ic: '🔥', lv: [11, 15], x: 80, y: 240, c: '#fb923c' },
+        { id: 'epic', n: 'Thiên Đỉnh', ic: '🌌', lv: [16, 20], x: 240, y: 165, c: '#a78bfa' },
+        { id: 'n4', n: 'Miền N4', ic: '🏯', lv: [21, 30], x: 85, y: 95, c: '#60a5fa' },
+        { id: 'blood', n: 'Vô Tận', ic: '💀', lv: [31, 31], x: 235, y: 38, c: '#ef4444' }
+    ];
+    const ACH = [
+        { id: 'ok', ic: '📚', n: 'Học giả', d: 'Trả lời đúng {n} từ', s: 'ok', t: [100, 300, 800, 2000] },
+        { id: 'kill', ic: '🧟', n: 'Thợ săn zombie', d: 'Hạ {n} zombie', s: 'kill', t: [10, 50, 200, 600] },
+        { id: 'boss', ic: '👹', n: 'Diệt trùm', d: 'Hạ {n} boss', s: 'boss', t: [1, 5, 15, 40] },
+        { id: 'combo', ic: '🔥', n: 'Chuỗi bất bại', d: 'Đạt combo x{n}', s: 'combo', t: [10, 20, 35] },
+        { id: 'crit', ic: '⚡', n: 'Xạ thủ chí mạng', d: 'Tung {n} đòn CRIT', s: 'crit', t: [10, 50, 200] },
+        { id: 'write', ic: '✍️', n: 'Bút lông', d: 'Viết đúng {n} chữ Kanji', s: 'writeOk', t: [10, 50, 150, 400] },
+        { id: 'level', ic: '🏁', n: 'Người leo núi', d: 'Hoàn thành {n} bài', s: 'levels', t: [1, 5, 15, 30] },
+        { id: 'zone', ic: '🗺️', n: 'Nhà thám hiểm', d: 'Khám phá {n} vùng đất', s: 'zones', t: [2, 4, 6] },
+        { id: 'streak', ic: '📆', n: 'Kiên trì', d: 'Học liên tiếp {n} ngày', s: 'maxStreak', t: [3, 7, 14, 30] },
+        { id: 'play', ic: '🎮', n: 'Chăm chỉ', d: 'Chơi {n} lượt', s: 'plays', t: [10, 50, 200] }
+    ];
+    const LEGACY = [['kill1', '🧟 Hạ zombie đầu tiên'], ['combo10', '🔥 Combo x10'], ['boss1', '👹 Hạ boss đầu tiên'], ['ok50', '📚 Đúng 50 từ'], ['ok200', '🎓 Đúng 200 từ'], ['lv5', '⭐ Đạt cấp 5']];
+    const ROM = ['I', 'II', 'III', 'IV'];
+
+    // ================= TRẠNG THÁI =================
+    const fresh = !localStorage.getItem(KEY);
+    let S = Object.assign({ st: {}, vis: {}, clr: {}, ach: {}, day: '', dq: [], dbonus: 0, wk: '', wq: [], zq: {}, last: '', streak: 0 }, J(KEY, {}));
+    const sv = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+    const st = k => S.st[k] || 0;
+    const lvOK = l => l === 31 || (typeof n5LevelsData !== 'undefined' && n5LevelsData[l] && n5LevelsData[l].length);
+    const zlv = z => { const a = []; for (let l = z.lv[0]; l <= z.lv[1]; l++) if (lvOK(l)) a.push(l); return a; };
+    const zoneOf = l => ZONES.find(z => l >= z.lv[0] && l <= z.lv[1]);
+    const zDisc = z => zlv(z).some(l => S.vis[l]);
+    const zClr = z => zlv(z).filter(l => S.clr[l]).length;
+    const stat = k => k === 'levels' ? Object.keys(S.clr).length : k === 'zones' ? ZONES.filter(zDisc).length : st(k);
+
+    if (fresh) { // nhập tiến độ cũ (ước lượng) để người chơi không bị mất công
+        const x = J('kz_extra_v1', {}), last = parseInt(localStorage.getItem('kz_last') || '1', 10) || 1;
+        S.st.ok = x.ok || 0; S.st.kill = x.kill || 0; S.st.boss = x.boss || 0; S.st.combo = x.maxc || 0;
+        for (let l = 1; l <= Math.min(last, 31); l++) if (lvOK(l)) { S.vis[l] = 1; if (l < last && l <= 30) S.clr[l] = 1; }
+    }
+
+    // ================= BANNER =================
+    const queue = []; let busy = false;
+    function banner(ic, t, sub, cls) { queue.push([ic, t, sub, cls]); if (!busy) next(); }
+    function next() {
+        const q = queue.shift(); if (!q) { busy = false; return; } busy = true;
+        const d = document.createElement('div'); d.className = 'k5-b ' + (q[3] || '');
+        d.innerHTML = '<span>' + q[0] + '</span><div>' + q[1] + (q[2] ? '<small>' + q[2] + '</small>' : '') + '</div>'; document.body.appendChild(d);
+        const a = d.animate([{ transform: 'translate3d(-50%,-140%,0)', opacity: 0 }, { transform: 'translate3d(-50%,0,0)', opacity: 1, offset: .12 }, { transform: 'translate3d(-50%,0,0)', opacity: 1, offset: .85 }, { transform: 'translate3d(-50%,-140%,0)', opacity: 0 }], { duration: 2600, fill: 'forwards' });
+        a.onfinish = () => { d.remove(); next(); };
+    }
+    const snd = t => { try { playSound(t); } catch (e) {} };
+
+    // ================= NHIỆM VỤ =================
+    function make(def, rnd) { const i = Math.min(2, rnd() * 3 | 0); return { id: def.id, n: def.n[i], xp: def.xp + i * 10, p: 0, d: 0 }; }
+    function pick(pool, k, seed) { const r = rng(seed), a = pool.slice(); for (let i = a.length - 1; i > 0; i--) { const j = r() * (i + 1) | 0;[a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, k).map(d => make(d, r)); }
+    function roll() {
+        let ch = 0;
+        if (S.day !== ymd()) {
+            const y = new Date(); y.setDate(y.getDate() - 1);
+            S.streak = S.last === ymd(y) ? S.streak + 1 : 1; S.last = ymd(); S.st.days = st('days') + 1; S.st.maxStreak = Math.max(st('maxStreak'), S.streak);
+            S.day = ymd(); S.dq = pick(DAILY, 3, 'd' + S.day); S.dbonus = 0; ch = 1;
+        }
+        if (S.wk !== week()) { S.wk = week(); S.wq = pick(WEEKLY, 2, 'w' + S.wk); ch = 1; }
+        if (ch) sv();
+    }
+    const defOf = id => DAILY.concat(WEEKLY).find(d => d.id === id);
+    function give(n, ic, title, sub, cls, sfx) { K.addXp(n); banner(ic, title, sub, cls); snd(sfx); }
+    function emit(ev, v) {
+        roll();
+        [].concat(S.dq, S.wq).forEach(q => {
+            const d = defOf(q.id); if (!d || d.ev !== ev || q.d) return;
+            q.p = d.max ? Math.max(q.p, v || 1) : q.p + (v || 1);
+            if (q.p >= q.n) { q.p = q.n; q.d = 1; give(q.xp, d.ic, 'Hoàn thành nhiệm vụ!', d.t.replace('{n}', q.n) + ' · +' + q.xp + ' XP', 'quest', 'quest'); }
+        });
+        if (!S.dbonus && S.dq.length && S.dq.every(q => q.d)) { S.dbonus = 1; give(60, '🎁', 'Xong cả 3 nhiệm vụ hôm nay!', '+60 XP thưởng', 'quest', 'quest'); }
+        sv(); checkAch(); checkZones();
+    }
+    K.emit = emit;
+    function checkZones() {
+        ZONES.forEach(z => { const L = zlv(z); if (!S.zq[z.id] && L.length && L.every(l => S.clr[l])) { S.zq[z.id] = 1; sv(); give(150, z.ic, 'Chinh phục ' + z.n + '!', '+150 XP', 'zone', 'ach'); } });
+    }
+    function checkAch(silent) {
+        ACH.forEach(a => {
+            const v = stat(a.s); let t = S.ach[a.id] || 0;
+            while (t < a.t.length && v >= a.t[t]) {
+                t++; S.ach[a.id] = t;
+                if (!silent) give(25 * t, a.ic, 'Thành tựu: ' + a.n + ' ' + ROM[t - 1], a.d.replace('{n}', a.t[t - 1]) + ' · +' + 25 * t + ' XP', '', 'ach');
+            }
+        });
+        sv();
+    }
+
+    // ================= MÓC VÀO GAME =================
+    const oRec = K.rec;
+    K.rec = function (q, ok) {
+        oRec(q, ok); if (!q) return;
+        if (ok) { S.st.ok = st('ok') + 1; const c = (typeof readCombo !== 'undefined' ? readCombo : 0) + 1; S.st.combo = Math.max(st('combo'), c); emit('ok'); emit('combo', c); }
+        else { S.st.ng = st('ng') + 1; sv(); }
+    };
+    const oSp = K.spawnZ;
+    K.spawnZ = function (k) { const was = K.boss; oSp(k); S.st.kill = st('kill') + 1; if (was) S.st.boss = st('boss') + 1; emit('kill'); if (was) emit('boss'); };
+    K.on = null;
+    const oW = { writeOk: 'writeOk', crit: 'crit' };
+    const oEmit = emit;
+    K.emit = function (ev, v) { if (oW[ev]) S.st[ev] = st(ev) + 1; oEmit(ev, v); };
+    const oNext = window.spawnNextReadQ;
+    window.spawnNextReadQ = function () {
+        const done = typeof readQueue !== 'undefined' && readQueue.length > 0 && readIdx >= readQueue.length && !K.review && !K.listen, old = typeof readLevel === 'number' ? readLevel : 0;
+        oNext();
+        if (done && old >= 1 && old <= 30) { S.clr[old] = 1; S.st.levels = Object.keys(S.clr).length; sv(); emit('levelDone'); banner('🏁', 'Hoàn thành Bài ' + (old > 20 ? 'N4 ' + (old - 20) : old), '', 'zone'); }
+    };
+    const oHint = K.hint;
+    K.hint = function (q) {
+        oHint(q);
+        if (!K.review && !K.listen && typeof readLevel === 'number' && lvOK(readLevel) && !S.vis[readLevel]) {
+            const z = zoneOf(readLevel), isNew = z && !zDisc(z); S.vis[readLevel] = 1; sv();
+            if (isNew) { banner(z.ic, 'Khu vực mới: ' + z.n, '+20 XP', 'zone'); snd('map'); K.addXp(20); }
+            checkAch();
+        }
+    };
+    const oOpen = window.openMode;
+    window.openMode = function (m) { oOpen(m); if (m !== 'menu') { S.st.plays = st('plays') + 1; emit('play'); } };
+
+    // ================= GIAO DIỆN =================
+    let tab = 'q', selZ = null;
+    const bar = (p, n, d) => '<div class="k5-bar"><i style="transform:scaleX(' + Math.max(.02, Math.min(1, p / n)) + ')"></i></div>';
+    function leftTxt() { const n = new Date(), m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1) - n; return Math.floor(m / 36e5) + 'h' + p2(Math.floor(m % 36e5 / 6e4)) + 'p'; }
+    function qRow(q) { const d = defOf(q.id); return '<div class="k5-card' + (q.d ? ' done' : '') + '"><div class="k5-ic">' + d.ic + '</div><div class="k5-bd"><b>' + d.t.replace('{n}', q.n) + '</b><small>' + q.p + ' / ' + q.n + '</small>' + bar(q.p, q.n) + '</div><div class="k5-xp">' + (q.d ? '✅' : '+' + q.xp) + '</div></div>'; }
+    function tabQ() {
+        roll(); const x = J('kz_extra_v1', {}), td = x.day === new Date().toISOString().slice(0, 10);
+        let h = '<div class="k5-sec"><span>📅 Hôm nay</span><small>🔥 Chuỗi ' + S.streak + ' ngày · làm mới sau ' + leftTxt() + '</small></div>' + S.dq.map(qRow).join('') +
+            '<div class="k5-sec"><span>📆 Tuần này</span></div>' + S.wq.map(qRow).join('') +
+            '<div class="k5-sec"><span>🧭 Hành trình</span><small>chinh phục từng vùng</small></div>' +
+            ZONES.map(z => { const L = zlv(z), c = zClr(z), d = !!S.zq[z.id]; return '<div class="k5-card' + (d ? ' done' : '') + '"><div class="k5-ic">' + z.ic + '</div><div class="k5-bd"><b>Chinh phục ' + z.n + '</b><small>' + c + ' / ' + L.length + ' bài</small>' + bar(c, L.length) + '</div><div class="k5-xp">' + (d ? '✅' : '+150') + '</div></div>'; }).join('') +
+            '<div class="k5-sec"><span>📌 Nhiệm vụ cơ bản</span></div>' +
+            '<div class="k5-card' + (td && x.q1 ? ' done' : '') + '"><div class="k5-ic">✅</div><div class="k5-bd"><b>20 từ đúng</b><small>' + (td ? Math.min(x.dok || 0, 20) : 0) + ' / 20</small></div><div class="k5-xp">' + (td && x.q1 ? '✅' : '+50') + '</div></div>' +
+            '<div class="k5-card' + (td && x.q2 ? ' done' : '') + '"><div class="k5-ic">🧟</div><div class="k5-bd"><b>Diệt 3 zombie</b><small>' + (td ? Math.min(x.dkill || 0, 3) : 0) + ' / 3</small></div><div class="k5-xp">' + (td && x.q2 ? '✅' : '+50') + '</div></div>';
+        return h;
+    }
+    function tabA() {
+        const lx = J('kz_extra_v1', {}).ach || {}; let tot = 0, got = 0;
+        let h = ACH.map(a => {
+            const t = S.ach[a.id] || 0, v = stat(a.s), full = t >= a.t.length, nx = a.t[Math.min(t, a.t.length - 1)]; tot += a.t.length; got += t;
+            return '<div class="k5-card' + (full ? ' done' : '') + '"><div class="k5-ic">' + a.ic + '</div><div class="k5-bd"><b>' + a.n + (t ? ' ' + ROM[t - 1] : '') + '</b><small>' + a.d.replace('{n}', nx) + ' · ' + Math.min(v, nx) + '/' + nx + '</small>' + bar(Math.min(v, nx), nx) + '</div><div class="k5-pips">' + a.t.map((_, i) => i < t ? '●' : '○').join('') + '</div></div>';
+        }).join('');
+        h += '<div class="k5-sec"><span>🎖️ Khởi đầu</span></div>' + LEGACY.map(a => '<div class="k5-card' + (lx[a[0]] ? ' done' : '') + '"><div class="k5-bd"><b>' + a[1] + '</b></div><div class="k5-xp">' + (lx[a[0]] ? '✅' : '⬜') + '</div></div>').join('');
+        return '<div class="k5-sec"><span>🏅 Đã mở ' + got + ' / ' + tot + ' bậc</span></div>' + h;
+    }
+    function tabM() {
+        const cur = zoneOf(parseInt(localStorage.getItem('kz_last') || '1', 10) || 1) || ZONES[0]; if (!selZ) selZ = cur.id;
+        const sz = ZONES.find(z => z.id === selZ);
+        let svg = '<svg class="k5-map" viewBox="0 0 320 440"><defs><linearGradient id="k5g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1b3a"/><stop offset="1" stop-color="#0f3d33"/></linearGradient><filter id="k5f" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter></defs>' +
+            '<rect width="320" height="440" fill="url(#k5g)"/><path d="M0 440 L0 330 Q80 300 120 350 T240 330 Q300 300 320 340 L320 440Z" fill="#064e3b" opacity=".6"/>' +
+            '<path d="M70 385 C70 345 245 355 245 315 S80 280 80 240 S240 205 240 165 S85 135 85 95 S235 75 235 38" fill="none" stroke="#c9a24a" stroke-width="3" stroke-dasharray="6 7" opacity=".7"/>';
+        ZONES.forEach((z, i) => {
+            const d = zDisc(z), c = zClr(z) === zlv(z).length && d, hint = !d && i > 0 && zDisc(ZONES[i - 1]);
+            svg += '<g class="k5-node" onclick="KZ.j5Z(\'' + z.id + '\')">';
+            if (selZ === z.id) svg += '<circle cx="' + z.x + '" cy="' + z.y + '" r="34" fill="none" stroke="#fde047" stroke-width="2"/>';
+            if (z.id === cur.id && d) svg += '<circle class="k5-pulse" cx="' + z.x + '" cy="' + z.y + '" r="26" fill="none" stroke="' + z.c + '" stroke-width="3"/>';
+            svg += '<circle cx="' + z.x + '" cy="' + z.y + '" r="28" fill="' + (d ? z.c : '#334155') + '" opacity="' + (d ? .9 : .6) + '" stroke="' + (c ? '#4ade80' : '#c9a24a') + '" stroke-width="3"/>' +
+                '<text x="' + z.x + '" y="' + (z.y + 9) + '" text-anchor="middle" font-size="26">' + (d || hint ? z.ic : '❓') + '</text>';
+            if (!d) svg += '<g filter="url(#k5f)" opacity="' + (hint ? .55 : .9) + '"><circle cx="' + (z.x - 14) + '" cy="' + z.y + '" r="26" fill="#cbd5e1"/><circle cx="' + (z.x + 12) + '" cy="' + (z.y - 8) + '" r="24" fill="#e2e8f0"/><circle cx="' + z.x + '" cy="' + (z.y + 12) + '" r="24" fill="#cbd5e1"/></g>' + (hint ? '' : '<text x="' + z.x + '" y="' + (z.y + 9) + '" text-anchor="middle" font-size="24">❓</text>');
+            svg += '<text x="' + z.x + '" y="' + (z.y + 46) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#f2deaa">' + (d || hint ? z.n : '???') + '</text></g>';
+        });
+        svg += '</svg>';
+        const L = zlv(sz), d = zDisc(sz), nxt = L.find(l => !S.clr[l]) || L[0];
+        const chips = L.map(l => '<button class="k5-chip ' + (S.clr[l] ? 'c' : S.vis[l] ? 'v' : '') + '" onclick="KZ.j5Play(' + l + ')">' + (l === 31 ? '∞' : l > 20 ? 'N4·' + (l - 20) : l) + (S.clr[l] ? ' ✔' : '') + '</button>').join('');
+        return '<div class="k5-sec"><span>🗺️ Khám phá ' + ZONES.filter(zDisc).length + ' / ' + ZONES.length + ' vùng</span></div>' + svg +
+            '<div class="k5-sec"><span>' + (d ? sz.ic + ' ' + sz.n : '❓ Vùng chưa khám phá') + '</span><small>' + zClr(sz) + ' / ' + L.length + ' bài' + (S.zq[sz.id] ? ' · ✅ Chinh phục' : '') + '</small></div><div class="k5-chips">' + chips + '</div>' +
+            '<button class="kz-btn" onclick="KZ.j5Play(' + nxt + ')">▶ ' + (d ? 'Tiếp tục' : 'Khám phá') + ' · ' + (nxt === 31 ? 'Vô Tận' : nxt > 20 ? 'N4 Bài ' + (nxt - 20) : 'Bài ' + nxt) + '</button>';
+    }
+    function render() {
+        const ov = $('kz5-ov'); if (!ov) return;
+        const tb = [['q', '📅 Nhiệm vụ'], ['a', '🏅 Thành tựu'], ['m', '🗺️ Bản đồ']].map(t => '<button class="' + (tab === t[0] ? 'on' : '') + '" onclick="KZ.journey(\'' + t[0] + '\')">' + t[1] + '</button>').join('');
+        ov.firstChild.innerHTML = '<h3>🧭 Hành trình</h3><div class="k5-tabs">' + tb + '</div>' + (tab === 'q' ? tabQ() : tab === 'a' ? tabA() : tabM()) + '<button class="kz-btn alt" onclick="KZ.j5Close()">Đóng</button>';
+    }
+    K.journey = function (t) {
+        if (t) { if (t !== tab) snd(t === 'm' ? 'map' : 'click'); tab = t; }
+        let ov = $('kz5-ov');
+        if (!ov) { ov = document.createElement('div'); ov.id = 'kz5-ov'; ov.className = 'kz-ov'; ov.innerHTML = '<div class="kz-box"></div>'; document.body.appendChild(ov); }
+        K.panel = true; K.paused = true; render(); ov.classList.add('on');
+    };
+    K.j5Close = function () { K.panel = false; K.paused = document.hidden; $('kz5-ov').classList.remove('on'); };
+    K.j5Z = function (id) { selZ = id; snd('click'); render(); };
+    K.j5Play = function (l) { K.j5Close(); openMode('read'); setTimeout(() => jumpToReadLevel(l), 150); };
+
+    function init() {
+        roll(); if (fresh) { checkAch(true); sv(); }
+        const mk = (cls) => { const b = document.createElement('button'); b.type = 'button'; b.className = cls; return b; };
+        const dock = document.querySelector('.kz-dock');
+        if (dock) { const b = mk(''); b.innerHTML = '<span>🧭</span>Hành trình'; b.onclick = () => K.journey(); dock.appendChild(b); }
+        document.querySelectorAll('.nav-right-btns').forEach(bar => { const b = mk('btn-sound'); b.textContent = '🧭'; b.title = 'Hành trình'; b.onclick = () => K.journey(); bar.appendChild(b); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(init, 120)); else setTimeout(init, 120);
+})();
+</script>
 </body>
 </html>
